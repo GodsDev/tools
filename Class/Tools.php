@@ -1,7 +1,4 @@
 <?php
-
-namespace GodsDev\Tools;
-
 class Tools
 {
     static $LOCALE = array(
@@ -74,7 +71,7 @@ class Tools
         return $a = $b;
     }
 
-    /** Return first non-zero parameter passed to this function, or parameter #1 
+    /** Return first non-zero parameter passed to this function, or parameter #1
      * @param mixed tested value
      * @return mixed
      * For just two arguments use: $a ?: $b;
@@ -112,7 +109,7 @@ class Tools
     {
         return isset($a) && $a == $b;
     }
-    
+
     /** Shortcut for isset($a) && $a, esp. useful for long variables
      * @return bool
      */
@@ -206,10 +203,7 @@ class Tools
                 if ($message[0] == 'error') {
                     $message[0] = 'danger';
                 }
-                $result .= '<div class="alert alert-' . self::h($message[0]) . '">'
-                    . '<a href="javascript:;" onclick="this.parentNode.style.display=\'none\';" class="hide_message">'
-                    . '<span class="glyphicon glyphicon-unchecked icon-alert-' . self::h($message[0]) . '" title="×" />'
-                    . '</a>' . $message[1] . '</div>' . PHP_EOL;
+                $result .= '<div class="alert alert-dismissible alert-' . self::h($message[0]) . '">' . $message[1] . '</div>' . PHP_EOL;
             }
             unset($_SESSION['messages'][$key]);
         }
@@ -251,9 +245,9 @@ class Tools
         }
         $result .= '>' . PHP_EOL . self::htmlSelectAppend(@$options['prepend'], $default);
         foreach ((array)$values as $key => $value) {
-            $result .= htmlOption($key, $value, $default);
+            $result .= self::htmlOption($key, $value, $default);
         }
-        return $result . htmlSelectAppend(@$options['append'], $default) . '</select>' . PHP_EOL;
+        return $result . self::htmlSelectAppend(@$options['append'], $default) . '</select>' . PHP_EOL;
     }
 
     protected static function htmlSelectAppend($array, $default)
@@ -374,15 +368,12 @@ class Tools
         $options = array_merge($options, array('name' => self::h($name), 'value' => $value));
         foreach (@$options as $k => $v) {
             if (is_string($k) && !is_null($v)
-                && !self::among($k, 'before', 'between', 'after', 'table', 'flag', 'random-id', 'label-after', 'label-html', 'required', 'value')) {
-                $result .= ' ' . $k . '="' . (mb_substr($k, 0, 2)=='on' ? self::h($v) : self::h($v)) . '"';
+                && !self::among($k, 'before', 'between', 'after', 'table', 'flag', 'random-id', 'label-after', 'label-html', 'value')) {
+                $result .= ' ' . $k . ($v === true ? '' : '="' . (mb_substr($k, 0, 2)=='on' ? self::h($v) : self::h($v)) . '"');
             }
         }
         $result .= isset($options['rows'])?'>' . self::h($value) . '</textarea>' : self::wrap(self::h($value), ' value="', '"') . '/>';
         $label = self::wrap($label, '<label for="' . self::h(@$options['id']) . '">', '</label>');
-        if (@$options['required']) {
-            $result .= '<span class="required">*</span>';
-        }
         return $result = @$options['before'] . (@$options['label-after'] ? $result : $label)
             . @$options['between'] . (@$options['label-after']?$label:$result) . @$options['after'];
     }
@@ -426,6 +417,13 @@ class Tools
 
     public static function escapeIn($input)
     {
+        if (is_array($input)) {
+            $result = '';
+            foreach ($input as $item) {
+                $result .= ',"' . self::escapeSQL($item) . '"';
+            }
+            return substr($result, 1);
+        }
         preg_match_all('~([-\+]?(0x[0-9a-f]+|(0|[1-9][0-9]*)(\.[0-9]+)?(e[-\+]?[0-9]+)?)|\'(\.|[^\'])*\'|"(\.|[^"])*")~i', $input, $matches);
         return implode(',', $matches[0]);
     }
@@ -584,7 +582,7 @@ class Tools
 
     /** How much time ago $datetime was according to the current time (Czech)
      * @param string or int date (and time) as string or as integer timestamp
-     * @param string language code as key to Tools::$LOCALE
+     * @param string language code as key to Tools::LOCALE
      * @return string text representation
      */
     public static function relativeTime($datetime, $language = 'en')
@@ -676,5 +674,62 @@ class Tools
         } else {
             self::addMessage('error', $errorMessage);
         }
+    }
+
+    /** Take a hash of arrays and rebase its keys to first item of each array's array
+     * @param array array
+     * @param mixed index
+     * [[0=>581, 1=>'Apple', 2=>'Fruits'], [0=>46, 1=>'Tomato', 2=>'Vegetables']] --> [581=>[1=>'Apple', 'Fruits'], 45=>[1=>'Tomato', 'Vegetables']]
+     * [[0=>581, 1=>'Apple'], [0=>45, 1=>'Banana']] --> [581=>'Apple', 45=>'Banana']
+     */
+    public static function arrayReindex($array, $index = 0)
+    {
+        $result = array();
+        if (is_array($array) && count($array)) {
+            foreach ($array as $item) {
+                if (isset($item[$index])) {
+                    $key = $item[$index];
+                    unset($item[$index]);
+                    if (count($item) == 1) {
+                        $item = reset($item);
+                    }
+                    if (isset($result[$key])) {
+                        $result[$key] = (array)$result[$key];
+                        $result[$key] []= $item;
+                    } else {
+                        $result[$key] = $item;
+                    }
+                }
+            }
+        }
+        return $result;
+    }
+
+    /** Subtract items from given array
+     * @param array array to remove items from
+     * @param mixed either array containing values that are keys to be removed
+     *              or key(s) to be removed
+     * Note: this function can have more arguments - argument #3, 4.. are taken as further items to remove
+     * Note: no error, warning or notice is thrown if item in array is not found.
+     * @return array with removed keys
+     * e.g. $a = ['Apple', 'Pear', 'Kiwi']; Tools::arrayRemoveItems($a, ['Apple', 'Pear']) -> ['Kiwi'];
+     *      Tools::arrayRemoveItems($a, 'Apple', 'Pear', 'Orange') -> ['Kiwi'];
+     */
+    public static function arrayRemoveItems($array1, $array2)
+    {
+        if (is_array($array2)) {
+            foreach ($array2 as $i) {
+                unset($array1[$i]);
+            }
+        } else {
+            foreach (func_get_args() as $index => $arg) {
+                if ($index) {
+                    if (($key = array_search($arg, $array1)) !== false) {
+                        unset($array1[$key]);
+                    }
+                }
+            }
+        }
+        return $array1;
     }
 }
