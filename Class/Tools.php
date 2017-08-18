@@ -732,4 +732,19 @@ class Tools
         }
         return $array1;
     }
+    
+    /** Generate random password of $length characters (letters, -, digits), 0O1lI are excluded.
+     * @param int length of the password
+     * @return string password
+     */
+    public static function randomPassword($length = 8)
+    {
+        static $chars = '23456789abcdefghijkmnopqrstuvwxyz-ABCDEFGHJKLMNPQRSTUVWXYZ';
+        $rand = function_exists('random_int') ? 'random_int' : 'rand'; 
+        $charsmax = strlen($chars) - 1;
+        for ($i = 0, $result = ''; $i < $length; $i++) {
+            $result .= substr($chars, $rand(0, $charsmax), 1);
+        }
+        return $result; 
+    }
 }
