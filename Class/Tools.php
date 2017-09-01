@@ -732,7 +732,21 @@ class Tools
         }
         return $array1;
     }
-    
+
+    /** Return an array with keys same as its values. Doesn't solve duplicates.
+     * @param array array
+     * @return array result
+     * E.g. arrayKeysAsValues(['Apple', 'Pear', 'Kiwi']) --> ['Apple'=>'Apple', 'Pear'=>'Pear', 'Kiwi'=>'Kiwi']
+     */
+    public static function arrayKeyAsValues($array)
+    {
+        $result = array();
+        foreach ($array as $key => $value) {
+            $result[$value] = $value;
+        }
+        return $result;
+    }
+
     /** Generate random password of $length characters (letters, -, digits), 0O1lI are excluded.
      * @param int length of the password
      * @return string password
