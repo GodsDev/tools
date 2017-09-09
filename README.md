@@ -23,3 +23,21 @@ require_once '/path/to/your-project/vendor/autoload.php';
 # Continuous integration
 
 # Testing
+
+# Methods
+
+@todo name only public methods:
+
+* h, set, ifemtpy, ifnull, equal, nonempty, nonzero, setifnull, setifempty, wrap, among
+* showMessages, addMessage
+* htmlOption, htmlSelect, htmlSelectAppend, htmlRadio, htmlTextarea, htmlInput, htmlTextInput
+* webalize, safeIn, safeJs, redir
+* arrayListed, exploded, cutTill
+* curlCall
+* set, equal, nonempty, nonzero, begins, ends
+* escapeSQL, escapeJS
+* arrayConfineKeys, arrayReindex, arrayRemoveItems, arrayKeyAsValues
+* urlChange
+* relativeTime, localeDate, localeTime
+* plural, resolve
+* randomPassword
