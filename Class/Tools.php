@@ -1,4 +1,7 @@
 <?php
+
+namespace GodsDev\Tools;
+
 class Tools
 {
     static $LOCALE = array(
