@@ -142,7 +142,7 @@ class Tools
 
     public static function wrap($n, $prefix, $postfix = '', $else = '')
     {
-        if ($n) {
+        if (isset($n) && $n) {
             return $prefix . $n . $postfix;
         }
         return $else;
