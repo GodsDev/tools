@@ -403,6 +403,14 @@ class Tools
         return $string;
     }
 
+    public static function shortify($string, $limit, $ellipsis = '…')
+    {
+        if (mb_strlen($string) > $limit) {
+            return mb_substr($string, 0, $limit) . $ellipsis;
+        }
+        return $string;
+    }
+
     public static function escapeSQL($input)
     {
         //return mysqli_real_escape_string(/* mysqli object */, $input);
@@ -763,5 +771,14 @@ class Tools
             $result .= substr($chars, $rand(0, $charsmax), 1);
         }
         return $result; 
+    }
+
+    public static function dump($args)
+    {
+        echo '<pre>';
+        foreach (func_get_args() as &$arg) {
+            var_dump($arg);
+        }
+        echo '</pre>';
     }
 }
