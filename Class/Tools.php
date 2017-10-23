@@ -493,7 +493,7 @@ class Tools
                     $value = (float)$value;
                 }
                 if (!($flags & 32) || $value) {
-                    $result .= "$glue$before$v$after";
+                    $result .= "$glue$before$value$after";
                 }
             }
         }
