@@ -182,7 +182,7 @@ class Tools
     /** Add a session message (i.e. a result of an data-changing operation).
      * @param string type one of 'success', 'info', 'danger', 'warning'
      * @param string message itself, in well-formatted HTML
-     * @param bool true=echo the alert box, false=store the message
+     * @param bool true --> then call showMessages()
      */
     public static function addMessage($type, $message, $show = false)
     {
@@ -199,6 +199,12 @@ class Tools
      */
     public static function showMessages($echo = true)
     {
+        static $ICONS = array(
+            'success' => '<span class="glyphicon glyphicon-ok-sign fa fa-check-circle" aria-hidden="true"></span>',
+            'danger' => '<span class="glyphicon glyphicon-exclamation-sign fa fa-times-circle" aria-hidden="true"></span>',
+            'warning' => '<span class="glyphicon glyphicon-remove-sign fa fa-exclamation-circle" aria-hidden="true"></span>',
+            'info' => '<span class="glyphicon glyphicon-info-sign fa fa-info-circle" aria-hidden="true"></span>'
+        );
         $_SESSION['messages'] = isset($_SESSION['messages']) && is_array($_SESSION['messages']) ? $_SESSION['messages'] : array();
         $result = '';
         foreach ((array)$_SESSION['messages'] as $key => $message) {
@@ -206,7 +212,7 @@ class Tools
                 if ($message[0] == 'error') {
                     $message[0] = 'danger';
                 }
-                $result .= '<div class="alert alert-dismissible alert-' . self::h($message[0]) . '">' . $message[1] . '</div>' . PHP_EOL;
+                $result .= '<div class="alert alert-dismissible alert-' . self::h($message[0]) . '">' . $ICONS[$message[0]] . ' ' . $message[1] . '</div>' . PHP_EOL;
             }
             unset($_SESSION['messages'][$key]);
         }
@@ -464,36 +470,36 @@ class Tools
     {
         $result = '';
         if (is_array($array)) {
-            foreach ($array as $key => $value) {
+            foreach ($array as $k => $v) {
                 if ($flags & 128) {
-                    $value = $key;
+                    $v = $k;
                 }
                 if ($flags & 64) {
-                    $value = str_replace('`', '``', $value);
+                    $v = str_replace('`', '``', $v);
                 }
                 if ($flags & 1) {
-                    $value = self::h($value);
+                    $v = htmlspecialchars($v, ENT_QUOTES);
                 }
                 if ($flags & 2) {
                     if ($flags & 8) {
-                        $value = strtr($value, array('"' => '\"', "'" => "\\'", "\\" => "\\\\", '%' => '%%', '_' => '\_')); //like
+                        $v = strtr($v, array('"' => '\"', "'" => "\\'", "\\" => "\\\\", '%' => '%%', '_' => '\_')); //like
                     } elseif ($flags&16) {
-                        $value = preg_quote($value);
+                        $v = preg_quote($v);
                     } else {
-                        $value = self::escapeSQL($value);
+                        $v = self::escapeSQL($v);
                     }
                 }
                 if ($flags & 4) {
-                    $value = self::escapeJS($value);
+                    $v = self::escapeJS($v);
                 }
                 if ($flags & 8) {
-                    $value = intval($value);
+                    $v = intval($v);
                 }
                 if ($flags & 16) {
-                    $value = (float)$value;
+                    $v = (float)$v;
                 }
-                if (!($flags & 32) || $value) {
-                    $result .= "$glue$before$value$after";
+                if (!($flags & 32) || $v) {
+                    $result .= "$glue$before$v$after";
                 }
             }
         }
