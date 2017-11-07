@@ -62,9 +62,9 @@ class Tools
         )
     );
 
-    public static function h($s)
+    public static function h($string)
     {
-        return htmlspecialchars($s, ENT_QUOTES);
+        return htmlspecialchars($string, ENT_QUOTES);
     }
 
     public static function set(&$a, $b = null) {
@@ -143,10 +143,10 @@ class Tools
         return $a = isset($a) ? ($a ?: $b) : $b;
     }
 
-    public static function wrap($n, $prefix, $postfix = '', $else = '')
+    public static function wrap($text, $prefix, $postfix = '', $else = '')
     {
-        if ($n) {
-            return $prefix . $n . $postfix;
+        if (isset($text) && $text) {
+            return $prefix . $text . $postfix;
         }
         return $else;
     }
@@ -154,35 +154,35 @@ class Tools
     // return true if $n is among given parameters (more than one can be given)
     public static function among($n, $m)
     {
-        $a = func_get_args();
-        array_shift($a);
-        return in_array($n, $a);
+        $args = func_get_args();
+        array_shift($args);
+        return in_array($n, $args);
     }
 
-    public static function begins($haystack, $needle, $caseSensitive = true, $encoding = null)
+    public static function begins($text, $beginning, $caseSensitive = true, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
         if ($caseSensitive) {
-            return mb_substr($haystack, 0, mb_strlen($needle), $encoding) == $needle;
+            return mb_substr($text, 0, mb_strlen($beginning), $encoding) == $beginning;
         } else {
-            return mb_strtolower(mb_substr($haystack, 0, mb_strlen($needle)), $encoding) == mb_strtolower($needle);
+            return mb_strtolower(mb_substr($text, 0, mb_strlen($beginning)), $encoding) == mb_strtolower($beginning);
         }
     }
 
-    public static function ends($haystack, $needle, $caseSensitive = true, $encoding = null)
+    public static function ends($text, $ending, $caseSensitive = true, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
         if ($caseSensitive) {
-            return mb_substr($haystack, -mb_strlen($needle), null, $encoding) == $needle;
+            return mb_substr($text, -mb_strlen($ending), null, $encoding) == $ending;
         } else {
-            return mb_strtolower(mb_substr($haystack, -mb_strlen($needle), $encoding)) == mb_strtolower($needle);
+            return mb_strtolower(mb_substr($text, -mb_strlen($ending), $encoding)) == mb_strtolower($ending);
         }
     }
 
     /** Add a session message (i.e. a result of an data-changing operation).
      * @param string type one of 'success', 'info', 'danger', 'warning'
      * @param string message itself, in well-formatted HTML
-     * @param bool true=echo the alert box, false=store the message
+     * @param bool true --> then call showMessages()
      */
     public static function addMessage($type, $message, $show = false)
     {
@@ -199,6 +199,12 @@ class Tools
      */
     public static function showMessages($echo = true)
     {
+        static $ICONS = array(
+            'success' => '<span class="glyphicon glyphicon-ok-sign fa fa-check-circle" aria-hidden="true"></span>',
+            'danger' => '<span class="glyphicon glyphicon-exclamation-sign fa fa-times-circle" aria-hidden="true"></span>',
+            'warning' => '<span class="glyphicon glyphicon-remove-sign fa fa-exclamation-circle" aria-hidden="true"></span>',
+            'info' => '<span class="glyphicon glyphicon-info-sign fa fa-info-circle" aria-hidden="true"></span>'
+        );
         $_SESSION['messages'] = isset($_SESSION['messages']) && is_array($_SESSION['messages']) ? $_SESSION['messages'] : array();
         $result = '';
         foreach ((array)$_SESSION['messages'] as $key => $message) {
@@ -206,7 +212,7 @@ class Tools
                 if ($message[0] == 'error') {
                     $message[0] = 'danger';
                 }
-                $result .= '<div class="alert alert-dismissible alert-' . self::h($message[0]) . '">' . $message[1] . '</div>' . PHP_EOL;
+                $result .= '<div class="alert alert-dismissible alert-' . self::h($message[0]) . '">' . $ICONS[$message[0]] . ' ' . $message[1] . '</div>' . PHP_EOL;
             }
             unset($_SESSION['messages'][$key]);
         }
@@ -344,21 +350,21 @@ class Tools
         if (is_string($options)) {
             $options = array('type' => $options);
         }
-        if ($label && !@$options['id']) {
+        if ($label && !self::nonempty($options['id'])) {
             $options['id'] = 'input-' . self::webalize($name);
         }
-        if (@$options['random-id']) {
+        if (self::nonempty($options['random-id'])) {
             $options['id'] .= '-' . rand(1e8, 1e9-1);
         }
-        if (!isset($options['rows']) and !@$options['type']) {
+        if (!isset($options['rows']) and !self::nonempty($options['type'])) {
             $options['type'] = 'text';
         }
-        if (@$options['table']) {
+        if (self::nonempty($options['table'])) {
             foreach (array('before'=>'<tr><td>', 'between'=>'</td><td>', 'after'=>'</td></tr>') as $k=>$v) {
                 self::setifempty($options[$k], $v);
             }
         }
-        if (!@$options['label-html']) {
+        if (!self::nonempty($options['label-html'])) {
             $label = self::h($label);
         }
         self::setifempty($options['type'], 'text');
@@ -369,7 +375,7 @@ class Tools
         }
         $result .= '<' . (isset($options['rows']) ? 'textarea' : 'input') . ' ';
         $options = array_merge($options, array('name' => self::h($name), 'value' => $value));
-        foreach (@$options as $k => $v) {
+        foreach ($options as $k => $v) {
             if (is_string($k) && !is_null($v)
                 && !self::among($k, 'before', 'between', 'after', 'table', 'flag', 'random-id', 'label-after', 'label-html', 'value')) {
                 $result .= ' ' . $k . ($v === true ? '' : '="' . (mb_substr($k, 0, 2)=='on' ? self::h($v) : self::h($v)) . '"');
@@ -377,30 +383,38 @@ class Tools
         }
         $result .= isset($options['rows'])?'>' . self::h($value) . '</textarea>' : self::wrap(self::h($value), ' value="', '"') . '/>';
         $label = self::wrap($label, '<label for="' . self::h(@$options['id']) . '">', '</label>');
-        return $result = @$options['before'] . (@$options['label-after'] ? $result : $label)
-            . @$options['between'] . (@$options['label-after']?$label:$result) . @$options['after'];
+        return $result = self::setifempty($options['before']) . (self::nonempty($options['label-after']) ? $result : $label)
+            . self::setifempty($options['between']) . (self::nonempty($options['label-after']) ? $label : $result) . self::setifempty($options['after']);
     }
 
-    public static function webalize($s, $charlist = null, $lower = true)
+    public static function webalize($string, $charlist = null, $lower = true)
     { //credit: Daniel Grudl (Nette)
-        $s = strtr($s, '`\'"^~', '-----');
+        $string = strtr($string, '`\'"^~', '-----');
         if (ICONV_IMPL === 'glibc') {
-            $s = @iconv('UTF-8', 'WINDOWS-1250//TRANSLIT', $s); // intentionally @
-            $s = strtr($s, "\xa5\xa3\xbc\x8c\xa7\x8a\xaa\x8d\x8f\x8e\xaf\xb9\xb3\xbe\x9c\x9a\xba\x9d\x9f\x9e\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2"
+            $string = @iconv('UTF-8', 'WINDOWS-1250//TRANSLIT', $string); // intentionally @
+            $string = strtr($string, "\xa5\xa3\xbc\x8c\xa7\x8a\xaa\x8d\x8f\x8e\xaf\xb9\xb3\xbe\x9c\x9a\xba\x9d\x9f\x9e\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2"
                 . "\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf8\xf9\xfa\xfb\xfc\xfd\xfe",
                 "ALLSSSSTZZZallssstzzzRAAAALCCCEEEEIIDDNNOOOOxRUUUUYTsraaaalccceeeeiiddnnooooruuuuyt");
         } else {
-            $s = @iconv('UTF-8', 'ASCII//TRANSLIT', $s); // intentionally @
+            $string = @iconv('UTF-8', 'ASCII//TRANSLIT', $string); // intentionally @
         }
-        $s = str_replace(array('`', "'", '"', '^', '~'), '', $s);
+        $string = str_replace(array('`', "'", '"', '^', '~'), '', $string);
         if ($lower === -1) {
-            $s = strtoupper($s);
+            $string = strtoupper($string);
         } elseif ($lower) {
-            $s = strtolower($s);
+            $string = strtolower($string);
         }
-        $s = preg_replace('#[^a-z0-9' . preg_quote($charlist, '#') . ']+#i', '-', $s);
-        $s = trim($s, '-');
-        return $s;
+        $string = preg_replace('#[^a-z0-9' . preg_quote($charlist, '#') . ']+#i', '-', $string);
+        $string = trim($string, '-');
+        return $string;
+    }
+
+    public static function shortify($string, $limit, $ellipsis = '…')
+    {
+        if (mb_strlen($string) > $limit) {
+            return mb_substr($string, 0, $limit) . $ellipsis;
+        }
+        return $string;
     }
 
     public static function escapeSQL($input)
@@ -450,13 +464,13 @@ class Tools
         );
     }
 
-    //example: array_listed(array("Levi's","Procter & Gamble"),1,", ","<b>","</b>") --> <b>Levi's</b>, <b>Procter &amp; Gamble</b>
+    //example: arrayListed(array("Levi's","Procter & Gamble"),1,", ","<b>","</b>") --> <b>Levi's</b>, <b>Procter &amp; Gamble</b>
     //flags: +1=htmlentities, +2=escape string, +4=escapeJs, +8=intval, +16=(float), +32=ignore empty +64=` -> ``, +128=array_keys, +10 = quote LIKE, +18 = preg_quote
-    public static function arrayListed($a, $flags = 0, $glue = ',', $before = '', $after = '')
+    public static function arrayListed($array, $flags = 0, $glue = ',', $before = '', $after = '')
     {
         $result = '';
-        if (is_array($a)) {
-            foreach ($a as $k => $v) {
+        if (is_array($array)) {
+            foreach ($array as $k => $v) {
                 if ($flags & 128) {
                     $v = $k;
                 }
@@ -763,5 +777,14 @@ class Tools
             $result .= substr($chars, $rand(0, $charsmax), 1);
         }
         return $result; 
+    }
+
+    public static function dump($args)
+    {
+        echo '<pre>';
+        foreach (func_get_args() as &$arg) {
+            var_dump($arg);
+        }
+        echo '</pre>';
     }
 }
