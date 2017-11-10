@@ -787,4 +787,27 @@ class Tools
         }
         echo '</pre>';
     }
+
+    /** Strip specified attributes of a given HTML/XML or its fragment
+     * Requires DOMDocument, DOMXPath, DOMElement, DOMElementList classes
+     * @param string $html HTML/XML - whole or partial
+     * @param mixed $attributes attribute(s) to strip from elements - either string (for one) or array
+     * @return string HTML/XML stripped of attributes
+     */
+    function stripAttributes($html, $attributes)
+    {
+        $domd = new DOMDocument();
+        libxml_use_internal_errors(true);
+        $domd->loadXML("<x>$html</x>");
+        libxml_use_internal_errors(false);
+        $domx = new DOMXPath($domd);
+        foreach ((is_array($attributes) ? $attributes : array($attributes)) as $attribute) {
+            $items = $domx->query("//*[@$attribute]");
+            foreach($items as $item) {
+                $item->removeAttribute($attribute);
+            }
+        }
+        return substr($domd->saveXML(), 26, -6);
+    }
+
 }
