@@ -794,7 +794,7 @@ class Tools
      * @param mixed $attributes attribute(s) to strip from elements - either string (for one) or array
      * @return string HTML/XML stripped of attributes
      */
-    function stripAttributes($html, $attributes)
+    public static function stripAttributes($html, $attributes)
     {
         $domd = new DOMDocument();
         libxml_use_internal_errors(true);
