@@ -796,11 +796,11 @@ class Tools
      */
     public static function stripAttributes($html, $attributes)
     {
-        $domd = new DOMDocument();
+        $domd = new \DOMDocument();
         libxml_use_internal_errors(true);
         $domd->loadXML("<x>$html</x>");
         libxml_use_internal_errors(false);
-        $domx = new DOMXPath($domd);
+        $domx = new \DOMXPath($domd);
         foreach ((is_array($attributes) ? $attributes : array($attributes)) as $attribute) {
             $items = $domx->query("//*[@$attribute]");
             foreach($items as $item) {
