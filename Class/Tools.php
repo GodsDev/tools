@@ -199,11 +199,12 @@ class Tools
      */
     public static function showMessages($echo = true)
     {
-        static $ICONS = array(
-            'success' => '<span class="glyphicon glyphicon-ok-sign fa fa-check-circle" aria-hidden="true"></span>',
-            'danger' => '<span class="glyphicon glyphicon-exclamation-sign fa fa-times-circle" aria-hidden="true"></span>',
-            'warning' => '<span class="glyphicon glyphicon-remove-sign fa fa-exclamation-circle" aria-hidden="true"></span>',
-            'info' => '<span class="glyphicon glyphicon-info-sign fa fa-info-circle" aria-hidden="true"></span>'
+        $tmp = ' href="#" onclick="event.preventDefault(); this.parentNode.style.display=\'none\'" aria-hidden="true"';
+        $ICONS = array(
+            'success' => '<a class="glyphicon glyphicon-ok-sign fa fa-check-circle"' . $tmp . '></a>',
+            'danger' => '<a class="glyphicon glyphicon-exclamation-sign fa fa-times-circle"' . $tmp . '></a>',
+            'warning' => '<a class="glyphicon glyphicon-remove-sign fa fa-exclamation-circle"' . $tmp . '></a>',
+            'info' => '<a class="glyphicon glyphicon-info-sign fa fa-info-circle"' . $tmp . '></a>'
         );
         $_SESSION['messages'] = isset($_SESSION['messages']) && is_array($_SESSION['messages']) ? $_SESSION['messages'] : array();
         $result = '';
