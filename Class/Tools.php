@@ -67,11 +67,17 @@ class Tools
         return htmlspecialchars($string, ENT_QUOTES);
     }
 
-    public static function set(&$a, $b = null) {
-        if (isset($a)) {
-            return $a;
+    public static function set(&$a, $b = null)
+    {
+        if (func_num_args() == 1) {
+            return isset($a) && $a ? $a : false;
         }
-        return $a = $b;
+        return $a = (isset($a) && $a ? $a : $b);
+    }
+
+    public static function setandequal(&$var, $value)
+    {
+        return isset($a) && $a === $value;
     }
 
     /** Return first non-zero parameter passed to this function, or parameter #1
