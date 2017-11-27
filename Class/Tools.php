@@ -67,6 +67,12 @@ class Tools
         return htmlspecialchars($string, ENT_QUOTES);
     }
 
+    // e.g. unset($a); echo Tools::set($a); // false
+    // e.g. $a = 0; echo Tools::set($a); // false
+    // e.g. $a = 5; echo Tools::set($a); // true
+    // e.g. unset($a); echo Tools::set($a, 5); // returns 5, $a = 5
+    // e.g. $a = 0; echo Tools::set($a, 5); // returns 5, $a = 5
+    // e.g. $a = 5; echo Tools::set($a, 6); // returns 5, $a = 5
     public static function set(&$a, $b = null)
     {
         if (func_num_args() == 1) {
@@ -149,6 +155,7 @@ class Tools
         return $a = isset($a) ? ($a ?: $b) : $b;
     }
 
+    // if $text is set and non-zero, return it with prefix and postfix, return $else otherwise
     public static function wrap($text, $prefix, $postfix = '', $else = '')
     {
         if (isset($text) && $text) {
@@ -162,26 +169,61 @@ class Tools
     {
         $args = func_get_args();
         array_shift($args);
-        return in_array($n, $args);
+        return in_array($n, $args, true); // strict comparison
     }
 
+    /** Return true if $text begins with $beginning
+     * @param string $text text to test
+     * @param mixed $beginning string (for one) or array (for more) beginnings to test against
+     * @param bool $caseSensitive case sensitive searching?
+     * @param string $encoding internal encoding
+     */
     public static function begins($text, $beginning, $caseSensitive = true, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
-        if ($caseSensitive) {
-            return mb_substr($text, 0, mb_strlen($beginning), $encoding) == $beginning;
-        } else {
-            return mb_strtolower(mb_substr($text, 0, mb_strlen($beginning)), $encoding) == mb_strtolower($beginning);
+        if (!is_array($beginning)) {
+            $beginning = array($beginning);
         }
+        if ($caseSensitive) {
+            foreach ($beginning as $value) {
+                if (mb_substr($text, 0, mb_strlen($value), $encoding) === $value) {
+                    return true;
+                }
+            }
+        } else {
+            foreach ($beginning as $value) {
+                if (mb_strtolower(mb_substr($text, 0, mb_strlen($value)), $encoding) === mb_strtolower($value)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
+    /** Return true if $text ends with $ending
+     * @param string $text text to test
+     * @param mixed $ending string (for one) or array (for more) endings to test against
+     * @param bool $caseSensitive case sensitive searching?
+     * @param string $encoding internal encoding
+     */
     public static function ends($text, $ending, $caseSensitive = true, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
+        if (!is_array($ending)) {
+            $ending = array($ending);
+        }
         if ($caseSensitive) {
-            return mb_substr($text, -mb_strlen($ending), null, $encoding) == $ending;
+            foreach ($ending as $value) {
+                if (mb_substr($text, -mb_strlen($ending), null, $encoding) === $ending) {
+                    return true;
+                }
+            }
         } else {
-            return mb_strtolower(mb_substr($text, -mb_strlen($ending), $encoding)) == mb_strtolower($ending);
+            foreach ($ending as $value) {
+                if (mb_strtolower(mb_substr($text, -mb_strlen($ending), $encoding)) === mb_strtolower($ending)) {
+                    return true;
+                }
+            }
         }
     }
 
