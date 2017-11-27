@@ -62,9 +62,12 @@ class Tools
         )
     );
 
+    /** Converts ", ', &, <, > in $string to &quot; &#039/&apos; &lt;, &gt; respectively
+     * @return string
+     */
     public static function h($string)
     {
-        return htmlspecialchars($string, ENT_QUOTES);
+        return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5);
     }
 
     // e.g. unset($a); echo Tools::set($a); // false
@@ -81,17 +84,12 @@ class Tools
         return $a = (isset($a) && $a ? $a : $b);
     }
 
-    public static function setandequal(&$var, $value)
-    {
-        return isset($a) && $a === $value;
-    }
-
     /** Return first non-zero parameter passed to this function, or parameter #1
      * @param mixed tested value
      * @return mixed
      * For just two arguments use: $a ?: $b;
      */
-    public static function ifempty($a, $b = null)
+    public static function ifempty($a)
     {
         foreach (func_get_args() as $arg) {
             if ($arg) {
@@ -122,7 +120,7 @@ class Tools
      */
     public static function equal(&$a, $b)
     {
-        return isset($a) && $a == $b;
+        return isset($a) && $a === $b;
     }
 
     /** Shortcut for isset($a) && $a, esp. useful for long variables
@@ -141,6 +139,22 @@ class Tools
         return isset($a) && (bool)+$a;
     }
 
+    /** Shortcut for isset($a) ? $a : $b
+     * @return mixed
+     */
+    public static function ifset(&$a, $b = null)
+    {
+        return isset($a) ? $a : $b;
+    }
+
+    /** Shortcut for $a = isset($a) ? $a : $b;
+     * @return mixed
+     */
+    public static function setifnotset(&$a, $b = null)
+    {
+        $a = isset($a) ? $a : $b;
+    }
+
     /** Shortcut for if (isset($a) && is_null($a)) $a = $b; useful for long variables
      */
     public static function setifnull(&$a, $b = null)
@@ -153,6 +167,22 @@ class Tools
     public static function setifempty(&$a, $b = null)
     {
         return $a = isset($a) ? ($a ?: $b) : $b;
+    }
+
+    /** Shortcut for isset($a) && is_scalar($a)
+     * @return bool
+     */
+    public static function setscalar(&$a)
+    {
+        return isset($a) && is_scalar($a);
+    }
+
+    /** Shortcut for isset($a) && is_array($a)
+     * @return bool
+     */
+    public static function setarray(&$a)
+    {
+        return isset($a) && is_array($a);
     }
 
     // if $text is set and non-zero, return it with prefix and postfix, return $else otherwise
