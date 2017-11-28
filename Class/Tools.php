@@ -123,20 +123,20 @@ class Tools
         return isset($a) && $a === $b;
     }
 
-    /** Shortcut for isset($a) && $a, esp. useful for long variables
+    /** Shortcut for isset($a) && !empty($a), esp. useful for long variables
      * @return bool
      */
     public static function nonempty(&$a)
     {
-        return isset($a) && (bool)$a;
+        return isset($a) && !empty($a);
     }
 
-    /** Shortcut for isset($a) && +$a, esp. useful for long variables
+    /** Shortcut for isset($a) && $a, esp. useful for long variables
      * @return bool
      */
     public static function nonzero(&$a)
     {
-        return isset($a) && (bool)+$a;
+        return isset($a) && $a;
     }
 
     /** Shortcut for isset($a) ? $a : $b
