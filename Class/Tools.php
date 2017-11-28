@@ -244,7 +244,7 @@ class Tools
         }
         if ($caseSensitive) {
             foreach ($ending as $value) {
-                if (mb_substr($text, -mb_strlen($ending), null, $encoding) === $ending) {
+                if (mb_substr($text, -mb_strlen($value), null, $encoding) === $ending) {
                     return true;
                 }
             }
