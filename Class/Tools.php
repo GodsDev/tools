@@ -264,7 +264,7 @@ class Tools
      */
     public static function addMessage($type, $message, $show = false)
     {
-        $_SESSION['messages'] = is_array($_SESSION['messages']) ? $_SESSION['messages'] : array();
+        $_SESSION['messages'] = self::setarray($_SESSION['messages']) ? $_SESSION['messages'] : array();
         $_SESSION['messages'] []= array($type, $message);
         if ($show) {
             self::showMessages();
