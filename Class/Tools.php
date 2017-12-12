@@ -62,16 +62,26 @@ class Tools
         )
     );
 
+    /** Converts ", ', &, <, > in $string to &quot; &#039/&apos; &lt;, &gt; respectively
+     * @return string
+     */
     public static function h($string)
     {
-        return htmlspecialchars($string, ENT_QUOTES);
+        return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5);
     }
 
-    public static function set(&$a, $b = null) {
-        if (isset($a)) {
-            return $a;
+    // e.g. unset($a); echo Tools::set($a); // false
+    // e.g. $a = 0; echo Tools::set($a); // false
+    // e.g. $a = 5; echo Tools::set($a); // true
+    // e.g. unset($a); echo Tools::set($a, 5); // returns 5, $a = 5
+    // e.g. $a = 0; echo Tools::set($a, 5); // returns 5, $a = 5
+    // e.g. $a = 5; echo Tools::set($a, 6); // returns 5, $a = 5
+    public static function set(&$a, $b = null)
+    {
+        if (func_num_args() == 1) {
+            return isset($a) && $a ? $a : false;
         }
-        return $a = $b;
+        return $a = (isset($a) && $a ? $a : $b);
     }
 
     /** Return first non-zero parameter passed to this function, or parameter #1
@@ -79,7 +89,7 @@ class Tools
      * @return mixed
      * For just two arguments use: $a ?: $b;
      */
-    public static function ifempty($a, $b = null)
+    public static function ifempty($a)
     {
         foreach (func_get_args() as $arg) {
             if ($arg) {
@@ -110,23 +120,39 @@ class Tools
      */
     public static function equal(&$a, $b)
     {
-        return isset($a) && $a == $b;
+        return isset($a) && $a === $b;
+    }
+
+    /** Shortcut for isset($a) && !empty($a), esp. useful for long variables
+     * @return bool
+     */
+    public static function nonempty(&$a)
+    {
+        return isset($a) && !empty($a);
     }
 
     /** Shortcut for isset($a) && $a, esp. useful for long variables
      * @return bool
      */
-    public static function nonempty(&$a)
-    {
-        return isset($a) && (bool)$a;
-    }
-
-    /** Shortcut for isset($a) && +$a, esp. useful for long variables
-     * @return bool
-     */
     public static function nonzero(&$a)
     {
-        return isset($a) && (bool)+$a;
+        return isset($a) && $a;
+    }
+
+    /** Shortcut for isset($a) ? $a : $b
+     * @return mixed
+     */
+    public static function ifset(&$a, $b = null)
+    {
+        return isset($a) ? $a : $b;
+    }
+
+    /** Shortcut for $a = isset($a) ? $a : $b;
+     * @return mixed
+     */
+    public static function setifnotset(&$a, $b = null)
+    {
+        $a = isset($a) ? $a : $b;
     }
 
     /** Shortcut for if (isset($a) && is_null($a)) $a = $b; useful for long variables
@@ -143,6 +169,23 @@ class Tools
         return $a = isset($a) ? ($a ?: $b) : $b;
     }
 
+    /** Shortcut for isset($a) && is_scalar($a)
+     * @return bool
+     */
+    public static function setscalar(&$a)
+    {
+        return isset($a) && is_scalar($a);
+    }
+
+    /** Shortcut for isset($a) && is_array($a)
+     * @return bool
+     */
+    public static function setarray(&$a)
+    {
+        return isset($a) && is_array($a);
+    }
+
+    // if $text is set and non-zero, return it with prefix and postfix, return $else otherwise
     public static function wrap($text, $prefix, $postfix = '', $else = '')
     {
         if (isset($text) && $text) {
@@ -156,26 +199,61 @@ class Tools
     {
         $args = func_get_args();
         array_shift($args);
-        return in_array($n, $args);
+        return in_array($n, $args, true); // strict comparison
     }
 
+    /** Return true if $text begins with $beginning
+     * @param string $text text to test
+     * @param mixed $beginning string (for one) or array (for more) beginnings to test against
+     * @param bool $caseSensitive case sensitive searching?
+     * @param string $encoding internal encoding
+     */
     public static function begins($text, $beginning, $caseSensitive = true, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
-        if ($caseSensitive) {
-            return mb_substr($text, 0, mb_strlen($beginning), $encoding) == $beginning;
-        } else {
-            return mb_strtolower(mb_substr($text, 0, mb_strlen($beginning)), $encoding) == mb_strtolower($beginning);
+        if (!is_array($beginning)) {
+            $beginning = array($beginning);
         }
+        if ($caseSensitive) {
+            foreach ($beginning as $value) {
+                if (mb_substr($text, 0, mb_strlen($value), $encoding) === $value) {
+                    return true;
+                }
+            }
+        } else {
+            foreach ($beginning as $value) {
+                if (mb_strtolower(mb_substr($text, 0, mb_strlen($value)), $encoding) === mb_strtolower($value)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
+    /** Return true if $text ends with $ending
+     * @param string $text text to test
+     * @param mixed $ending string (for one) or array (for more) endings to test against
+     * @param bool $caseSensitive case sensitive searching?
+     * @param string $encoding internal encoding
+     */
     public static function ends($text, $ending, $caseSensitive = true, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
+        if (!is_array($ending)) {
+            $ending = array($ending);
+        }
         if ($caseSensitive) {
-            return mb_substr($text, -mb_strlen($ending), null, $encoding) == $ending;
+            foreach ($ending as $value) {
+                if (mb_substr($text, -mb_strlen($value), null, $encoding) === $ending) {
+                    return true;
+                }
+            }
         } else {
-            return mb_strtolower(mb_substr($text, -mb_strlen($ending), $encoding)) == mb_strtolower($ending);
+            foreach ($ending as $value) {
+                if (mb_strtolower(mb_substr($text, -mb_strlen($ending), $encoding)) === mb_strtolower($ending)) {
+                    return true;
+                }
+            }
         }
     }
 
@@ -186,7 +264,7 @@ class Tools
      */
     public static function addMessage($type, $message, $show = false)
     {
-        $_SESSION['messages'] = is_array($_SESSION['messages']) ? $_SESSION['messages'] : array();
+        $_SESSION['messages'] = self::setarray($_SESSION['messages']) ? $_SESSION['messages'] : array();
         $_SESSION['messages'] []= array($type, $message);
         if ($show) {
             self::showMessages();
@@ -199,11 +277,12 @@ class Tools
      */
     public static function showMessages($echo = true)
     {
-        static $ICONS = array(
-            'success' => '<span class="glyphicon glyphicon-ok-sign fa fa-check-circle" aria-hidden="true"></span>',
-            'danger' => '<span class="glyphicon glyphicon-exclamation-sign fa fa-times-circle" aria-hidden="true"></span>',
-            'warning' => '<span class="glyphicon glyphicon-remove-sign fa fa-exclamation-circle" aria-hidden="true"></span>',
-            'info' => '<span class="glyphicon glyphicon-info-sign fa fa-info-circle" aria-hidden="true"></span>'
+        $tmp = ' href="#" onclick="event.preventDefault(); this.parentNode.style.display=\'none\'" aria-hidden="true"';
+        $ICONS = array(
+            'success' => '<a class="glyphicon glyphicon-ok-sign fa fa-check-circle"' . $tmp . '></a>',
+            'danger' => '<a class="glyphicon glyphicon-exclamation-sign fa fa-times-circle"' . $tmp . '></a>',
+            'warning' => '<a class="glyphicon glyphicon-remove-sign fa fa-exclamation-circle"' . $tmp . '></a>',
+            'info' => '<a class="glyphicon glyphicon-info-sign fa fa-info-circle"' . $tmp . '></a>'
         );
         $_SESSION['messages'] = isset($_SESSION['messages']) && is_array($_SESSION['messages']) ? $_SESSION['messages'] : array();
         $result = '';
@@ -787,4 +866,27 @@ class Tools
         }
         echo '</pre>';
     }
+
+    /** Strip specified attributes of a given HTML/XML or its fragment
+     * Requires DOMDocument, DOMXPath, DOMElement, DOMElementList classes
+     * @param string $html HTML/XML - whole or partial
+     * @param mixed $attributes attribute(s) to strip from elements - either string (for one) or array
+     * @return string HTML/XML stripped of attributes
+     */
+    public static function stripAttributes($html, $attributes)
+    {
+        $domd = new \DOMDocument();
+        libxml_use_internal_errors(true);
+        $domd->loadXML("<x>$html</x>");
+        libxml_use_internal_errors(false);
+        $domx = new \DOMXPath($domd);
+        foreach ((is_array($attributes) ? $attributes : array($attributes)) as $attribute) {
+            $items = $domx->query("//*[@$attribute]");
+            foreach($items as $item) {
+                $item->removeAttribute($attribute);
+            }
+        }
+        return substr($domd->saveXML(), 26, -6);
+    }
+
 }
