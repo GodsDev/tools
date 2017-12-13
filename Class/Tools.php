@@ -496,12 +496,6 @@ class Tools
         return $string;
     }
 
-    public static function escapeSQL($input)
-    {
-        //return mysqli_real_escape_string(/* mysqli object */, $input);
-        return addslashes($input);
-    }
-
     /** Escape identifier (column, table, database, ..) in MySQL (or compatible)
      * @param string $id identifier
      * @return string properly escaped identifier
