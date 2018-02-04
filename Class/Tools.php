@@ -649,13 +649,15 @@ class Tools
         return curl_errno($ch) ? null : $response;
     }
 
-    /** Return actual QUERY_STRING changed by suggested amendments.
+    /**
+     * Return actual QUERY_STRING changed by suggested amendments.
      * @param array changes, parameters to add/modify, null as a value signifies omitting the key:value pair
      * @param bool htmlspecialchars - apply htmlspecialchars()?
+     * @return string
      */
     public static function urlChange($changes, $htmlspecialchars = false)
     {
-        parse_str($_SERVER['QUERY_STRING'], $parameters);
+        parse_str((isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : ""), $parameters);
         foreach ((array)$changes as $key => $value) {
             if (is_null($value)) {
                 unset($parameters[$key]);
