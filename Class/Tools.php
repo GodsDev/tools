@@ -573,7 +573,7 @@ class Tools
      * @param $charlist (optional) string of chars to be used
      * @param $lower bool (optional) convert to lower-case?
      * @return string converted text
-     * credit: Daniel Grudl (Nette)
+     * @author Daniel Grudl (Nette)
      */
     public static function webalize($string, $charlist = null, $lower = true)
     {
@@ -1100,7 +1100,7 @@ class Tools
                 $item->removeAttribute($attribute);
             }
         }
-        return substr($domd->saveXML(), 26, -6);
+        return substr($domd->saveXML(), 26, -6); //@todo: suboptimal, version-sensitive
     }
 
     /**
