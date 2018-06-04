@@ -1121,4 +1121,25 @@ class Tools
         $unpacked = unpack('N', substr($hash, ord(substr($hash, -1)) & 0xF, 4));
         return ($unpacked[1] & 0x7FFFFFFF) % 1000000;
     }
+
+    /**
+     * Inverse to str_getcsv() - return comma-separated-values out of given array
+     * For parameter details see PHP's fputcsv()
+     * credit: https://gist.github.com/johanmeiring/2894568
+     *
+     * @param array $fields
+     * @param string $delimiter (optional)
+     * @param string $enclosure (optional)
+     * @param string $escape_char (optional)
+     */
+    public static function str_putcsv(array $fields, string $delimiter = ',', string $enclosure = '"', string $escape_char = "\\")
+    {
+        $fp = fopen('php://memory', 'r+b');
+        fputcsv($fp, $fields, $delimiter, $enclosure, $escape_char);
+        $fpSize = ftell($fp);
+        rewind($fp);
+        $data = fread($fp, $fpSize);
+        fclose($fp);
+        return $data;
+    }
 }
