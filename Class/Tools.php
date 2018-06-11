@@ -315,17 +315,18 @@ class Tools
         }
         if ($caseSensitive) {
             foreach ($ending as $value) {
-                if (mb_substr($text, -mb_strlen($value), null, $encoding) === $ending) {
+                if (mb_substr($text, -mb_strlen($value), null, $encoding) === $value) {
                     return true;
                 }
             }
         } else {
             foreach ($ending as $value) {
-                if (mb_strtolower(mb_substr($text, -mb_strlen($ending), $encoding)) === mb_strtolower($ending)) {
+                if (mb_strtolower(mb_substr($text, -mb_strlen($value), null, $encoding)) === mb_strtolower($value)) {
                     return true;
                 }
             }
         }
+        return false;
     }
 
     /**
