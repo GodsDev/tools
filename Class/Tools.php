@@ -534,7 +534,7 @@ class Tools
             $options['id'] = 'input-' . self::webalize($name);
         }
         if (self::nonempty($options['random-id'])) {
-            $options['id'] .= '-' . rand(1e8, 1e9-1);
+            $options['id'] = Tools::set($options['id'], 'input') . '-' . rand(1e8, 1e9-1);
         }
         if (!isset($options['rows']) and !self::nonempty($options['type'])) {
             $options['type'] = 'text';
@@ -561,8 +561,8 @@ class Tools
                 $result .= ' ' . $k . ($v === true ? '' : '="' . (mb_substr($k, 0, 2)=='on' ? self::h($v) : self::h($v)) . '"');
             }
         }
-        $result .= isset($options['rows'])?'>' . self::h($value) . '</textarea>' : self::wrap(self::h($value), ' value="', '"') . '/>';
-        $label = self::wrap($label, '<label for="' . self::h(@$options['id']) . '">', '</label>');
+        $result .= isset($options['rows']) ? '>' . self::h($value) . '</textarea>' : ' value="' . self::h($value) . '"/>';
+        $label = $label === '' || $label === false || $label === null ? '' : '<label' . self::wrap(self::h(self::set($options['id'])), ' for="', '"') . self::wrap(self::h(self::set($options['label-class'])), ' class="', '"') . '>' . $label . '</label>';
         return $result = self::setifempty($options['before']) . (self::nonempty($options['label-after']) ? $result : $label)
             . self::setifempty($options['between']) . (self::nonempty($options['label-after']) ? $label : $result) . self::setifempty($options['after']);
     }
