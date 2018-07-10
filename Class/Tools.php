@@ -515,10 +515,10 @@ class Tools
      *     [type] - input's type, 'text' by default
      *     [before], [between], [after] - HTML to insert before/between/after <label> and <input>
      *     [table] - refill [before], [between], [after] to make a table row
-     *     [flag] - <code> -> prefix the label with a flag icon of given code
      *     [random-id] - append random number to the id attribute
      *     [label-after] - <tag> goes first, <label> after
      *     [label-html] - label given as raw HTML, don't escape HTML entities
+     *     [label-class] - class(es) for label
      *     other tag's attributes - will be specified (except for NULLs)
      */
     protected static function htmlTextInput($name, $label, $value, $options = array())
@@ -540,7 +540,7 @@ class Tools
             $options['type'] = 'text';
         }
         if (self::nonempty($options['table'])) {
-            foreach (array('before'=>'<tr><td>', 'between'=>'</td><td>', 'after'=>'</td></tr>') as $k=>$v) {
+            foreach (array('before' => '<tr><td>', 'between' => '</td><td>', 'after' => '</td></tr>') as $k=>$v) {
                 self::setifempty($options[$k], $v);
             }
         }
@@ -557,7 +557,7 @@ class Tools
         $options = array_merge($options, array('name' => self::h($name), 'value' => $value));
         foreach ($options as $k => $v) {
             if (is_string($k) && !is_null($v)
-                && !self::among($k, 'before', 'between', 'after', 'table', 'flag', 'random-id', 'label-after', 'label-html', 'value')) {
+                && !self::among($k, 'before', 'between', 'after', 'table', 'random-id', 'label-after', 'label-html', 'label-class', 'value')) {
                 $result .= ' ' . $k . ($v === true ? '' : '="' . (mb_substr($k, 0, 2)=='on' ? self::h($v) : self::h($v)) . '"');
             }
         }
