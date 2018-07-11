@@ -268,6 +268,23 @@ class Tools
     }
 
     /**
+     * Return true if any of given argument variables are set
+     *
+     * @example Tools::anyset($_GET['article'], $_GET['category'])
+     * @param mixed variable(s) byref
+     * @return bool
+     */
+    public static function anyset(&$n)
+    {
+        foreach (func_get_args() as $value) {
+            if (isset($value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Return true if $text begins with $beginning
      *
      * @param string $text text to test
