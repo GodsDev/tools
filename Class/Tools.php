@@ -1,4 +1,8 @@
 <?php
+/**
+ * A class with additional miscelaneous, general-purpose methods.
+ * Some methods require PHP 5.6+
+ */
 
 namespace GodsDev\Tools;
 
@@ -268,16 +272,33 @@ class Tools
     }
 
     /**
-     * Return true if any of given argument variables are set
+     * Return true if all of given argument variables are set (ie. pass isset())
      *
      * @example Tools::anyset($_GET['article'], $_GET['category'])
      * @param mixed variable(s) byref
-     * @return bool
+     * @return bool true if all variables pass isset(), false otherwise
      */
-    public static function anyset(&$n)
+    public static function allset(&...$args) // "..."  requires PHP 5.6+
     {
-        foreach (func_get_args() as $value) {
-            if (isset($value)) {
+        foreach ($args as $arg) {
+            if (!isset($arg)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Return true if any of given argument variables are set (ie. pass isset())
+     *
+     * @example Tools::anyset($_GET['article'], $_GET['category'])
+     * @param mixed variable(s) byref
+     * @return bool true if any (at least one) variable pass isset(), false otherwise
+     */
+    public static function anyset(&...$args) // "..." requires PHP 5.6+
+    {
+        foreach ($args as $arg) {
+            if (isset($arg)) {
                 return true;
             }
         }
