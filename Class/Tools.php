@@ -1,7 +1,6 @@
 <?php
 /**
  * A class with additional miscelaneous, general-purpose methods.
- * Some methods require PHP 5.6+
  */
 
 namespace GodsDev\Tools;
@@ -272,30 +271,34 @@ class Tools
     }
 
     /**
-     * Return true if all of given argument variables are set (ie. pass isset())
-     *
-     * @example Tools::anyset($_GET['article'], $_GET['category'])
-     * @param mixed variable(s) byref
-     * @return bool true if all variables pass isset(), false otherwise
-     */
-    public static function allset(&...$args) // "..."  requires PHP 5.6+
-    {
-        foreach ($args as $arg) {
-            if (!isset($arg)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
      * Return true if any of given argument variables are set (ie. pass isset())
+     * Version for PHP below 5.6 is limited to 100 arguments.
      *
      * @example Tools::anyset($_GET['article'], $_GET['category'])
      * @param mixed variable(s) byref
      * @return bool true if any (at least one) variable pass isset(), false otherwise
      */
-    public static function anyset(&...$args) // "..." requires PHP 5.6+
+    public static function anyset(&$n0, &$n1 = 0, &$n2 = 0, &$n3 = 0, &$n4 = 0, &$n5 = 0, &$n6 = 0, &$n7 = 0, &$n8 = 0, &$n9 = 0,
+        &$n10 = 0, &$n11 = 0, &$n12 = 0, &$n13 = 0, &$n14 = 0, &$n15 = 0, &$n16 = 0, &$n17 = 0, &$n18 = 0, &$n19 = 0,
+        &$n20 = 0, &$n21 = 0, &$n22 = 0, &$n23 = 0, &$n24 = 0, &$n25 = 0, &$n26 = 0, &$n27 = 0, &$n28 = 0, &$n29 = 0,
+        &$n30 = 0, &$n31 = 0, &$n32 = 0, &$n33 = 0, &$n34 = 0, &$n35 = 0, &$n36 = 0, &$n37 = 0, &$n38 = 0, &$n39 = 0,
+        &$n40 = 0, &$n41 = 0, &$n42 = 0, &$n43 = 0, &$n44 = 0, &$n45 = 0, &$n46 = 0, &$n47 = 0, &$n48 = 0, &$n49 = 0,
+        &$n50 = 0, &$n51 = 0, &$n52 = 0, &$n53 = 0, &$n54 = 0, &$n55 = 0, &$n56 = 0, &$n57 = 0, &$n58 = 0, &$n59 = 0,
+        &$n60 = 0, &$n61 = 0, &$n62 = 0, &$n63 = 0, &$n64 = 0, &$n65 = 0, &$n66 = 0, &$n67 = 0, &$n68 = 0, &$n69 = 0,
+        &$n70 = 0, &$n71 = 0, &$n72 = 0, &$n73 = 0, &$n74 = 0, &$n75 = 0, &$n76 = 0, &$n77 = 0, &$n78 = 0, &$n79 = 0,
+        &$n80 = 0, &$n81 = 0, &$n82 = 0, &$n83 = 0, &$n84 = 0, &$n85 = 0, &$n86 = 0, &$n87 = 0, &$n88 = 0, &$n89 = 0,
+        &$n90 = 0, &$n91 = 0, &$n92 = 0, &$n93 = 0, &$n94 = 0, &$n95 = 0, &$n96 = 0, &$n97 = 0, &$n98 = 0, &$n99 = 0)
+    {
+        for ($i = 0, $len = func_num_args(); $i < $len; $i++) {
+            $var = "n$i";
+            if (isset($$var)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    /* version with "..." requires PHP 5.6+
+    public static function anyset(&...$args)
     {
         foreach ($args as $arg) {
             if (isset($arg)) {
@@ -304,6 +307,7 @@ class Tools
         }
         return false;
     }
+    */
 
     /**
      * Return true if $text begins with $beginning
@@ -378,14 +382,14 @@ class Tools
     public static function addMessage($type, $message, $show = false)
     {
         $_SESSION['messages'] = self::setarray($_SESSION['messages']) ? $_SESSION['messages'] : array();
-        $_SESSION['messages'] []= array($type, $message);
+        $_SESSION['messages'] []= array($type == 'error' ? 'danger' : $type, $message);
         if ($show) {
             self::showMessages();
         }
     }
 
     /**
-     * Return or show session message variables as HTML <div>s and unset them.
+     * Return or show session message variables as HTML <div>s and unset them. Bootstrap styling is used.
      *
      * @param bool $echo (optional) echo the messages immediately?
      * @return void or array with session messages or void if $echo == true
@@ -402,7 +406,6 @@ class Tools
         $result = '';
         foreach ((array)$_SESSION['messages'] as $key => $message) {
             if (isset($message[0], $message[1])) {
-                $message[0] = $message[0] == 'error' ? 'danger' : $message[0];
                 $result .= '<div class="alert alert-dismissible alert-' . self::h($message[0]) . '" role="alert">'
                     . '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
                     . '<i class="' . $ICONS[$message[0]] . ' mr-1"></i> ' . $message[1] . '</div>' . PHP_EOL;
@@ -653,7 +656,9 @@ class Tools
     }
 
     /**
-     * Basic escaping of a string for use in MySQL. Database-specific. Outdated. Use mysqli_real_escape_string() instead.
+     * Basic escaping of a string for use in MySQL. Database-specific.
+     * Outdated and discouraged to use. Use mysqli_real_escape_string() instead.
+     * 
      * @param string $input
      * @return string
      */
@@ -704,7 +709,7 @@ class Tools
     }
 
     /**
-     * Perform a HTTP redirection to given (or same) URL.
+     * Perform a HTTP redirection to a given URL.
      *
      * @param string $url (optional) URL to redirect to. Default value "" means the current URL
      * @return void
@@ -791,10 +796,11 @@ class Tools
 
     /**
      * Walk through given array and extract only selected keys
-     * @example arrayConfineKeys(array(array('name'=>'John', 'age'=>43), array('name'=>'Lucy', 'age'=>28)), 'age') --> array(43, 28)
+     * @example $employees = [[name=>John, age=>43], [name=>Lucy, age=>28]]
+     *          arrayConfineKeys($employees, 'age') --> array(43, 28)
      *
      * @param mixed[] $array Array to walk through
-     * @param mixed[] $keys Array of keys to extract
+     * @param mixed $keys key or array of keys to extract
      * @return array
      */
     public static function arrayConfineKeys($array, $keys)
@@ -819,7 +825,7 @@ class Tools
 
     /**
      * Extract a string separated by a given separator on a given position 
-     * @example exploded('|', 'apple|banana|kiwi', 1) -> banana
+     * @example exploded('-', '1996-07-30', 2) -> '30'
      *
      * @param string $separator
      * @param string $string to extract from
@@ -971,16 +977,20 @@ class Tools
     /**
      * Plural form of a string according to a suplied number.
      *
+     * @example plural(1, 'child', false, 'children') --> 'child'
+     * @example plural(2, 'Jahr', 'Jahre', 'Jahren') --> 'Jahre'
+     *
      * @param int $amount amount
      * @param string $form1 form for amount of 1
-     * @param string $form234 form for amount of 2, 3, or 4
+     * @param string $form234 form for amount of 2, 3, or 4 (if false is given, $form5plus will be used)
      * @param string $form5plus form for amount of 5+
-     * @param string $form0 (optional) form for amount of 0 (omit it or give false to use $form5plus instead)
+     * @param string $form0 (optional) form for amount of 0 (omit it or submit false to use $form5plus instead)
      * @return string result form
      */
     public static function plural($amount, $form1, $form234, $form5plus, $form0 = false)
     {
         $amount = abs((int)$amount);
+        $form234 = $form234 !== false ? $form234 : $form5plus;
         $form0 = $form0 !== false ? $form0 : $form5plus;
         return $amount >= 5 ? $form5plus : ($amount == 1 ? $form1 : $form234);
     }
@@ -1003,12 +1013,13 @@ class Tools
     }
 
     /**
-     * Take a hash of arrays and rebase its keys to first item of each array's array
+     * Take a hash of arrays and rebase its keys to the first item of each array's array.
+     * If resulting items have only one item, get rid of array() 
      *
-     * @example [[0=>581, 1=>'Apple', 2=>'Fruits'], [0=>46, 1=>'Tomato', 2=>'Vegetables']]
-     *          --> [581=>[1=>'Apple', 'Fruits'], 45=>[1=>'Tomato', 'Vegetables']]
-     * @example [[0=>581, 1=>'Apple'], [0=>45, 1=>'Banana']]
-     *          --> [581=>'Apple', 45=>'Banana']
+     * @example $a = [[id=>5, name=>John, surname=>Doe], [id=>6, name=>Jane, surname=>Dean]]
+     *          $b = [[id=>5, name=>John], [id=>6, name=>Jane]]
+     *          arrayReindex($a, 'id') --> [5=>[name=>John, surname=>Doe], 6=>[name=>Jane, surname=>Dean]]
+     *          arrayReindex($b, 'id') --> [5=>John, 6=>Jane]
      *
      * @param array $array
      * @param mixed $index (optional)
@@ -1043,8 +1054,8 @@ class Tools
      *      Tools::arrayRemoveItems($a, ['Apple', 'Pear']) -> ['Kiwi'];
      *      Tools::arrayRemoveItems($a, 'Apple', 'Pear', 'Orange') -> ['Kiwi'];
      *
-     * @param mixed[] $array1 array to remove items from
-     * @param mixed[] $array2 either array containing values that are keys to be removed
+     * @param array $array1 array to remove items from
+     * @param mixed $array2 either array containing values that are keys to be removed
      *              or key(s) to be removed
      * @return array with removed keys
      *
@@ -1060,7 +1071,7 @@ class Tools
         } else {
             foreach (func_get_args() as $index => $arg) {
                 if ($index) {
-                    if (($key = array_search($arg, $array1)) !== false) {
+                    while (($key = array_search($arg, $array1)) !== false) {
                         unset($array1[$key]);
                     }
                 }
@@ -1164,21 +1175,71 @@ class Tools
     /**
      * Inverse to str_getcsv() - return comma-separated-values out of given array
      * For parameter details see PHP's fputcsv()
-     * credit: https://gist.github.com/johanmeiring/2894568
+     * edited version from https://gist.github.com/johanmeiring/2894568
      *
      * @param array $fields
      * @param string $delimiter (optional)
      * @param string $enclosure (optional)
      * @param string $escape_char (optional)
+     * @result string CSV of given arguments
      */
     public static function str_putcsv(array $fields, string $delimiter = ',', string $enclosure = '"', string $escape_char = "\\")
     {
         $fp = fopen('php://memory', 'r+b');
         fputcsv($fp, $fields, $delimiter, $enclosure, $escape_char);
-        $fpSize = ftell($fp);
+        $size = ftell($fp);
         rewind($fp);
-        $data = fread($fp, $fpSize);
+        $data = fread($fp, $size);
         fclose($fp);
         return $data;
+    }
+
+    /**
+     * Multibyte version of ucfirst()
+     *
+     * @param string $string
+     * @param string $encoding (optional)
+     * @result string
+     */
+    public static function mb_ucfirst($string, $encoding = null)
+    {
+        $encoding = $encoding ?: mb_internal_encoding();
+        return mb_strtoupper(mb_substr($string, 0, 1, $encoding), $encoding) . mb_substr($string, 1, null, $encoding);
+    }
+
+    /**
+     * Case-insensitive version of array_search()
+     *
+     * @param string $needle
+     * @param array $haystack
+     * @param bool $strict (optional)
+     * @param mixed $encoding (optional)
+     * @result mixed found key or false if needle not found
+     */
+    public static function array_search_i($needle, array $haystack, bool $strict = false, $encoding = null)
+    {
+        $encoding = $encoding ?: mb_internal_encoding();
+        $needle = mb_strtolower($needle, $encoding);
+        foreach ($haystack as $key => $value) {
+            if ($needle == mb_strtolower($value, $encoding)) {
+                return $key;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Case-insensitive version of in_array()
+     *
+     * @param string $needle
+     * @param array $haystack
+     * @param bool $strict (optional)
+     * @param mixed $encoding (optional)
+     * @result bool true/false whether the needle was found
+     */
+    public static function in_array_i($needle, array $haystack, bool $strict = false, $encoding = null)
+    {
+        $key = self::array_search_i($needle, $haystack, $strict, $encoding);
+        return $key !== false && isset($haystack[$key]);
     }
 }
