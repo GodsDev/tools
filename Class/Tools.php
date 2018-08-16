@@ -125,7 +125,7 @@ class Tools
      * @param mixed $b value returned if parameter #1 is null
      * @return mixed
      */
-    public static function ifnull($a, $b)
+    public static function ifnull($a)
     {
         foreach (func_get_args() as $arg) {
             if (!is_null($arg)) {
@@ -275,7 +275,7 @@ class Tools
      * Version for PHP below 5.6 is limited to 100 arguments.
      *
      * @example Tools::anyset($_GET['article'], $_GET['category'])
-     * @param mixed variable(s) byref
+     * @param mixed &$n variable(s)
      * @return bool true if any (at least one) variable pass isset(), false otherwise
      */
     public static function anyset(&$n0, &$n1 = 0, &$n2 = 0, &$n3 = 0, &$n4 = 0, &$n5 = 0, &$n6 = 0, &$n7 = 0, &$n8 = 0, &$n9 = 0,
@@ -326,13 +326,13 @@ class Tools
         }
         if ($caseSensitive) {
             foreach ($beginning as $value) {
-                if (mb_substr($text, 0, mb_strlen($value), $encoding) === $value) {
+                if (mb_substr($text, 0, mb_strlen($value, $encoding), $encoding) === $value) {
                     return true;
                 }
             }
         } else {
             foreach ($beginning as $value) {
-                if (mb_strtolower(mb_substr($text, 0, mb_strlen($value)), $encoding) === mb_strtolower($value)) {
+                if (mb_strtolower(mb_substr($text, 0, mb_strlen($value, $encoding)), $encoding) === mb_strtolower($value)) {
                     return true;
                 }
             }
@@ -357,13 +357,13 @@ class Tools
         }
         if ($caseSensitive) {
             foreach ($ending as $value) {
-                if (mb_substr($text, -mb_strlen($value), null, $encoding) === $value) {
+                if (mb_substr($text, -mb_strlen($value, $encoding), null, $encoding) === $value) {
                     return true;
                 }
             }
         } else {
             foreach ($ending as $value) {
-                if (mb_strtolower(mb_substr($text, -mb_strlen($value), null, $encoding)) === mb_strtolower($value)) {
+                if (mb_strtolower(mb_substr($text, -mb_strlen($value, $encoding), null, $encoding)) === mb_strtolower($value)) {
                     return true;
                 }
             }
@@ -881,6 +881,7 @@ class Tools
         }
         curl_setopt_array($ch, $curlOptions);
         $response = curl_exec($ch);
+        curl_close($ch);
         return curl_errno($ch) ? null : $response;
     }
 
@@ -1195,6 +1196,42 @@ class Tools
     }
 
     /**
+     * Short cut for finding a substring within a string and returning all before (or false on no match)
+     *
+     * @param string $haystack
+     * @param string $needle
+     * @param bool $caseSensitive (default: false)
+     * @return string substring before $needle or false is $needle wasn't found
+     */
+    public static function str_before($haystack, $needle, $caseSensitive = false, $encoding = null)
+    {
+        $encoding = $encoding ?: mb_internal_encoding();
+        $function = $caseSensitive ? 'mb_stripos' : 'mb_strpos';
+        if (($pos = $function($haystack, $needle, 0, $encoding)) === false) {
+            return false;
+        }
+        return mb_substr($haystack, 0, $pos, $encoding);
+    }
+
+    /**
+     * Short cut for finding a substring within a string and returning what follows (or false on no match)
+     *
+     * @param string $haystack
+     * @param string $needle
+     * @param bool $caseSensitive (default: false)
+     * @return string substring after $needle or false is $needle wasn't found
+     */
+    public static function str_after($haystack, $needle, $caseSensitive = false, $encoding = null)
+    {
+        $encoding = $encoding ?: mb_internal_encoding();
+        $function = $caseSensitive ? 'mb_stripos' : 'mb_strpos';
+        if (($pos = $function($haystack, $needle, 0, $encoding)) === false) {
+            return false;
+        }
+        return substr($haystack, $pos + strlen($needle));
+    }
+
+    /**
      * Multibyte version of ucfirst()
      *
      * @param string $string
@@ -1241,5 +1278,73 @@ class Tools
     {
         $key = self::array_search_i($needle, $haystack, $strict, $encoding);
         return $key !== false && isset($haystack[$key]);
+    }
+
+    /**
+     * Shortcut for checking value of given variable against given list and change it if it is not in it
+     *
+     * @example $os = 'Windows'; Tools::whitelist($os, ['Windows', 'Unix'], 'unsupported'); //$os remains 'Windows'
+     * @example $os = 'Solaris'; Tools::whitelist($os, ['Windows', 'Unix'], 'unsupported'); //$os set to 'unsupported'
+     * @param mixed &$value
+     * @param array $list
+     * @param mixed $else
+     * @return bool if the value was in the list
+     */
+    public static function whitelist(&$value, array $list, $else)
+    {
+        if (!in_array($value, $list)) {
+            $value = $else;
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Shortcut for checking value of given variable against given list and change if it is in it
+     *
+     * @example $word = 'vitamins'; Tools::blacklist($product, ['violence', 'sex'], null); //$word remains 'vitamins'
+     * @example $word = 'violence'; Tools::blacklist($product, ['violence', 'sex'], null); //$word set to null
+     * @param mixed &$value
+     * @param array $list
+     * @param mixed $else
+     * @return bool if the value was in the list
+     */
+    public static function blacklist(&$value, array $list, $else)
+    {
+        if (in_array($value, $list)) {
+            $value = $else;
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Return a HTTP response split into headers and body
+     *
+     * @param string $response
+     * @param array $options (optional)
+     *        $options['JSON'] = non-zero - apply json_decode() on response body
+     * @return array containing ['headers'] with HTTP headers and ['body'] with response body
+     */
+    public static function httpResponse($response, $options = array())
+    {
+        static $HEADERS_BODY_SEPARATOR = "\r\n\r\n";
+        $result = array(
+            'headers' => array(), 
+            'body' => array()
+        );
+        if ($pos = strpos($response, $HEADERS_BODY_SEPARATOR)) {
+            foreach (explode("\n", substr($response, 0, $pos)) as $key => $value) {
+                $value = trim($value, "\t\r\n ");
+                if ($value && ($p = strpos($value, ':'))) {
+                    $result['headers'][trim(substr($value, 0, $p), ' ')] = trim(substr($value, $p + 1), ' ');
+                }
+            }
+        }
+        $result['body'] = substr($response, $pos + strlen($HEADERS_BODY_SEPARATOR));
+        if (self::set($options['JSON'])) {
+            $result['body'] = json_decode($result['body'], true);
+        }
+        return $result;
     }
 }
