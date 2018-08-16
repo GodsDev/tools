@@ -1326,7 +1326,7 @@ class Tools
      *        $options['JSON'] = non-zero - apply json_decode() on response body
      * @return array containing ['headers'] with HTTP headers and ['body'] with response body
      */
-    public static function HTTPResponse($response, $options = array())
+    public static function httpResponse($response, $options = array())
     {
         static $HEADERS_BODY_SEPARATOR = "\r\n\r\n";
         $result = array(
@@ -1347,5 +1347,4 @@ class Tools
         }
         return $result;
     }
-
 }
