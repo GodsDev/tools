@@ -712,9 +712,10 @@ class Tools
      * Perform a HTTP redirection to a given URL.
      *
      * @param string $url (optional) URL to redirect to. Default value "" means the current URL
+     * @param int $HTTPCode (optional) HTTP code used in header. Should be between 300 and 399, default is 303.
      * @return void
      */
-    public static function redir($url = '')
+    public static function redir($url = '', $HTTPCode = 303)
     {
         $url = self::wrap($url,
             ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['SCRIPT_NAME'],
@@ -724,7 +725,7 @@ class Tools
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_write_close();
         }
-        header("Location: $url", true, 303);
+        header("Location: $url", true, $HTTPCode);
         header('Connection: close');
         die('<script type="text/javascript">window.location=' . json_encode($url) . ";</script>\n"
             . '<a href=' . urlencode($url) . '>&rarr;</a>'
