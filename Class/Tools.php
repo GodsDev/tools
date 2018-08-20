@@ -1045,9 +1045,10 @@ class Tools
     /**
      * Subtract items from given array.
      *
-     * @example $a = ['Apple', 'Pear', 'Kiwi']
-     *      Tools::arrayRemoveItems($a, ['Apple', 'Pear']) -> ['Kiwi'];
-     *      Tools::arrayRemoveItems($a, 'Apple', 'Pear', 'Orange') -> ['Kiwi'];
+     * @example $fruits = ['Apple', 'Pear', 2=>'Kiwi']
+     *      Tools::arrayRemoveItems($fruits, ['Apple', 'Pear']) --> [2=>'Kiwi'];
+     *      Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Orange') --> [2=>'Kiwi'];
+     *      Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Kiwi') --> [];
      *
      * @param array $array1 array to remove items from
      * @param mixed $array2 either array containing values that are keys to be removed
@@ -1057,22 +1058,24 @@ class Tools
      * Note: this function can have more arguments - argument #3, 4.. are taken as further items to remove
      * Note: no error, warning or notice is thrown if item in array is not found.
      */
-    public static function arrayRemoveItems($array1, $array2)
+    public static function arrayRemoveItems($array, $remove)
     {
-        if (is_array($array2)) {
-            foreach ($array2 as $i) {
-                unset($array1[$i]);
+        if (is_array($remove)) {
+            foreach ($remove as $item) {
+                while (($key = array_search($item, $array)) !== false) {
+                    unset($array[$key]);
+                }
             }
         } else {
-            foreach (func_get_args() as $index => $arg) {
+            foreach (func_get_args() as $index => $item) {
                 if ($index) {
-                    while (($key = array_search($arg, $array1)) !== false) {
-                        unset($array1[$key]);
+                    while (($key = array_search($item, $array)) !== false) {
+                        unset($array[$key]);
                     }
                 }
             }
         }
-        return $array1;
+        return $array;
     }
 
     /**
