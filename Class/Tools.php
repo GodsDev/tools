@@ -108,7 +108,7 @@ class Tools
      * @return mixed
      * For just two arguments use: $a ?: $b;
      */
-    public static function ifempty($a, $b)
+    public static function ifempty($a)
     {
         foreach (func_get_args() as $arg) {
             if ($arg) {
@@ -321,9 +321,7 @@ class Tools
     public static function begins($text, $beginning, $caseSensitive = true, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
-        if (!is_array($beginning)) {
-            $beginning = array($beginning);
-        }
+        $beginning = is_array($beginning) ? $beginning : array($beginning);  
         if ($caseSensitive) {
             foreach ($beginning as $value) {
                 if (mb_substr($text, 0, mb_strlen($value, $encoding), $encoding) === $value) {
@@ -352,9 +350,7 @@ class Tools
     public static function ends($text, $ending, $caseSensitive = true, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
-        if (!is_array($ending)) {
-            $ending = array($ending);
-        }
+        $ending = is_array($ending) ? $ending : array($ending); 
         if ($caseSensitive) {
             foreach ($ending as $value) {
                 if (mb_substr($text, -mb_strlen($value, $encoding), null, $encoding) === $value) {
@@ -465,11 +461,8 @@ class Tools
     }
 
     // used in ::htmlSelect()
-    protected static function htmlSelectAppend($array, $default)
+    protected static function htmlSelectAppend(array $array, $default)
     {
-        if (!is_array($array)) {
-            return'';
-        }
         $result = '';
         foreach ($array as $key => $value) {
             $option = is_string($value) ? explode("\0", $value) : array_values($value); 
@@ -494,11 +487,9 @@ class Tools
     public static function htmlRadio($name, $input, $value = null, $options = array())
     {
         $result = '';
-        if (!is_array($input)) {
-            $input = array($input);
-        }
-        if (is_array($value)) {
-            $value = @$value[$name];
+        $input = is_array($input) ? $input : array($input);
+        if (is_array($value) && isset($value[$name])) {
+            $value = $value[$name];
         }
         $name = self::h($name);
         $i = +@$options['offset'];
@@ -647,10 +638,11 @@ class Tools
      * @param string $ellipsis (optional) string to signify ellipsis
      * @return string
      */
-    public static function shortify($string, $limit, $ellipsis = '…')
+    public static function shortify($string, $limit, $ellipsis = '…', $encoding = null)
     {
-        if (mb_strlen($string) > $limit) {
-            return mb_substr($string, 0, $limit) . $ellipsis;
+        $encoding = $encoding ?: mb_internal_encoding();
+        if (mb_strlen($string, $encoding) > $limit) {
+            return mb_substr($string, 0, $limit, $encoding) . $ellipsis;
         }
         return $string;
     }
