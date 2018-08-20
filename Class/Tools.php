@@ -891,11 +891,12 @@ class Tools
      *
      * @param array $changes parameters to add/modify, null as a value signifies omitting the key:value pair
      * @param bool $htmlspecialchars (optional) apply htmlspecialchars()?
+     * @return string URL-encoded string
      */
-    public static function urlChange($changes, $htmlspecialchars = false)
+    public static function urlChange(array $changes, $htmlspecialchars = false)
     {
-        parse_str($_SERVER['QUERY_STRING'], $parameters);
-        foreach ((array)$changes as $key => $value) {
+        parse_str(self::set($_SERVER['QUERY_STRING'], ''), $parameters);
+        foreach ($changes as $key => $value) {
             if (is_null($value)) {
                 unset($parameters[$key]);
             } else {
