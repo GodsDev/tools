@@ -1282,7 +1282,7 @@ class Tools
      * @param mixed $encoding (optional)
      * @result mixed found key or false if needle not found
      */
-    public static function array_search_i($needle, array $haystack, bool $strict = false, $encoding = null)
+    public static function array_search_i($needle, $haystack, bool $strict = false, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
         $needle = mb_strtolower($needle, $encoding);
@@ -1303,7 +1303,7 @@ class Tools
      * @param mixed $encoding (optional)
      * @result bool true/false whether the needle was found
      */
-    public static function in_array_i($needle, array $haystack, bool $strict = false, $encoding = null)
+    public static function in_array_i($needle, $haystack, bool $strict = false, $encoding = null)
     {
         $key = self::array_search_i($needle, $haystack, $strict, $encoding);
         return $key !== false && isset($haystack[$key]);
@@ -1319,7 +1319,7 @@ class Tools
      * @param mixed $else
      * @return bool if the value was in the list
      */
-    public static function whitelist(&$value, array $list, $else)
+    public static function whitelist(&$value, $list, $else)
     {
         if (!in_array($value, $list)) {
             $value = $else;
@@ -1338,7 +1338,7 @@ class Tools
      * @param mixed $else
      * @return bool if the value was in the list
      */
-    public static function blacklist(&$value, array $list, $else)
+    public static function blacklist(&$value, $list, $else)
     {
         if (in_array($value, $list)) {
             $value = $else;
