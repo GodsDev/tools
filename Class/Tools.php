@@ -1,6 +1,10 @@
 <?php
 /**
  * A class with additional miscelaneous, general-purpose methods.
+ *
+ * Compatible with PHP 5.6.
+ * Use of classes: DateTime (relativeTime()), DOMDocument, DOMXPath (stripAttributes).
+ * str_putcsv() opens the "php://memory" stream
  */
 
 namespace GodsDev\Tools;
@@ -67,7 +71,7 @@ class Tools
     );
 
     /**
-     * Converts ", ', &, <, > in $string to &quot; &#039/&apos; &lt;, &gt; respectively
+     * Converts ", ', &, <, > in $string to &quot; &#039/&apos; &lt;, &gt; respectively.
      *
      * @param string $string unescaped string 
      * @return string escaped string to use in HTML 
@@ -79,7 +83,7 @@ class Tools
 
     /**
      * If called with just one parameter, returns given variable if it is set and non-zero, false otherwise.
-     * If called with two parameters, assign the 2nd parameter to the 1st if the 1st variable is not set or not non-zero 
+     * If called with two parameters, assign the 2nd parameter to the 1st if the 1st variable is not set or not non-zero. 
      *
      * @example unset($a); echo Tools::set($a); // false
      * @example $a = 0; echo Tools::set($a); // false
@@ -101,7 +105,7 @@ class Tools
     }
 
     /**
-     * Return first non-zero parameter passed to this function, or the 1st parameter if all are non-zero
+     * Return first non-zero parameter passed to this function, or the 1st parameter if all are non-zero.
      *
      * @param mixed $a tested value(s)
      * @return mixed
@@ -118,7 +122,7 @@ class Tools
     }
 
     /**
-     * Return first non-null parameter passed to this function, or null
+     * Return first non-null parameter passed to this function, or null.
      *
      * @param mixed $a tested value
      * @param mixed $b value returned if parameter #1 is null
@@ -135,7 +139,7 @@ class Tools
     }
 
     /**
-     * Shortcut for isset($a) && $a == $b, esp. useful for long variables
+     * Shortcut for isset($a) && $a == $b; useful for long variables.
      *
      * @param mixed &$a tested variable
      * @param mixed $b tested value
@@ -147,7 +151,7 @@ class Tools
     }
 
     /**
-     * Shortcut for isset($a) && !empty($a), esp. useful for long variables
+     * Shortcut for isset($a) && !empty($a); useful for long variables.
      *
      * @param mixed &$a tested variable
      * @return bool
@@ -158,7 +162,7 @@ class Tools
     }
 
     /**
-     * Shortcut for isset($a) && $a, esp. useful for long variables
+     * Shortcut for isset($a) && $a; useful for long variables.
      *
      * @param mixed &$a tested variable
      * @return bool
@@ -169,7 +173,7 @@ class Tools
     }
 
     /**
-     * Shortcut for isset($a) ? $a : $b
+     * Shortcut for isset($a) ? $a : $b;
      *
      * @param mixed &$a tested variable
      * @param mixed $b optional variable in case $a is not set
@@ -193,7 +197,7 @@ class Tools
     }
 
     /**
-     * Shortcut for if (isset($a) && is_null($a)) $a = $b; useful for long variables
+     * Shortcut for if (isset($a) && is_null($a)) $a = $b; useful for long variables.
      *
      * @param mixed &$a tested variable
      * @param mixed $b (optional) value in case $a is not set or null
@@ -205,7 +209,7 @@ class Tools
     }
 
     /**
-     * Shortcut for if (isset($a) && !$a) $a = $b; useful for long variables
+     * Shortcut for if (isset($a) && !$a) $a = $b; useful for long variables.
      *
      * @param mixed &$a tested variable
      * @param mixed $b (optional) value in case $a is not set or empty
@@ -217,7 +221,7 @@ class Tools
     }
 
     /**
-     * Shortcut for isset($a) && is_scalar($a)
+     * Shortcut for isset($a) && is_scalar($a);
      *
      * @param mixed &$a tested variable
      * @return bool
@@ -228,7 +232,7 @@ class Tools
     }
 
     /**
-     * Shortcut for isset($a) && is_array($a)
+     * Shortcut for isset($a) && is_array($a);
      *
      * @param mixed &$a tested variable
      * @return bool
@@ -239,7 +243,7 @@ class Tools
     }
 
     /**
-     * If $text is set and non-zero, return it with prefix and postfix around, return $else otherwise
+     * If $text is set and non-zero, return it with prefix and postfix around, return $else otherwise.
      *
      * @param mixed $text value to be wrapped or replaced by $else
      * @param mixed $prefix
@@ -256,7 +260,7 @@ class Tools
     }
 
     /**
-     * Return true if $n is among given parameters (more than one can be given)
+     * Return true if $n is among given parameters (more than one can be given).
      *
      * @param mixed $n value tested
      * @param mixed $m option(s)
@@ -270,9 +274,9 @@ class Tools
     }
 
     /**
-     * Return true if any of given argument variables are set (ie. pass isset())
+     * Return true if any of given argument variables are set (ie. pass isset()).
      * Version for PHP below 5.6 is limited to 100 arguments.
-     * To test if all arguments are set, simply use isset($var1, $var2, ...)
+     * To test if all arguments are set, simply use isset($var1, $var2, ...).
      *
      * @example Tools::anyset($_GET['article'], $_GET['category'])
      * @param mixed &$n variable(s)
@@ -310,7 +314,7 @@ class Tools
     */
 
     /**
-     * Return true if $text begins with $beginning
+     * Return true if $text begins with $beginning.
      *
      * @param string $text text to test
      * @param mixed $beginning string (for one) or array (for more) beginnings to test against
@@ -339,7 +343,7 @@ class Tools
     }
 
     /**
-     * Return true if $text ends with $ending
+     * Return true if $text ends with $ending.
      *
      * @param string $text text to test
      * @param mixed $ending string (for one) or array (for more) endings to test against
@@ -416,7 +420,7 @@ class Tools
     }
 
     /**
-     * HTML notation for <option> filled with given parameters
+     * HTML notation for <option> filled with given parameters.
      *
      * @param mixed $value
      * @param string $text
@@ -435,7 +439,10 @@ class Tools
     /**
      * HTML notation for <select>, options given either as an array or a SQL query.
      * @example htmlSelect('agree', ['Y'=>'Yes', 'N'=>'No'], 'N', ['class'=>'form-control']) -->
-     *          <select name="agree" class="form-control"><option value="Y">Yes</option><option value="N" selected="selected">No</option></select>
+     *          <select name="agree" class="form-control">
+     *          <option value="Y">Yes</option>
+     *          <option value="N" selected="selected">No</option>
+     *          </select>
      *
      * @param string $name
      * @param array $values
@@ -462,7 +469,13 @@ class Tools
             . '</select>' . PHP_EOL;
     }
 
-    // used in ::htmlSelect()
+    /**
+     * Used in ::htmlSelect().
+     *
+     * @param array $array key:value pairs to be converted to <option>s
+     * @param mixed $default
+     * @return string
+     */
     protected static function htmlSelectAppend(array $array, $default)
     {
         $result = '';
@@ -474,7 +487,7 @@ class Tools
     }
 
     /**
-     * HTML notation for one or more <input type=radio> element(s) filled with given parameters
+     * HTML notation for one or more <input type=radio> element(s) filled with given parameters.
      *
      * @param string $name name attribute of the element
      * @param array $input associative array of value=>label pairs
@@ -547,7 +560,7 @@ class Tools
     }
 
     /**
-     * HTML notation for the <input> or <textarea> tag. Used by self::htmlInput() and self::htmlTextarea()
+     * HTML notation for the <input> or <textarea> tag. Used by self::htmlInput() and self::htmlTextarea().
      *
      * @param string $name element name 
      * @param string $label label, omitted if empty, translated if true
@@ -614,7 +627,7 @@ class Tools
     }
 
     /**
-     * String conversion: diacritics --> ASCII, everything else than a-z, A-Z, 0-9, "_", "-" --> "-", then "--" --> "-" and "-" at the ends get trimmed 
+     * String conversion: diacritics --> ASCII, everything else than a-z, A-Z, 0-9, "_", "-" --> "-", then "--" --> "-" and "-" at the ends get trimmed. 
      *
      * @param $string string to webalize
      * @param $charlist (optional) string of chars to be used
@@ -704,7 +717,7 @@ class Tools
     }
 
     /**
-     * Escape a string to use in <script type="text/javascript">
+     * Escape a string to use in <script type="text/javascript"> blocks.
      *
      * @param string $string
      * @return string escaped string
@@ -802,9 +815,9 @@ class Tools
     }
 
     /**
-     * Walk through given array and extract only selected keys
+     * Walk through given array and extract only selected keys.
      * @example $employees = [[name=>John, surname=>Doe, age=>43], [name=>Lucy, surname=>Smith, age=>28]]
-     *          arrayConfineKeys($employees, 'age') --> ['age'=>43, 'age'=>28]
+     *          arrayConfineKeys($employees, 'age') --> [['age'=>43], ['age'=>28]]
      *
      * @param mixed[] $array Array to walk through
      * @param mixed $keys key or array of keys to extract
@@ -831,7 +844,7 @@ class Tools
     }
 
     /**
-     * Extract a string separated by a given separator on a given position 
+     * Extract a string separated by a given separator on a given position. 
      * @example exploded('-', '1996-07-30', 2) -> '30'
      *
      * @param string $separator
@@ -919,7 +932,7 @@ class Tools
     }
 
     /**
-     * How much time ago $datetime was according to the current time (Czech)
+     * How much time ago $datetime was according to the current time. Uses self::$LOCALE.
      *
      * @param mixed $datetime elapsed time as a string or an integer timestamp
      * @param string $language (optional) language code as key to Tools::LOCALE
@@ -941,11 +954,12 @@ class Tools
         }
         $result = explode(',', $result);
         $result = array_slice($result, 1, 2) ?: array(self::$LOCALE[$language]['time ago']['moment']);
-        return ($diff->invert ? self::$LOCALE[$language]['time ago']['in'] . ' ' : '') . implode(', ', $result) . ($diff->invert ? '' : ' ' . self::$LOCALE[$language]['time ago']['ago']);
+        return ($diff->invert ? self::$LOCALE[$language]['time ago']['in'] . ' ' : '') 
+            . implode(', ', $result) . ($diff->invert ? '' : ' ' . self::$LOCALE[$language]['time ago']['ago']);
     }
 
     /**
-     * Date (and time) locally.
+     * Date (and time) locally. Uses self::$LOCALE.
      *
      * @param mixed $datetime date/time as a string or integer
      * @param string $language (optional) language code as key to Tools::LOCALE
@@ -1007,7 +1021,7 @@ class Tools
     }
 
     /**
-     * Add an message according to given result
+     * Add an message according to given result.
      *
      * @param bool $success was the operation successful?
      * @param string $successMessage
@@ -1025,7 +1039,7 @@ class Tools
 
     /**
      * Take a hash of arrays and rebase its keys to the first item of each array's array.
-     * If resulting items have only one item, get rid of array() 
+     * If resulting items have only one item, get rid of array(). 
      *
      * @example $a = [[id=>5, name=>John, surname=>Doe], [id=>6, name=>Jane, surname=>Dean]]
      *          $b = [[id=>5, name=>John], [id=>6, name=>Jane]]
@@ -1144,7 +1158,7 @@ class Tools
     }
 
     /**
-     * Strip specified attributes of a given HTML/XML or its fragment
+     * Strip specified attributes of a given HTML/XML or its fragment.
      * Requires DOMDocument, DOMXPath, DOMElement, DOMElementList classes
      *
      * @param string $html HTML/XML - whole or partial
@@ -1187,7 +1201,7 @@ class Tools
     }
 
     /**
-     * Inverse to str_getcsv() - return comma-separated-values out of given array
+     * Inverse to str_getcsv() - return comma-separated-values out of given array.
      * For parameter details see PHP's fputcsv()
      * edited version from https://gist.github.com/johanmeiring/2894568
      *
@@ -1209,7 +1223,7 @@ class Tools
     }
 
     /**
-     * Short cut for finding a substring within a string and returning all before (or false on no match)
+     * Short cut for finding a substring within a string and returning all before (or false on no match).
      *
      * @param string $haystack
      * @param string $needle
@@ -1228,7 +1242,7 @@ class Tools
     }
 
     /**
-     * Short cut for finding a substring within a string and returning what follows (or false on no match)
+     * Short cut for finding a substring within a string and returning what follows (or false on no match).
      *
      * @param string $haystack
      * @param string $needle
@@ -1247,7 +1261,7 @@ class Tools
     }
 
     /**
-     * Multibyte version of ucfirst()
+     * Multibyte version of ucfirst().
      *
      * @param string $string
      * @param string $encoding (optional)
@@ -1260,7 +1274,7 @@ class Tools
     }
 
     /**
-     * Case-insensitive version of array_search()
+     * Case-insensitive version of array_search().
      *
      * @param string $needle
      * @param array $haystack
@@ -1281,7 +1295,7 @@ class Tools
     }
 
     /**
-     * Case-insensitive version of in_array()
+     * Case-insensitive version of in_array().
      *
      * @param string $needle
      * @param array $haystack
@@ -1296,7 +1310,7 @@ class Tools
     }
 
     /**
-     * Shortcut for checking value of given variable against given list and change it if it is not in it
+     * Shortcut for checking value of given variable against given list and change it if it is not in it.
      *
      * @example $os = 'Windows'; Tools::whitelist($os, ['Windows', 'Unix'], 'unsupported'); //$os remains 'Windows'
      * @example $os = 'Solaris'; Tools::whitelist($os, ['Windows', 'Unix'], 'unsupported'); //$os set to 'unsupported'
@@ -1315,7 +1329,7 @@ class Tools
     }
 
     /**
-     * Shortcut for checking value of given variable against given list and change if it is in it
+     * Shortcut for checking value of given variable against given list and change if it is in it.
      *
      * @example $word = 'vitamins'; Tools::blacklist($product, ['violence', 'sex'], null); //$word remains 'vitamins'
      * @example $word = 'violence'; Tools::blacklist($product, ['violence', 'sex'], null); //$word set to null
@@ -1334,7 +1348,7 @@ class Tools
     }
 
     /**
-     * Return a HTTP response split into headers and body
+     * Return a HTTP response split into headers and body.
      *
      * @param string $response
      * @param array $options (optional)
