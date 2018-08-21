@@ -101,12 +101,11 @@ class Tools
     }
 
     /**
-     * Return first non-zero parameter passed to this function, or the 1st parameter if all are empty
+     * Return first non-zero parameter passed to this function, or the 1st parameter if all are non-zero
      *
-     * @param mixed $a tested value
-     * @param mixed $b option(s)
+     * @param mixed $a tested value(s)
      * @return mixed
-     * For just two arguments use: $a ?: $b;
+     * For just two arguments use the ternary operator
      */
     public static function ifempty($a)
     {
@@ -273,6 +272,7 @@ class Tools
     /**
      * Return true if any of given argument variables are set (ie. pass isset())
      * Version for PHP below 5.6 is limited to 100 arguments.
+     * To test if all arguments are set, simply use isset($var1, $var2, ...)
      *
      * @example Tools::anyset($_GET['article'], $_GET['category'])
      * @param mixed &$n variable(s)
@@ -422,7 +422,7 @@ class Tools
      * @param string $text
      * @param mixed $default (optional)
      * @param bool $disabled (optional)
-     * @return string
+     * @return string HTML code
      */
     public static function htmlOption($value, $text, $default = null, $disabled = false)
     {
@@ -444,6 +444,7 @@ class Tools
      *  [prepend] array of options to prepend before $values
      *  [append] array of options to append after $values
      *  [class], [id], [onchange], ... optional HTML attributes to add to the <select> notation
+     * @return string HTML code
      */
     public static function htmlSelect($name, $values, $default, $options = array())
     {
@@ -453,11 +454,12 @@ class Tools
                 $result .= ' ' . $key . '="' . self::h($value) . '"';
             }
         }
-        $result .= '>' . PHP_EOL . self::htmlSelectAppend(@$options['prepend'], $default);
+        $result .= '>' . PHP_EOL . self::htmlSelectAppend(self::set($options['prepend'], array()), $default);
         foreach ((array)$values as $key => $value) {
             $result .= self::htmlOption($key, $value, $default);
         }
-        return $result . self::htmlSelectAppend(@$options['append'], $default) . '</select>' . PHP_EOL;
+        return $result . self::htmlSelectAppend(Tools::set($options['append'], array()), $default) 
+            . '</select>' . PHP_EOL;
     }
 
     // used in ::htmlSelect()
@@ -492,24 +494,30 @@ class Tools
             $value = $value[$name];
         }
         $name = self::h($name);
-        $i = +@$options['offset'];
-        foreach ($input as $k => $v) {
-            $result .= @$options['separator'] . '<input type="radio" name="' . $name . '" value="' . self::h($k) . '"'
-                . ($k === $value ? ' checked="checked"' : '')
+        foreach (array('offset', 'separator' ,'label-class' ,'radio-class') as $key) {
+            self::set($options[$key], '');
+        }
+        $i = (int)$options['offset'];
+        self::set($_SESSION['fill'][$name], '');
+        foreach ($input as $inputKey => $inputValue) {
+            $result .= $options['separator'] . '<input type="radio" name="' . $name . '" value="' . self::h($inputKey) . '"'
+                . ($inputKey === $value ? ' checked="checked"' : '')
                 . ' id="' . $name . '-' . $i . '"'
-                . self::wrap(@$options['radio-class'], ' class="', '"');
-            foreach ($options as $k2 => $v2) {
-                if (!in_array($k2, array('separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value')) && !is_null($v2)) {
-                    $result .= ' ' . $k2 . ($v2 === true ? '' : '="' . self::escapeJs($v2) . '"');
+                . self::wrap($options['radio-class'], ' class="', '"');
+            foreach ($options as $optionKey => $optionValue) {
+                if (!in_array($optionKey, array('separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value')) && !is_null($optionValue)) {
+                    $result .= ' ' . $optionKey . ($optionValue === true ? '' : '="' . self::escapeJs($optionValue) . '"');
                 }
             }
             $result .= '/> ';
-            if ($v = self::h($v)) {
-                $result .= '<label for="' . $name . '-' . $i . '" class="' . trim((@$_SESSION['fill'][$name] ? 'highlight' : '') . ' ' . @$options['label-class'], ' ') . '">' . $v . '</label>';
+            if ($inputValue = self::h($inputValue)) {
+                $result .= '<label for="' . $name . '-' . $i . '"'
+                    . self::wrap(trim(($_SESSION['fill'][$name] ? 'highlight' : '') . ' ' . $options['label-class'], ' '), ' class="', '"') 
+                    . '>' . $inputValue . '</label>';
             }
             $i++;
         }
-        return mb_substr($result, mb_strlen(@$options['separator']));
+        return mb_substr($result, mb_strlen($options['separator']));
     }
 
     /** 
@@ -520,10 +528,11 @@ class Tools
      * @param int $cols (optional)
      * @param int $rows (optional)
      * @param mixed[] $options (optional) See self::htmlTextInput() for more info
+     * @return string HTML code
      */
     public static function htmlTextarea($name, $content, $cols = 60, $rows = 5, $options = array())
     {
-        $label = @$options['label'];
+        $label = self::set($options['label'], '');
         unset($options['label']);
         $options = array_merge($options, array('cols' => $cols, 'rows' => $rows));
         return self::htmlTextInput($name, $label, $content, $options);
@@ -552,12 +561,13 @@ class Tools
      *     [label-html] - label given as raw HTML, don't escape HTML entities
      *     [label-class] - class(es) for label
      *     other tag's attributes - will be specified (except for NULLs)
+     * @return string HTML code
      */
     protected static function htmlTextInput($name, $label, $value, $options = array())
     {
         $result = '';
         if (is_array($value)) {
-            $value = @$value[$name];
+            $value = self::set($value[$name], '');
         }
         if (is_string($options)) {
             $options = array('type' => $options);
@@ -566,7 +576,7 @@ class Tools
             $options['id'] = 'input-' . self::webalize($name);
         }
         if (self::nonempty($options['random-id'])) {
-            $options['id'] = Tools::set($options['id'], 'input') . '-' . rand(1e8, 1e9-1);
+            $options['id'] = self::set($options['id'], 'input') . '-' . rand(1e8, 1e9-1);
         }
         if (!isset($options['rows']) and !self::nonempty($options['type'])) {
             $options['type'] = 'text';
@@ -580,12 +590,15 @@ class Tools
             $label = self::h($label);
         }
         self::setifempty($options['type'], 'text');
+        if (isset($options['rows'], $options['type'])) {
+            $options['type'] = null; // don't specify type="..." in <textarea>
+        }
         if ($options['type'] == 'disabled') {
             $result .= '<input type="hidden" name="' . self::h($name) . '" value="' . self::h($value) . '"/>';
             $options['type'] = 'text';
             $options['disabled'] = 'disabled';
         }
-        $result .= '<' . (isset($options['rows']) ? 'textarea' : 'input') . ' ';
+        $result .= '<' . (isset($options['rows']) ? 'textarea' : 'input');
         $options = array_merge($options, array('name' => self::h($name), 'value' => $value));
         foreach ($options as $k => $v) {
             if (is_string($k) && !is_null($v)
@@ -594,8 +607,9 @@ class Tools
             }
         }
         $result .= isset($options['rows']) ? '>' . self::h($value) . '</textarea>' : ' value="' . self::h($value) . '"/>';
-        $label = $label === '' || $label === false || $label === null ? '' : '<label' . self::wrap(self::h(self::set($options['id'])), ' for="', '"') . self::wrap(self::h(self::set($options['label-class'])), ' class="', '"') . '>' . $label . '</label>';
-        return $result = self::setifempty($options['before']) . (self::nonempty($options['label-after']) ? $result : $label)
+        $label = self::among($label, '', false, null) ? '' : '<label' . self::wrap(self::h(self::set($options['id'])), ' for="', '"') 
+            . self::wrap(self::h(self::set($options['label-class'], '')), ' class="', '"') . '>' . $label . '</label>';
+        return self::setifempty($options['before']) . (self::nonempty($options['label-after']) ? $result : $label)
             . self::setifempty($options['between']) . (self::nonempty($options['label-after']) ? $label : $result) . self::setifempty($options['after']);
     }
 
@@ -852,7 +866,7 @@ class Tools
      * @param mixed[] options (optional) changing CURL options
      * @return string response or null if curl_errno() is non-zero
      */
-    public static function curlCall($url, $options = array())
+    public static function curlCall($url, $options = array(), &$error = null)
     {
         $curlOptions = array(
             CURLOPT_URL => $url,
@@ -874,8 +888,10 @@ class Tools
         }
         curl_setopt_array($ch, $curlOptions);
         $response = curl_exec($ch);
+        $error = curl_error($ch);
+        $errno = curl_errno($ch);
         curl_close($ch);
-        return curl_errno($ch) ? null : $response;
+        return $errno ? null : $response;
     }
 
     /**
@@ -1181,7 +1197,7 @@ class Tools
      * @param string $escape_char (optional)
      * @result string CSV of given arguments
      */
-    public static function str_putcsv(array $fields, string $delimiter = ',', string $enclosure = '"', string $escape_char = "\\")
+    public static function str_putcsv(array $fields, $delimiter = ',', $enclosure = '"', $escape_char = "\\")
     {
         $fp = fopen('php://memory', 'r+b');
         fputcsv($fp, $fields, $delimiter, $enclosure, $escape_char);

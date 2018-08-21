@@ -65,7 +65,17 @@ class BackyardTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(false, Tools::equal($a, '0'));
         $this->assertSame(false, Tools::equal($a, 0.0));
         $this->assertSame(true, Tools::equal($a, 0));
+        // among
+        $a = 0;
+        $this->assertSame(false, Tools::among($a, '0'));
+        $a = false;
+        $this->assertSame(false, Tools::among($a, 0));
+        $a = null;
+        $this->assertSame(false, Tools::among($a, 0, false, true));
+        $this->assertSame(true, Tools::among($a, null));
         // anyset
+        $this->assertSame(false, Tools::anyset($_GET['a'], $_POST['abc'][1], $a));
+        $a = 1;
         $this->assertSame(true, Tools::anyset($_GET['a'], $_POST['abc'][1], $a));
         $a = null;
         $this->assertSame(false, Tools::anyset($_GET['a'], $a));
@@ -120,6 +130,38 @@ class BackyardTest extends \PHPUnit_Framework_TestCase
             ],
             'body' => "<p>Hello, world!</p>\n"
         ], Tools::httpResponse($response));
+        // htmlInput
+        $this->assertSame('<input type="text" name="info" value="a&apos;b&quot;c"/>', 
+            Tools::htmlInput('info', '', 'a\'b"c')
+        );
+        $this->assertSame('<label for="input-info">info:</label>'
+            . '<input id="input-info" type="text" name="info" value="a&apos;b&quot;c"/>', 
+            Tools::htmlInput('info', 'info:', 'a\'b"c')
+        );
+        $this->assertSame('<input class="text-right" id="info1" type="text" name="info" value="a&apos;b&quot;c"/>' . "\n"
+            . '<label for="info1" class="ml-1">info:</label>',
+            Tools::htmlInput('info', 'info:', 'a\'b"c', ['class' => 'text-right', 'label-class'=>'ml-1', 'id'=>'info1', 'label-after' => true, 'between' => "\n"])
+        );
+        // htmlTextarea
+        $this->assertSame('<textarea cols="60" rows="5" name="info">abc</textarea>', 
+            Tools::htmlTextarea('info', 'abc')
+        );
+        $this->assertSame('<textarea class="my-3" cols="61" rows="6" name="info">a&apos;b&quot;c</textarea>', 
+            Tools::htmlTextarea('info', 'a\'b"c', 61, 6, ['class'=>'my-3'])
+        );
+        // htmlRadio
+        $this->assertSame('<input type="radio" name="platform" value="0" id="platform-0"/>'
+            . ' <label for="platform-0">Android</label>'
+            . '<input type="radio" name="platform" value="1" id="platform-1"/>' //should not be checked <==> strict comparison between 1 and '1'
+            . ' <label for="platform-1">iOS</label>', 
+            Tools::htmlRadio('platform', [0=>'Android', 1=>'iOS'], '1', [])
+        );
+        $this->assertSame('<input type="radio" name="platform" value="0" id="platform-100" class="mr-1"/>'
+            . ' <label for="platform-100" class="ml-1">Android</label>,'
+            . '<input type="radio" name="platform" value="1" checked="checked" id="platform-101" class="mr-1"/>'
+            . ' <label for="platform-101" class="ml-1">iOS</label>', 
+            Tools::htmlRadio('platform', ['Android', 'iOS'], 1, ['label-class' => 'ml-1', 'radio-class' => 'mr-1', 'separator' => ',', 'offset' => 100])
+        );
         // urlChange
         unset($_SERVER['QUERY_STRING']);
         $this->assertSame('a=1&b=text', Tools::urlChange(['a' => 1,'b' => 'text']));
