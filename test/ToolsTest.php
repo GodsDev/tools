@@ -46,6 +46,7 @@ class BackyardTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(5, Tools::set($a, 6)); // $a = 5
         $this->assertSame(5, $a);
         // ifempty
+        $a = 5;
         $this->assertSame(5, Tools::ifempty($a, 6));
         $a = 0;
         $this->assertSame(5, Tools::ifempty($a, 5));
@@ -65,6 +66,29 @@ class BackyardTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(false, Tools::equal($a, '0'));
         $this->assertSame(false, Tools::equal($a, 0.0));
         $this->assertSame(true, Tools::equal($a, 0));
+        // nonempty
+        // nonzero
+        // ifset
+        // setifnotset
+        // setifnull
+        // setifempty
+        // setscalar
+        unset($a);
+        $this->assertSame(false, Tools::setscalar($a));
+        $a = true;
+        $this->assertSame(true, Tools::setscalar($a));
+        $a = array();
+        $this->assertSame(false, Tools::setscalar($a));
+        // setarray
+        unset($a);
+        $this->assertSame(false, Tools::setarray($a));
+        $a = true;
+        $this->assertSame(false, Tools::setarray($a));
+        $a = array();
+        $this->assertSame(true, Tools::setarray($a));
+        // wrap
+        $this->assertSame('<b>Hello</b>', Tools::wrap('Hello', '<b>', '</b>'));
+        $this->assertSame('N/A', Tools::wrap('', '<b>', '</b>', 'N/A'));
         // among
         $a = 0;
         $this->assertSame(false, Tools::among($a, '0'));
@@ -80,6 +104,130 @@ class BackyardTest extends \PHPUnit_Framework_TestCase
         $a = null;
         $this->assertSame(false, Tools::anyset($_GET['a'], $a));
         $this->assertSame(false, Tools::anyset($_GET['a'][2], $b, $a));
+        // begins
+        $palindrom = 'Příliš žluťoučký kůň úpěl ďábelské ódy!';
+        $this->assertSame(true, Tools::begins($palindrom, 'Příliš'));
+        $this->assertSame(true, Tools::begins($palindrom, 'pŘÍLIŠ', false));
+        // ends
+        $this->assertSame(true, Tools::ends($palindrom, 'ódy!'));
+        $this->assertSame(true, Tools::ends($palindrom, 'ÓDY!', false));
+        // addMessage
+        // showMessages
+        // htmlOption
+        $this->assertSame('<option value="1">Android</option>' . PHP_EOL, Tools::htmlOption(1, 'Android'));
+        // htmlSelect
+        $platforms = ['Android', 'iOS'];
+        $this->assertSame('<select name="platform">' . PHP_EOL
+            . '<option value="0">Android</option>' . PHP_EOL
+            . '<option value="1" selected="selected">iOS</option>' . PHP_EOL
+            . '</select>' . PHP_EOL, 
+            Tools::htmlSelect('platform', $platforms, 1, [])
+        );
+        // htmlRadio
+        $this->assertSame('<input type="radio" name="platform" value="0" id="platform-0"/>'
+            . ' <label for="platform-0">Android</label>'
+            . '<input type="radio" name="platform" value="1" id="platform-1"/>' //should not be checked <==> strict comparison between 1 and '1'
+            . ' <label for="platform-1">iOS</label>', 
+            Tools::htmlRadio('platform', $platforms, '1', [])
+        );
+        $this->assertSame('<input type="radio" name="platform" value="0" id="platform-100" class="mr-1"/>'
+            . ' <label for="platform-100" class="ml-1">Android</label>,'
+            . '<input type="radio" name="platform" value="1" checked="checked" id="platform-101" class="mr-1"/>'
+            . ' <label for="platform-101" class="ml-1">iOS</label>', 
+            Tools::htmlRadio('platform', $platforms, 1, ['label-class' => 'ml-1', 'radio-class' => 'mr-1', 'separator' => ',', 'offset' => 100])
+        );
+        // htmlTextarea
+        $this->assertSame('<textarea cols="60" rows="5" name="info">abc</textarea>', 
+            Tools::htmlTextarea('info', 'abc')
+        );
+        $this->assertSame('<textarea class="my-3" cols="61" rows="6" name="info">a&apos;b&quot;c</textarea>', 
+            Tools::htmlTextarea('info', 'a\'b"c', 61, 6, ['class'=>'my-3'])
+        );
+        // htmlInput
+        $this->assertSame('<input type="text" name="info" value="a&apos;b&quot;c"/>', 
+            Tools::htmlInput('info', '', 'a\'b"c')
+        );
+        $this->assertSame('<label for="input-info">info:</label>'
+            . '<input id="input-info" type="text" name="info" value="a&apos;b&quot;c"/>', 
+            Tools::htmlInput('info', 'info:', 'a\'b"c')
+        );
+        $this->assertSame('<input class="text-right" id="info1" type="text" name="info" value="a&apos;b&quot;c"/>' . "\n"
+            . '<label for="info1" class="ml-1">info:</label>',
+            Tools::htmlInput('info', 'info:', 'a\'b"c', ['class' => 'text-right', 'label-class'=>'ml-1', 'id'=>'info1', 'label-after' => true, 'between' => "\n"])
+        );
+        // webalize
+        // shortify
+        $this->assertSame('Příli…', Tools::shortify($palindrom, 5));
+        // escapeSQL
+        // escapeDbIdentifier
+        // escapeIn
+        // escapeJS
+        // redir
+        // arrayListed
+        // arrayConfineKeys
+        $employees = [['name'=>'John', 'age'=>43], ['name'=>'Lucy', 'age'=>28]];
+        $this->assertSame([['age'=>43], ['age'=>28]], Tools::arrayConfineKeys($employees, 'age'));
+        // exploded
+        $this->assertSame('30', Tools::exploded('-', '1996-07-30', 2));
+        // cutTill
+        // curlCall
+        // urlChange
+        unset($_SERVER['QUERY_STRING']);
+        $this->assertSame('a=1&b=text', Tools::urlChange(['a' => 1,'b' => 'text']));
+        // relativeTime
+        // localeDate
+        // localeTime
+        // plural
+        $this->assertSame('child', Tools::plural(1, 'child', false, 'children'));
+        $this->assertSame('Jahre', Tools::plural(2, 'Jahr', 'Jahre', 'Jahren'));
+        // resolve
+        // arrayReindex
+        $a = [
+            ['id'=>5, 'name'=>'John', 'surname'=>'Doe'], 
+            ['id'=>6, 'name'=>'Jane', 'surname'=>'Dean']
+        ];
+        $b = [
+            ['id'=>5, 'name'=>'John'], 
+            ['id'=>6, 'name'=>'Jane']
+        ];
+        $this->assertSame(
+            [
+                5=>['name'=>'John', 'surname'=>'Doe'], 
+                6=>['name'=>'Jane', 'surname'=>'Dean']
+            ],
+            Tools::arrayReindex($a, 'id')
+        ); 
+        $this->assertSame(
+            [
+                5=>'John', 
+                6=>'Jane'
+            ],
+            Tools::arrayReindex($b, 'id')
+        );
+        // arrayRemoveItems
+        $fruits = ['Apple', 'Pear', 'Kiwi'];
+        $this->assertSame([2=>'Kiwi'], Tools::arrayRemoveItems($fruits, ['Apple', 'Pear']));
+        $this->assertSame([2=>'Kiwi'], Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Orange'));
+        $this->assertSame([], Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Kiwi', 'Orange'));
+        // arrayKeyAsValues
+        $this->assertSame(['Apple'=>'Apple', 'Pear'=>'Pear', 'Kiwi'=>'Kiwi'], Tools::arrayKeyAsValues($fruits));
+        // randomPassword
+        // dump
+        // stripAttributes
+        // GoogleAuthenticatorCode
+        // str_putcsv
+        $fields = [2, null, false, true, 'ab;c', 'žluťoučký kůň', 'say "Hello"'];
+        $this->assertSame('2;;;1;"ab;c";"žluťoučký kůň";"say ""Hello"""'."\n", Tools::str_putcsv($fields, ';'));
+        // str_before
+        $this->assertSame('Příliš žluťoučký kůň', Tools::str_before($palindrom, ' úpěl ďábelské ódy!'));
+        $this->assertSame(false, Tools::str_before($palindrom, ' ÚPĚL ĎÁBELSKÉ ÓDY!'));
+        $this->assertSame('Příliš žluťoučký kůň', Tools::str_before($palindrom, ' ÚPĚL ĎÁBELSKÉ ÓDY!', true));
+        // str_after
+        $this->assertSame(' úpěl ďábelské ódy!', Tools::str_after($palindrom, 'Příliš žluťoučký kůň'));
+        $this->assertSame(false, Tools::str_after($palindrom, 'PŘÍLIŠ ŽLUŤOUČKÝ KŮŇ'));
+        $this->assertSame(' úpěl ďábelské ódy!', Tools::str_after($palindrom, 'PŘÍLIŠ ŽLUŤOUČKÝ KŮŇ', true));
+        // mb_ucfirst
+        $this->assertSame('Ďábelské ódy!', Tools::mb_ucfirst('ďábelské ódy!'));
         // array_search_i
         $fruits = [0 => 'Banana', 1 => 'Orange', 2 => 'Kiwi', 3 => 'ŠÍPEK', 'STRAWBERRY'];
         $this->assertSame(2, Tools::array_search_i('kiwi', $fruits));
@@ -87,26 +235,6 @@ class BackyardTest extends \PHPUnit_Framework_TestCase
         // in_array_i
         $this->assertSame(false, Tools::in_array_i('kiwi2', $fruits));
         $this->assertSame(true, Tools::in_array_i('šípek', $fruits));
-        // arrayRemoveItems
-        $fruits = ['Apple', 'Pear', 'Kiwi'];
-        $this->assertSame([2=>'Kiwi'], Tools::arrayRemoveItems($fruits, ['Apple', 'Pear']));
-        $this->assertSame([2=>'Kiwi'], Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Orange'));
-        $this->assertSame([], Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Kiwi', 'Orange'));
-        // mb_ucfirst
-        $this->assertSame('Šípek', Tools::mb_ucfirst('šípek'));
-        // shortify
-        $this->assertSame('Šípeč…', Tools::shortify('Šípeček', 5));
-        // str_after, str_before
-        $text = 'My name ís Emínem';
-        $this->assertSame('My name ís ', Tools::str_before($text, 'Emínem'));
-        $this->assertSame(false, Tools::str_before($text, 'EmíneM'));
-        $this->assertSame('My name ís ', Tools::str_before($text, 'EMÍNEM', true));
-        $this->assertSame('Emínem', Tools::str_after($text, 'name ís '));
-        $this->assertSame(false, Tools::str_after($text, 'Name ís '));
-        $this->assertSame('Emínem', Tools::str_after($text, 'Name Ís ', true));
-        // str_putcsv
-        $fields = [2, null, false, true, 'ab,c', 'Mary Jane', 'say "Hello"'];
-        $this->assertSame('2;;;1;ab,c;"Mary Jane";"say ""Hello"""'."\n", Tools::str_putcsv($fields, ';'));
         // whitelist
         $os = 'Windows';
         Tools::whitelist($os, ['Windows', 'Unix'], 'unsupported');
@@ -130,41 +258,11 @@ class BackyardTest extends \PHPUnit_Framework_TestCase
             ],
             'body' => "<p>Hello, world!</p>\n"
         ], Tools::httpResponse($response));
-        // htmlInput
-        $this->assertSame('<input type="text" name="info" value="a&apos;b&quot;c"/>', 
-            Tools::htmlInput('info', '', 'a\'b"c')
-        );
-        $this->assertSame('<label for="input-info">info:</label>'
-            . '<input id="input-info" type="text" name="info" value="a&apos;b&quot;c"/>', 
-            Tools::htmlInput('info', 'info:', 'a\'b"c')
-        );
-        $this->assertSame('<input class="text-right" id="info1" type="text" name="info" value="a&apos;b&quot;c"/>' . "\n"
-            . '<label for="info1" class="ml-1">info:</label>',
-            Tools::htmlInput('info', 'info:', 'a\'b"c', ['class' => 'text-right', 'label-class'=>'ml-1', 'id'=>'info1', 'label-after' => true, 'between' => "\n"])
-        );
-        // htmlTextarea
-        $this->assertSame('<textarea cols="60" rows="5" name="info">abc</textarea>', 
-            Tools::htmlTextarea('info', 'abc')
-        );
-        $this->assertSame('<textarea class="my-3" cols="61" rows="6" name="info">a&apos;b&quot;c</textarea>', 
-            Tools::htmlTextarea('info', 'a\'b"c', 61, 6, ['class'=>'my-3'])
-        );
-        // htmlRadio
-        $this->assertSame('<input type="radio" name="platform" value="0" id="platform-0"/>'
-            . ' <label for="platform-0">Android</label>'
-            . '<input type="radio" name="platform" value="1" id="platform-1"/>' //should not be checked <==> strict comparison between 1 and '1'
-            . ' <label for="platform-1">iOS</label>', 
-            Tools::htmlRadio('platform', [0=>'Android', 1=>'iOS'], '1', [])
-        );
-        $this->assertSame('<input type="radio" name="platform" value="0" id="platform-100" class="mr-1"/>'
-            . ' <label for="platform-100" class="ml-1">Android</label>,'
-            . '<input type="radio" name="platform" value="1" checked="checked" id="platform-101" class="mr-1"/>'
-            . ' <label for="platform-101" class="ml-1">iOS</label>', 
-            Tools::htmlRadio('platform', ['Android', 'iOS'], 1, ['label-class' => 'ml-1', 'radio-class' => 'mr-1', 'separator' => ',', 'offset' => 100])
-        );
-        // urlChange
-        unset($_SERVER['QUERY_STRING']);
-        $this->assertSame('a=1&b=text', Tools::urlChange(['a' => 1,'b' => 'text']));
+        $response = "pragma: no cache\r\n\r\n" . '["abc", 2, true, false, null, {"d": "e"}]';
+        $this->assertSame([
+            'headers' => ['pragma' => 'no cache'],
+            'body' => ["abc", 2, true, false, null, ["d" => "e"]]
+        ], Tools::httpResponse($response, ['JSON'=>true]));
     }
 
 }

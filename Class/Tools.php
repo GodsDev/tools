@@ -249,7 +249,7 @@ class Tools
      */
     public static function wrap($text, $prefix, $postfix = '', $else = '')
     {
-        if (isset($text) && $text) {
+        if ($text) {
             return $prefix . $text . $postfix;
         }
         return $else;
@@ -803,8 +803,8 @@ class Tools
 
     /**
      * Walk through given array and extract only selected keys
-     * @example $employees = [[name=>John, age=>43], [name=>Lucy, age=>28]]
-     *          arrayConfineKeys($employees, 'age') --> array(43, 28)
+     * @example $employees = [[name=>John, surname=>Doe, age=>43], [name=>Lucy, surname=>Smith, age=>28]]
+     *          arrayConfineKeys($employees, 'age') --> ['age'=>43, 'age'=>28]
      *
      * @param mixed[] $array Array to walk through
      * @param mixed $keys key or array of keys to extract
@@ -1192,9 +1192,9 @@ class Tools
      * edited version from https://gist.github.com/johanmeiring/2894568
      *
      * @param array $fields
-     * @param string $delimiter (optional)
-     * @param string $enclosure (optional)
-     * @param string $escape_char (optional)
+     * @param string $delimiter (optional) default ','
+     * @param string $enclosure (optional) default '"'
+     * @param string $escape_char (optional) default "\\"
      * @result string CSV of given arguments
      */
     public static function str_putcsv(array $fields, $delimiter = ',', $enclosure = '"', $escape_char = "\\")
@@ -1213,13 +1213,14 @@ class Tools
      *
      * @param string $haystack
      * @param string $needle
-     * @param bool $caseSensitive (default: false)
+     * @param bool $caseInsensitive (optional) default: false
+     * @param string $encoding (optional)
      * @return string substring before $needle or false is $needle wasn't found
      */
-    public static function str_before($haystack, $needle, $caseSensitive = false, $encoding = null)
+    public static function str_before($haystack, $needle, $caseInsensitive = false, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
-        $function = $caseSensitive ? 'mb_stripos' : 'mb_strpos';
+        $function = $caseInsensitive ? 'mb_stripos' : 'mb_strpos';
         if (($pos = $function($haystack, $needle, 0, $encoding)) === false) {
             return false;
         }
@@ -1231,13 +1232,14 @@ class Tools
      *
      * @param string $haystack
      * @param string $needle
-     * @param bool $caseSensitive (default: false)
+     * @param bool $caseInsensitive (optional) default: false
+     * @param string $encoding (optional)
      * @return string substring after $needle or false is $needle wasn't found
      */
-    public static function str_after($haystack, $needle, $caseSensitive = false, $encoding = null)
+    public static function str_after($haystack, $needle, $caseInsensitive = false, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
-        $function = $caseSensitive ? 'mb_stripos' : 'mb_strpos';
+        $function = $caseInsensitive ? 'mb_stripos' : 'mb_strpos';
         if (($pos = $function($haystack, $needle, 0, $encoding)) === false) {
             return false;
         }
@@ -1283,7 +1285,7 @@ class Tools
      *
      * @param string $needle
      * @param array $haystack
-     * @param bool $strict (optional)
+     * @param bool $strict (optional) default false
      * @param mixed $encoding (optional)
      * @result bool true/false whether the needle was found
      */
