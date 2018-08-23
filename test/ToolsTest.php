@@ -124,17 +124,16 @@ class BackyardTest extends \PHPUnit_Framework_TestCase
             Tools::htmlSelect('platform', $platforms, 1, [])
         );
         // htmlRadio
-        $this->assertSame('<input type="radio" name="platform" value="0" id="platform-0"/>'
-            . ' <label for="platform-0">Android</label>'
-            . '<input type="radio" name="platform" value="1" id="platform-1"/>' //should not be checked <==> strict comparison between 1 and '1'
-            . ' <label for="platform-1">iOS</label>', 
+        $this->assertSame('<label><input type="radio" name="platform" value="0"/> Android</label>'
+            . '<label><input type="radio" name="platform" value="1"/> iOS</label>', //should not be checked <==> strict comparison between 1 and '1'
             Tools::htmlRadio('platform', $platforms, '1', [])
         );
-        $this->assertSame('<input type="radio" name="platform" value="0" id="platform-100" class="mr-1"/>'
-            . ' <label for="platform-100" class="ml-1">Android</label>,'
-            . '<input type="radio" name="platform" value="1" checked="checked" id="platform-101" class="mr-1"/>'
-            . ' <label for="platform-101" class="ml-1">iOS</label>', 
-            Tools::htmlRadio('platform', $platforms, 1, ['label-class' => 'ml-1', 'radio-class' => 'mr-1', 'separator' => ',', 'offset' => 100])
+        $this->assertSame('<label class="ml-1"><input type="radio" name="platform" value="0" class="mr-1"/>…Android</label>,'
+            . '<label class="ml-1"><input type="radio" name="platform" value="1" checked="checked" class="mr-1"/>…iOS</label>', 
+            Tools::htmlRadio('platform', $platforms, 1, ['label-class' => 'ml-1', 'radio-class' => 'mr-1', 'separator' => ',', 'between' => '…'])
+        );
+        $this->assertSame('<input type="radio" name="platform" value=""/>', 
+            Tools::htmlRadio('platform', '', 1)
         );
         // htmlTextarea
         $this->assertSame('<textarea cols="60" rows="5" name="info">abc</textarea>', 

@@ -494,15 +494,15 @@ class Tools
      * @param scalar $value value that should be checked
      * @param mixed[] $options (optional)
      *     [separator] - between items,
-     *     [offset] - start index for the "id" attributes (0 by default),
      *     [radio-class] - optional class for <input type=radio>,
      *     [label-class] - optional class for <label>,
+     *     [between] - what is between the input and its label (in raw HTML; default is " ")
      * @return string HTML code
      */
     public static function htmlRadio($name, $input, $value = null, $options = array())
     {
         $result = '';
-        $input = is_array($input) ? $input : array($input);
+        $input = is_array($input) ? $input : array($input => $input);
         if (is_array($value) && isset($value[$name])) {
             $value = $value[$name];
         }
@@ -511,23 +511,20 @@ class Tools
             self::set($options[$key], '');
         }
         $i = (int)$options['offset'];
+        self::set($options['between'], ' ');
         self::set($_SESSION['fill'][$name], '');
         foreach ($input as $inputKey => $inputValue) {
-            $result .= $options['separator'] . '<input type="radio" name="' . $name . '" value="' . self::h($inputKey) . '"'
+            $result .= $options['separator'] 
+                . ($inputValue !== '' ? '<label' . self::wrap(trim(($_SESSION['fill'][$name] ? 'highlight' : '') . ' ' . $options['label-class'], ' '), ' class="', '"') . '>' : '')
+                . '<input type="radio" name="' . $name . '" value="' . self::h($inputKey) . '"'
                 . ($inputKey === $value ? ' checked="checked"' : '')
-                . ' id="' . $name . '-' . $i . '"'
                 . self::wrap($options['radio-class'], ' class="', '"');
             foreach ($options as $optionKey => $optionValue) {
-                if (!in_array($optionKey, array('separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value')) && !is_null($optionValue)) {
+                if (!in_array($optionKey, array('separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value', 'between')) && !is_null($optionValue)) {
                     $result .= ' ' . $optionKey . ($optionValue === true ? '' : '="' . self::escapeJs($optionValue) . '"');
                 }
             }
-            $result .= '/> ';
-            if ($inputValue = self::h($inputValue)) {
-                $result .= '<label for="' . $name . '-' . $i . '"'
-                    . self::wrap(trim(($_SESSION['fill'][$name] ? 'highlight' : '') . ' ' . $options['label-class'], ' '), ' class="', '"') 
-                    . '>' . $inputValue . '</label>';
-            }
+            $result .= '/>' . ($inputValue !== '' ? $options['between'] . Tools::h($inputValue) . '</label>' : '');
             $i++;
         }
         return mb_substr($result, mb_strlen($options['separator']));
