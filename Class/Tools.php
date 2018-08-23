@@ -453,7 +453,7 @@ class Tools
      *  [class], [id], [onchange], ... optional HTML attributes to add to the <select> notation
      * @return string HTML code
      */
-    public static function htmlSelect($name, $values, $default, $options = array())
+    public static function htmlSelect($name, array $values, $default, $options = array())
     {
         $result = '<select name="' . self::h($name) . '"';
         foreach ($options as $key => $value) {
@@ -462,7 +462,7 @@ class Tools
             }
         }
         $result .= '>' . PHP_EOL . self::htmlSelectAppend(self::set($options['prepend'], array()), $default);
-        foreach ((array)$values as $key => $value) {
+        foreach ($values as $key => $value) {
             $result .= self::htmlOption($key, $value, $default);
         }
         return $result . self::htmlSelectAppend(Tools::set($options['append'], array()), $default) 
@@ -490,7 +490,7 @@ class Tools
      * HTML notation for one or more <input type=radio> element(s) filled with given parameters.
      *
      * @param string $name name attribute of the element
-     * @param array $input associative array of value=>label pairs
+     * @param mixed $input associative array of value=>label pairs or one value (in case of one item)
      * @param scalar $value value that should be checked
      * @param mixed[] $options (optional)
      *     [separator] - between items,
@@ -1049,23 +1049,21 @@ class Tools
      * @param array $array
      * @param mixed $index (optional)
      */
-    public static function arrayReindex($array, $index = 0)
+    public static function arrayReindex(array $array, $index = 0)
     {
         $result = array();
-        if (is_array($array) && count($array)) {
-            foreach ($array as $item) {
-                if (isset($item[$index])) {
-                    $key = $item[$index];
-                    unset($item[$index]);
-                    if (count($item) == 1) {
-                        $item = reset($item);
-                    }
-                    if (isset($result[$key])) {
-                        $result[$key] = (array)$result[$key];
-                        $result[$key] []= $item;
-                    } else {
-                        $result[$key] = $item;
-                    }
+        foreach ($array as $item) {
+            if (isset($item[$index])) {
+                $key = $item[$index];
+                unset($item[$index]);
+                if (count($item) == 1) {
+                    $item = reset($item);
+                }
+                if (isset($result[$key])) {
+                    $result[$key] = (array)$result[$key];
+                    $result[$key] []= $item;
+                } else {
+                    $result[$key] = $item;
                 }
             }
         }
@@ -1088,7 +1086,7 @@ class Tools
      * Note: this function can have more arguments - argument #3, 4.. are taken as further items to remove
      * Note: no error, warning or notice is thrown if item in array is not found.
      */
-    public static function arrayRemoveItems($array, $remove)
+    public static function arrayRemoveItems(array $array, $remove)
     {
         if (is_array($remove)) {
             foreach ($remove as $item) {
@@ -1282,7 +1280,7 @@ class Tools
      * @param mixed $encoding (optional)
      * @result mixed found key or false if needle not found
      */
-    public static function array_search_i($needle, $haystack, bool $strict = false, $encoding = null)
+    public static function array_search_i($needle, array $haystack, $strict = false, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
         $needle = mb_strtolower($needle, $encoding);
@@ -1303,7 +1301,7 @@ class Tools
      * @param mixed $encoding (optional)
      * @result bool true/false whether the needle was found
      */
-    public static function in_array_i($needle, $haystack, bool $strict = false, $encoding = null)
+    public static function in_array_i($needle, array $haystack, $strict = false, $encoding = null)
     {
         $key = self::array_search_i($needle, $haystack, $strict, $encoding);
         return $key !== false && isset($haystack[$key]);
@@ -1319,7 +1317,7 @@ class Tools
      * @param mixed $else
      * @return bool if the value was in the list
      */
-    public static function whitelist(&$value, $list, $else)
+    public static function whitelist(&$value, array $list, $else)
     {
         if (!in_array($value, $list)) {
             $value = $else;
@@ -1338,7 +1336,7 @@ class Tools
      * @param mixed $else
      * @return bool if the value was in the list
      */
-    public static function blacklist(&$value, $list, $else)
+    public static function blacklist(&$value, array $list, $else)
     {
         if (in_array($value, $list)) {
             $value = $else;
@@ -1355,7 +1353,7 @@ class Tools
      *        $options['JSON'] = non-zero - apply json_decode() on response body
      * @return array containing ['headers'] with HTTP headers and ['body'] with response body
      */
-    public static function httpResponse($response, $options = array())
+    public static function httpResponse($response, array $options = array())
     {
         static $HEADERS_BODY_SEPARATOR = "\r\n\r\n";
         $result = array(
