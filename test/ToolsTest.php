@@ -262,6 +262,15 @@ class BackyardTest extends \PHPUnit_Framework_TestCase
             'headers' => ['pragma' => 'no cache'],
             'body' => ["abc", 2, true, false, null, ["d" => "e"]]
         ], Tools::httpResponse($response, ['JSON'=>true]));
+        // columnName
+        $this->assertSame('', Tools::columnName(-1));
+        $this->assertSame('A', Tools::columnName(0));
+        $this->assertSame('B', Tools::columnName(1));
+        $this->assertSame('Z', Tools::columnName(25));
+        $this->assertSame('AA', Tools::columnName(26));
+        $this->assertSame('AB', Tools::columnName(27));
+        $this->assertSame('ZZ', Tools::columnName(701));
+        $this->assertSame('AAA', Tools::columnName(702));
     }
 
 }

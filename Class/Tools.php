@@ -85,12 +85,12 @@ class Tools
      * If called with just one parameter, returns given variable if it is set and non-zero, false otherwise.
      * If called with two parameters, assign the 2nd parameter to the 1st if the 1st variable is not set or not non-zero. 
      *
-     * @example unset($a); echo Tools::set($a); // false
-     * @example $a = 0; echo Tools::set($a); // false
-     * @example $a = 5; echo Tools::set($a); // 5
-     * @example unset($a); echo Tools::set($a, 5); // returns 5, $a = 5
-     * @example $a = 0; echo Tools::set($a, 5); // returns 5, $a = 5
-     * @example $a = 4; echo Tools::set($a, 5); // returns 4, $a = 4
+     * @example unset($a); Tools::set($a); --> false
+     * @example $a = 0; Tools::set($a); --> false
+     * @example $a = 5; Tools::set($a); --> 5
+     * @example unset($a); Tools::set($a, 5); --> 5 ($a = 5)
+     * @example $a = 0; Tools::set($a, 5); --> 5 ($a = 5)
+     * @example $a = 4; Tools::set($a, 5); --> 4 ($a = 4)
      *
      * @param mixed &$a tested variable
      * @param mixed $b (optional) value to assign to the first variable
@@ -438,7 +438,7 @@ class Tools
 
     /**
      * HTML notation for <select>, options given either as an array or a SQL query.
-     * @example htmlSelect('agree', ['Y'=>'Yes', 'N'=>'No'], 'N', ['class'=>'form-control']) -->
+     * @example Tools::htmlSelect('agree', ['Y'=>'Yes', 'N'=>'No'], 'N', ['class'=>'form-control']) -->
      *          <select name="agree" class="form-control">
      *          <option value="Y">Yes</option>
      *          <option value="N" selected="selected">No</option>
@@ -750,7 +750,7 @@ class Tools
 
     /**
      * Like implode() but with more options.
-     * @example: arrayListed(array("Levi's", "Procter & Gamble"), 1, ", ", "<b>", "</b>") --> <b>Levi's</b>, <b>Procter &amp; Gamble</b>
+     * @example: Tools::arrayListed(array("Levi's", "Procter & Gamble"), 1, ", ", "<b>", "</b>") --> <b>Levi's</b>, <b>Procter &amp; Gamble</b>
      *
      * @param mixed[] $array
      * @param int $flags (optional) set of the following bits
@@ -814,7 +814,7 @@ class Tools
     /**
      * Walk through given array and extract only selected keys.
      * @example $employees = [[name=>John, surname=>Doe, age=>43], [name=>Lucy, surname=>Smith, age=>28]]
-     *          arrayConfineKeys($employees, 'age') --> [['age'=>43], ['age'=>28]]
+     *          Tools::arrayConfineKeys($employees, 'age') --> [['age'=>43], ['age'=>28]]
      *
      * @param mixed[] $array Array to walk through
      * @param mixed $keys key or array of keys to extract
@@ -842,7 +842,7 @@ class Tools
 
     /**
      * Extract a string separated by a given separator on a given position. 
-     * @example exploded('-', '1996-07-30', 2) -> '30'
+     * @example Tools::exploded('-', '1996-07-30', 2) --> '30'
      *
      * @param string $separator
      * @param string $string to extract from
@@ -999,8 +999,8 @@ class Tools
     /**
      * Plural form of a string according to a suplied number.
      *
-     * @example plural(1, 'child', false, 'children') --> 'child'
-     * @example plural(2, 'Jahr', 'Jahre', 'Jahren') --> 'Jahre'
+     * @example Tools::plural(1, 'child', false, 'children') --> 'child'
+     * @example Tools::plural(2, 'Jahr', 'Jahre', 'Jahren') --> 'Jahre'
      *
      * @param int $amount amount
      * @param string $form1 form for amount of 1
@@ -1370,5 +1370,23 @@ class Tools
             $result['body'] = json_decode($result['body'], true);
         }
         return $result;
+    }
+
+    /**
+     * Return alphabetical column name (like A, B, C ... Z, AA, AB, ...) from integer index
+     * @example Tools::columnName(0) --> A, Tools::columnName(25) --> Z, Tools::columnName(26) --> AA
+     *
+     * @param int $ColumnIndex Column index (base 0)
+     * @return string column name or empty string if the index is < 0 
+     */
+    public static function columnName($columnIndex = 0)
+    {
+        if ($columnIndex < 0) {
+            return '';
+        }
+        if ($columnIndex < 26) {
+            return chr(65 + $columnIndex);
+        }
+        return self::columnName((int)($columnIndex / 26) - 1) . chr(65 + $columnIndex % 26);
     }
 }
