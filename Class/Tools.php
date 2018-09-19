@@ -521,7 +521,7 @@ class Tools
                 . self::wrap($options['radio-class'], ' class="', '"');
             foreach ($options as $optionKey => $optionValue) {
                 if (!in_array($optionKey, array('separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value', 'between')) && !is_null($optionValue)) {
-                    $result .= ' ' . $optionKey . ($optionValue === true ? '' : '="' . self::escapeJs($optionValue) . '"');
+                    $result .= ' ' . $optionKey . ($optionValue === true ? '' : '="' . self::escapeJS($optionValue) . '"');
                 }
             }
             $result .= '/>' . ($inputValue !== '' ? $options['between'] . Tools::h($inputValue) . '</label>' : '');
@@ -770,8 +770,8 @@ class Tools
     const ARRL_EMPTY = 32;
     const ARRL_DB_ID = 64;
     const ARRL_KEYS = 128;
-    const ARRL_LIKE = ARRL_ESC | ARRL_INT;
-    const ARRL_PREGQ = ARRL_ESC | ARRL_FLOAT;
+    const ARRL_LIKE = self::ARRL_ESC | self::ARRL_INT;
+    const ARRL_PREGQ = self::ARRL_ESC | self::ARRL_FLOAT;
     public static function arrayListed($array, $flags = 0, $glue = ',', $before = '', $after = '')
     {
         $result = '';
