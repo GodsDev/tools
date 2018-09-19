@@ -680,6 +680,7 @@ class Tools
      */
     public static function escapeSQL($input)
     {
+        //TODO: zavést logování, kde je použito a pak po opravě instancí zrušit
         return addslashes($input);
     }
 
@@ -1376,7 +1377,7 @@ class Tools
      * Return alphabetical column name (like A, B, C ... Z, AA, AB, ...) from integer index
      * @example Tools::columnName(0) --> A, Tools::columnName(25) --> Z, Tools::columnName(26) --> AA
      *
-     * @param int $ColumnIndex Column index (base 0)
+     * @param int $columnIndex Column index (base 0)
      * @return string column name or empty string if the index is < 0 
      */
     public static function columnName($columnIndex = 0)
