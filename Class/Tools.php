@@ -770,8 +770,8 @@ class Tools
     const ARRL_EMPTY = 32;
     const ARRL_DB_ID = 64;
     const ARRL_KEYS = 128;
-    const ARRL_LIKE = ARRL_ESC | ARRL_INT;
-    const ARRL_PREGQ = ARRL_ESC | ARRL_FLOAT;
+    const ARRL_LIKE = self::ARRL_ESC | self::ARRL_INT;
+    const ARRL_PREGQ = self::ARRL_ESC | self::ARRL_FLOAT;
     public static function arrayListed($array, $flags = 0, $glue = ',', $before = '', $after = '')
     {
         $result = '';
