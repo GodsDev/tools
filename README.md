@@ -40,9 +40,19 @@ operator into the **file** where the `Tools::method` statement is to be used.
 * arrayListed, exploded, cutTill
 * curlCall
 * set, equal, nonempty, nonzero, begins, ends
-* escapeSQL, escapeJS
+* escapeSQL (OBSOLETE) 
+* escapeJS
 * arrayConfineKeys, arrayReindex, arrayRemoveItems, arrayKeyAsValues
 * urlChange
 * relativeTime, localeDate, localeTime
 * plural, resolve
 * randomPassword
+* anyset
+* GoogleAuthenticatorCode
+* str_putcsv
+* str_before, str_after
+* mb_ucfirst
+* array_search_i, in_array_i
+* whitelist, blacklist
+* columnName
+* httpResponse
