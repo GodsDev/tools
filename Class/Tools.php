@@ -521,7 +521,7 @@ class Tools
                 . self::wrap($options['radio-class'], ' class="', '"');
             foreach ($options as $optionKey => $optionValue) {
                 if (!in_array($optionKey, array('separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value', 'between')) && !is_null($optionValue)) {
-                    $result .= ' ' . $optionKey . ($optionValue === true ? '' : '="' . self::escapeJs($optionValue) . '"');
+                    $result .= ' ' . $optionKey . ($optionValue === true ? '' : '="' . self::escapeJS($optionValue) . '"');
                 }
             }
             $result .= '/>' . ($inputValue !== '' ? $options['between'] . Tools::h($inputValue) . '</label>' : '');
