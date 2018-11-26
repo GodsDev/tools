@@ -374,7 +374,7 @@ class Tools
     /**
      * Add a session message (i.e. a result of an data-changing operation).
      *
-     * @param string $type type one of 'success', 'info', 'danger', 'warning'
+     * @param mixed $type type one of 'success', 'info' (or true), 'danger', 'warning' (or false)
      * @param string $message message itself, in well-formatted HTML
      * @param bool $show (optional) true --> then call showMessages()
      * @return void
@@ -382,7 +382,7 @@ class Tools
     public static function addMessage($type, $message, $show = false)
     {
         $_SESSION['messages'] = self::setarray($_SESSION['messages']) ? $_SESSION['messages'] : array();
-        $_SESSION['messages'] []= array($type == 'error' ? 'danger' : $type, $message);
+        $_SESSION['messages'] []= array(is_bool($type) ? ($type ? 'success' : 'warning') : ($type == 'error' ? 'danger' : $type), $message);
         if ($show) {
             self::showMessages();
         }
