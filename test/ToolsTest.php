@@ -115,7 +115,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(true, Tools::ends($palindrom, 'ódy!'));
         $this->assertSame(true, Tools::ends($palindrom, 'ÓDY!', false));
         // addMessage
-        unset($_SESSION['messages']);
+        $_SESSION['messages'] = array();
         Tools::addMessage('info', 'One');
         Tools::addMessage('error', 'Two');
         Tools::addMessage(true, 'Three');
