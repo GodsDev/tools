@@ -120,15 +120,15 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         Tools::addMessage('error', 'Two');
         Tools::addMessage(true, 'Three');
         Tools::addMessage(false, 'Four');
-        $this->assertSame(true, $_SESSION['messages'], array(
-            array('info' => 'One'),
-            array('danger' => 'Two'),
-            array('success' => 'Three'),
-            array('warning' => 'Four'),
+        $this->assertSame($_SESSION['messages'], array(
+            array('info', 'One'),
+            array('danger', 'Two'),
+            array('success', 'Three'),
+            array('warning', 'Four'),
         ));
         // showMessages
-        Tools::showMessages(true);
-        $this->assertSame(true, $_SESSION['messages'], array());
+        Tools::showMessages();
+        $this->assertSame($_SESSION['messages'], array());
         // htmlOption
         $this->assertSame('<option value="1">Android</option>' . PHP_EOL, Tools::htmlOption(1, 'Android'));
         // htmlSelect
