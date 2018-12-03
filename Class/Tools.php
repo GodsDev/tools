@@ -374,7 +374,7 @@ class Tools
     /**
      * Add a session message (i.e. a result of an data-changing operation).
      *
-     * @param string $type type one of 'success', 'info', 'danger', 'warning'
+     * @param mixed $type type one of 'success', 'info' (or true), 'danger', 'warning' (or false)
      * @param string $message message itself, in well-formatted HTML
      * @param bool $show (optional) true --> then call showMessages()
      * @return void
@@ -382,7 +382,7 @@ class Tools
     public static function addMessage($type, $message, $show = false)
     {
         $_SESSION['messages'] = self::setarray($_SESSION['messages']) ? $_SESSION['messages'] : array();
-        $_SESSION['messages'] []= array($type == 'error' ? 'danger' : $type, $message);
+        $_SESSION['messages'] []= array(is_bool($type) ? ($type ? 'success' : 'warning') : ($type == 'error' ? 'danger' : $type), $message);
         if ($show) {
             self::showMessages();
         }
@@ -706,7 +706,13 @@ class Tools
         if (is_array($input)) {
             $result = '';
             foreach ($input as $item) {
-                $result .= ',"' . self::escapeSQL($item) . '"';
+                if (is_null($item)) {
+                    $result .= ',NULL';
+                } elseif (is_numeric($item) || is_bool($item)) {
+                    $result .= "," . (float)$item;
+                } else {
+                    $result .= ',"' . self::escapeSQL($item) . '"';
+                }
             }
             return substr($result, 1);
         }
@@ -755,12 +761,24 @@ class Tools
      *
      * @param mixed[] $array
      * @param int $flags (optional) set of the following bits
-     *      +1=htmlentities, +2=escape string, +4=escapeJs, +8=intval, +16=(float), +32=ignore empty +64=` -> ``, +128=array_keys
+     *      +1 = htmlentities
+     *      +2 = escape string
+     *      +4 = escapeJs
+     *      +8 = intval
+     *      +16 = (float)
+     *      +32 = ignore empty
+     *      +64 = ` -> ``
+     *      +128 = operate with array_keys
+     *      +256 = replace mode - $before becomes a pattern, $after becomes a symbol to replace
      *      special combinations: +2+8 = quote LIKE, +2+16 = preg_quote
      * @param string $glue (optional)
      * @param string $before (optional)
      * @param string $after (optional)
      * @return string
+     * @example Tools::arrayListed(["<b>Apple</b>", "Levi's", "H&M"]) --> "<b>Apple</b>,Levi's,H&M"
+     * @example Tools::arrayListed(['A', 'B', 0, '', false, null, 'C'], Tools::ARRL_EMPTY) --> "A,B,C"
+     * @example Tools::arrayListed(['about', 'links'], Tools::ARRL_PATTERN, ' | ', '<a href="/en/#" title="#">#</a>', '#')
+     *  --> '<a href="/en/about" title="about">about</a> | <a href="/en/links" title="links">links</a>'
      */
     const ARRL_HTML = 1;
     const ARRL_ESC = 2;
@@ -770,6 +788,7 @@ class Tools
     const ARRL_EMPTY = 32;
     const ARRL_DB_ID = 64;
     const ARRL_KEYS = 128;
+    const ARRL_PATTERN = 256;
     const ARRL_LIKE = self::ARRL_ESC | self::ARRL_INT;
     const ARRL_PREGQ = self::ARRL_ESC | self::ARRL_FLOAT;
     public static function arrayListed($array, $flags = 0, $glue = ',', $before = '', $after = '')
@@ -805,7 +824,11 @@ class Tools
                     $v = (float)$v;
                 }
                 if (!($flags & self::ARRL_EMPTY) || $v) {
-                    $result .= "$glue$before$v$after";
+                    if ($flags & self::ARRL_PATTERN) {
+                        $result .= $glue . strtr($before, array($after => $v));
+                    } else {
+                        $result .= $glue . $before . $v . $after;
+                    }
                 }
             }
         }
@@ -1007,12 +1030,14 @@ class Tools
      * @param string $form1 form for amount of 1
      * @param string $form234 form for amount of 2, 3, or 4 (if false is given, $form5plus will be used)
      * @param string $form5plus form for amount of 5+
-     * @param string $form0 (optional) form for amount of 0 (omit it or submit false to use $form5plus instead)
+     * @param string $form0 = false (optional) form for amount of 0 (omit it or submit false to use $form5plus instead)
+     * @param bool $mod100 = false get modulo of 100 from $amount
      * @return string result form
      */
-    public static function plural($amount, $form1, $form234, $form5plus, $form0 = false)
+    public static function plural($amount, $form1, $form234, $form5plus, $form0 = false, $mod100 = false)
     {
         $amount = abs((int)$amount);
+        $amount = $mod100 ? $amount % 100 : $amount;
         $form234 = $form234 !== false ? $form234 : $form5plus;
         $form0 = $form0 !== false ? $form0 : $form5plus;
         return $amount >= 5 ? $form5plus : ($amount == 1 ? $form1 : $form234);
