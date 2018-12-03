@@ -174,17 +174,29 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         // shortify
         $this->assertSame('Příli…', Tools::shortify($palindrom, 5));
         // escapeSQL
+        $this->assertSame("<a href=\\\"#\\\" class=\'btn\'>#</a>", Tools::escapeSQL('<a href="#" class=\'btn\'>#</a>'));
         // escapeDbIdentifier
+        $this->assertSame('`na``me`', Tools::escapeDbIdentifier('na`me'));
         // escapeIn
+        $this->assertSame('0,1.5,"",0,1,NULL,"a\"b"', Tools::escapeIn([0, 1.5, '', false, true, null, 'a"b']));
         // escapeJS
         // redir
-        // arrayListed
+        // arrayListed($array, $flags = 0, $glue = ',', $before = '', $after = '')
+        $fruits = ['<b>Apple</b>', 'Levi\'s', 'H&M'];
+        $this->assertSame("<b>Apple</b>,Levi's,H&M", Tools::arrayListed($fruits));
+        $this->assertSame("&lt;b&gt;Apple&lt;/b&gt;,Levi&#039;s,H&amp;M", Tools::arrayListed($fruits, Tools::ARRL_HTML));
+        $this->assertSame("<b>Apple</b>,Levi\\'s,H&M", Tools::arrayListed($fruits, Tools::ARRL_ESC));
+        $this->assertSame("A,B,C", Tools::arrayListed(['A', 'B', 0, '', false, null, 'C'], Tools::ARRL_EMPTY));
+        $this->assertSame('<a href="/en/about" title="about">about</a> | <a href="/en/links" title="links">links</a>', Tools::arrayListed(['about', 'links'], Tools::ARRL_PATTERN, ' | ', '<a href="/en/#" title="#">#</a>', '#'));
         // arrayConfineKeys
         $employees = [['name'=>'John', 'age'=>43], ['name'=>'Lucy', 'age'=>28]];
         $this->assertSame([['age'=>43], ['age'=>28]], Tools::arrayConfineKeys($employees, 'age'));
         // exploded
         $this->assertSame('30', Tools::exploded('-', '1996-07-30', 2));
         // cutTill
+        $text = 'Mary had a little lamb with wool as white as snow.';
+        Tools::cutTill($text, 'with');
+        $this->assertSame('Mary had a little lamb ', $text);
         // curlCall
         // urlChange
         unset($_SERVER['QUERY_STRING']);
@@ -195,6 +207,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         // plural
         $this->assertSame('child', Tools::plural(1, 'child', false, 'children'));
         $this->assertSame('Jahre', Tools::plural(2, 'Jahr', 'Jahre', 'Jahren'));
+        $this->assertSame('child', Tools::plural(7601, 'child', false, 'children'));
         // resolve
         // arrayReindex
         $a = [
