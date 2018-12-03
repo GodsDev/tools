@@ -706,7 +706,13 @@ class Tools
         if (is_array($input)) {
             $result = '';
             foreach ($input as $item) {
-                $result .= ',"' . self::escapeSQL($item) . '"';
+                if (is_null($item)) {
+                    $result .= ',NULL';
+                } elseif (is_numeric($item) || is_bool($item)) {
+                    $result .= "," . (float)$item;
+                } else {
+                    $result .= ',"' . self::escapeSQL($item) . '"';
+                }
             }
             return substr($result, 1);
         }
@@ -1024,12 +1030,14 @@ class Tools
      * @param string $form1 form for amount of 1
      * @param string $form234 form for amount of 2, 3, or 4 (if false is given, $form5plus will be used)
      * @param string $form5plus form for amount of 5+
-     * @param string $form0 (optional) form for amount of 0 (omit it or submit false to use $form5plus instead)
+     * @param string $form0 = false (optional) form for amount of 0 (omit it or submit false to use $form5plus instead)
+     * @param bool $mod100 = false get modulo of 100 from $amount
      * @return string result form
      */
-    public static function plural($amount, $form1, $form234, $form5plus, $form0 = false)
+    public static function plural($amount, $form1, $form234, $form5plus, $form0 = false, $mod100 = false)
     {
         $amount = abs((int)$amount);
+        $amount = $mod100 ? $amount % 100 : $amount;
         $form234 = $form234 !== false ? $form234 : $form5plus;
         $form0 = $form0 !== false ? $form0 : $form5plus;
         return $amount >= 5 ? $form5plus : ($amount == 1 ? $form1 : $form234);
