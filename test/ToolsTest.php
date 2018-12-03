@@ -207,7 +207,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         // plural
         $this->assertSame('child', Tools::plural(1, 'child', false, 'children'));
         $this->assertSame('Jahre', Tools::plural(2, 'Jahr', 'Jahre', 'Jahren'));
-        $this->assertSame('child', Tools::plural(7601, 'child', false, 'children'));
+        $this->assertSame('child', Tools::plural(7601, 'child', false, 'children', false, true));
         // resolve
         // arrayReindex
         $a = [
