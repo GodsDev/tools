@@ -755,12 +755,24 @@ class Tools
      *
      * @param mixed[] $array
      * @param int $flags (optional) set of the following bits
-     *      +1=htmlentities, +2=escape string, +4=escapeJs, +8=intval, +16=(float), +32=ignore empty +64=` -> ``, +128=array_keys
+     *      +1 = htmlentities
+     *      +2 = escape string
+     *      +4 = escapeJs
+     *      +8 = intval
+     *      +16 = (float)
+     *      +32 = ignore empty
+     *      +64 = ` -> ``
+     *      +128 = operate with array_keys
+     *      +256 = replace mode - $before becomes a pattern, $after becomes a symbol to replace
      *      special combinations: +2+8 = quote LIKE, +2+16 = preg_quote
      * @param string $glue (optional)
      * @param string $before (optional)
      * @param string $after (optional)
      * @return string
+     * @example Tools::arrayListed(["<b>Apple</b>", "Levi's", "H&M"]) --> "<b>Apple</b>,Levi's,H&M"
+     * @example Tools::arrayListed(['A', 'B', 0, '', false, null, 'C'], Tools::ARRL_EMPTY) --> "A,B,C"
+     * @example Tools::arrayListed(['about', 'links'], Tools::ARRL_PATTERN, ' | ', '<a href="/en/#" title="#">#</a>', '#')
+     *  --> '<a href="/en/about" title="about">about</a> | <a href="/en/links" title="links">links</a>'
      */
     const ARRL_HTML = 1;
     const ARRL_ESC = 2;
@@ -770,6 +782,7 @@ class Tools
     const ARRL_EMPTY = 32;
     const ARRL_DB_ID = 64;
     const ARRL_KEYS = 128;
+    const ARRL_PATTERN = 256;
     const ARRL_LIKE = self::ARRL_ESC | self::ARRL_INT;
     const ARRL_PREGQ = self::ARRL_ESC | self::ARRL_FLOAT;
     public static function arrayListed($array, $flags = 0, $glue = ',', $before = '', $after = '')
@@ -805,7 +818,11 @@ class Tools
                     $v = (float)$v;
                 }
                 if (!($flags & self::ARRL_EMPTY) || $v) {
-                    $result .= "$glue$before$v$after";
+                    if ($flags & self::ARRL_PATTERN) {
+                        $result .= $glue . strtr($before, array($after => $v));
+                    } else {
+                        $result .= $glue . $before . $v . $after;
+                    }
                 }
             }
         }
