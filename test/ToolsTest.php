@@ -107,6 +107,21 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $a = null;
         $this->assertSame(false, Tools::anyset($_GET['a'], $a));
         $this->assertSame(false, Tools::anyset($_GET['a'][2], $b, $a));
+        // add
+        unset($a);
+        $this->assertSame(1, Tools::add($a));
+        $this->assertSame(2, Tools::add($a));
+        $this->assertSame(4, Tools::add($a, 2));
+        $this->assertSame('41', Tools::add($a, true));
+        $this->assertSame('41', Tools::add($a, false));
+        unset($a);
+        $this->assertSame('a', Tools::add($a, 'a'));
+        $this->assertSame('ab', Tools::add($a, 'b'));
+        $this->assertSame('ab1', Tools::add($a, true));
+        $this->assertSame('ab1', Tools::add($a, false));
+        $this->assertSame('ab1', Tools::add($a, null));
+        $a = ['Apple'];
+        $this->assertSame(['Apple', 'Banana'], Tools::add($a, 'Banana'));
         // begins
         $palindrom = 'Příliš žluťoučký kůň úpěl ďábelské ódy!';
         $this->assertSame(true, Tools::begins($palindrom, 'Příliš'));

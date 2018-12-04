@@ -314,6 +314,25 @@ class Tools
     */
 
     /**
+     * Add or concatenate $delta to given $variable. If the variable is not set, set it.
+     *
+     * @param mixed &$variable
+     * @param mixed $delta = 1, what to add. []= used for $variable being an array, otherwise += used for numeric $delta and .= otherwise
+     * @return mixed variable after addition
+     */
+    public static function add(&$variable, $delta = 1)
+    {
+        if (isset($variable) && is_array($variable)) {
+            $variable []= $delta;
+        } elseif (is_numeric($delta)) {
+            $variable = (isset($variable) ? $variable : 0) + $delta;
+        } else {
+            $variable = (isset($variable) ? $variable : '') . $delta; //$delta == true becomes '1'; false and null become ''
+        }
+        return $variable;
+    }
+
+    /**
      * Return true if $text begins with $beginning.
      *
      * @param string $text text to test
@@ -1415,4 +1434,5 @@ class Tools
         }
         return self::columnName((int)($columnIndex / 26) - 1) . chr(65 + $columnIndex % 26);
     }
+
 }
