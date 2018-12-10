@@ -315,6 +315,17 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('AB', Tools::columnName(27));
         $this->assertSame('ZZ', Tools::columnName(701));
         $this->assertSame('AAA', Tools::columnName(702));
+        // arraySearchAssoc
+        $a = [0=>['id'=>5,'name'=>'Joe','surname'=>'Doe','age'=>35], 1=>['id'=>17,'name'=>'Irene','surname'=>'Smith','age'=>28]]; 
+        $this->assertSame(1, Tools::arraySearchAssoc(['name'=>'Irene'], $a));
+        $this->assertSame(false, Tools::arraySearchAssoc(['name'=>'Mary'], $a));
+        $this->assertSame(1, Tools::arraySearchAssoc(['name'=>'Irene','surname'=>'Smith'], $a));
+        $this->assertSame(false, Tools::arraySearchAssoc(['name'=>'Irene','surname'=>'Miller'], $a));
+        $this->assertSame(1, Tools::arraySearchAssoc(['name'=>'Irene','surname'=>'Miller'], $a, ['partial'=>true]));
+        $this->assertSame(false, Tools::arraySearchAssoc(['job'=>'accountant','age'=>35], $a));
+        $this->assertSame(0, Tools::arraySearchAssoc(['job'=>'accountant','age'=>35], $a, ['partial'=>true]));
+        $this->assertSame(1, Tools::arraySearchAssoc(['age'=>28], $a));
+        $this->assertSame(false, Tools::arraySearchAssoc(['age'=>'28'], $a, ['strict'=>true]));
     }
 
 }

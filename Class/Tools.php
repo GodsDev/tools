@@ -1435,4 +1435,39 @@ class Tools
         return self::columnName((int)($columnIndex / 26) - 1) . chr(65 + $columnIndex % 26);
     }
 
+    /**
+     * Return the key of given array whose index .. equals ...
+     * @example $array = [0=>['id'=>5,'name'=>'Joe'], 1=>['id'=>17,'name'=>'Irene']]; Tools::arraySearchAssoc(['name'=>'Irene'], $array) --> 1
+     * Keys that don't exist are counted as non-matches.
+     *
+     * @param array $needles 
+     * @param array $haystack
+     * @param array $options
+     *      [strict] - non-zero -> strict comparison (default - false)
+     *      [partial] - non-zero -> search for at least one match (default: all must match)
+     * @return mixed key for the $needle or false if array item was not found
+     */
+    public static function arraySearchAssoc($needles, $haystack, $options = array())
+    {
+        if (!is_array($haystack) || !is_array($needles)) {
+            return false;
+        }
+        Tools::set($options['strict'], false);
+        Tools::set($options['partial'], false);
+        foreach ($haystack as $key => $value) {
+            $matched = 0;
+            foreach ($needles as $needleKey => $needleValue) {
+                if (isset($value[$needleKey]) && ($options['strict'] ? $value[$needleKey] === $needleValue : $value[$needleKey] == $needleValue)) {
+                    $matched++;
+                } elseif (!$options['partial']) {
+                    break;
+                }
+            }
+            if ($options['partial'] ? $matched > 0 : $matched == count($needles)) {
+                return $key;
+            }
+        }
+        return false;
+    }
+
 }
