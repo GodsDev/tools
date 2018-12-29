@@ -271,6 +271,8 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(' úpěl ďábelské ódy!', Tools::str_after($palindrom, 'PŘÍLIŠ ŽLUŤOUČKÝ KŮŇ', true));
         // mb_ucfirst
         $this->assertSame('Ďábelské ódy!', Tools::mb_ucfirst('ďábelské ódy!'));
+        // mb_lcfirst
+        $this->assertSame('ďábelské ódy!', Tools::mb_lcfirst('Ďábelské ódy!'));
         // array_search_i
         $fruits = [0 => 'Banana', 1 => 'Orange', 2 => 'Kiwi', 3 => 'ŠÍPEK', 'STRAWBERRY'];
         $this->assertSame(2, Tools::array_search_i('kiwi', $fruits));

@@ -1314,6 +1314,19 @@ class Tools
     }
 
     /**
+     * Multibyte version of low-case for first character of given string.
+     *
+     * @param string $string
+     * @param string $encoding (optional)
+     * @result string
+     */
+    public static function mb_lcfirst($string, $encoding = null)
+    {
+        $encoding = $encoding ?: mb_internal_encoding();
+        return mb_strtolower(mb_substr($string, 0, 1, $encoding), $encoding) . mb_substr($string, 1, null, $encoding);
+    }
+
+    /**
      * Case-insensitive version of array_search().
      *
      * @param string $needle
