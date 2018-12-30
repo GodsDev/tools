@@ -122,6 +122,8 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('ab1', Tools::add($a, null));
         $a = ['Apple'];
         $this->assertSame(['Apple', 'Banana'], Tools::add($a, 'Banana'));
+        $a = [];
+        $this->assertSame(['Banana'], Tools::add($a, 'Banana'));
         // begins
         $palindrom = 'Příliš žluťoučký kůň úpěl ďábelské ódy!';
         $this->assertSame(true, Tools::begins($palindrom, 'Příliš'));
@@ -142,7 +144,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
             array('warning', 'Four'),
         ));
         // showMessages
-        Tools::showMessages();
+        Tools::showMessages(false);
         $this->assertSame($_SESSION['messages'], array());
         // htmlOption
         $this->assertSame('<option value="1">Android</option>' . PHP_EOL, Tools::htmlOption(1, 'Android'));
