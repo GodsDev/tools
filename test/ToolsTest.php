@@ -330,6 +330,12 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0, Tools::arraySearchAssoc(['job'=>'accountant','age'=>35], $a, ['partial'=>true]));
         $this->assertSame(1, Tools::arraySearchAssoc(['age'=>28], $a));
         $this->assertSame(false, Tools::arraySearchAssoc(['age'=>'28'], $a, ['strict'=>true]));
+        // xorCipher
+        $key = md5(uniqid(mt_rand(), true));
+        $text = 'Mary had a little lamb.';
+        $ciphered = Tools::xorCipher($text, $key);
+        $deciphered = Tools::xorDecipher($ciphered, $key);
+        $this->assertSame(true, $text == $deciphered);
     }
 
 }

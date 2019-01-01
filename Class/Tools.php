@@ -1483,4 +1483,33 @@ class Tools
         return false;
     }
 
+    /**
+     * Cipher a text with a key using xor operator
+     *
+     * @param string text to cipher
+     * @param string key
+     * @return string
+     * @copyright Jakub Vrána, https://php.vrana.cz/
+     */
+    function xorCipher($text, $key) {
+        $text2 = strlen($text) . ':' . str_pad($text, 17);
+        $repeat = ceil(strlen($text2) / strlen($key));
+        return $text2 ^ str_repeat($key, $repeat);
+    }
+    
+    /**
+     * Decipher a text with a key using xor operator
+     *
+     * @param string ciphered data
+     * @param string key
+     * @return string
+     * @copyright Jakub Vrána, https://php.vrana.cz/
+     */
+    function xorDecipher($cipher, $key) {
+        $repeat = ceil(strlen($cipher) / strlen($key));
+        $text2 = $cipher ^ str_repeat($key, $repeat);
+        list($length, $text) = explode(':', $text2, 2);
+        return substr($text, 0, $length);
+    }
+
 }
