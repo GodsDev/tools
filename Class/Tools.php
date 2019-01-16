@@ -759,18 +759,19 @@ class Tools
      */
     public static function redir($url = '', $HTTPCode = 303)
     {
-        $url = self::wrap($url,
-            ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['SCRIPT_NAME'],
-            '',
-            '?' . $_SERVER['QUERY_STRING']
-        );
+        $url = parse_url($url);
+        $url2 = (Tools::set($url['scheme']) ? $url['scheme'] . '://' : (Tools::set($_SERVER['HTTPS']) == 'on' ? 'https://' : 'http://'))
+            . (Tools::set($url['host']) ? $url['host'] : $_SERVER['HTTP_HOST'])
+            . (Tools::set($url['path']) ? $url['path'] : $_SERVER['SCRIPT_NAME'])
+            . Tools::wrap(Tools::set($url['query']) ? $url['query'] : $_SERVER['QUERY_STRING'], '?')
+            . Tools::wrap(Tools::set($url['fragment']), '#');
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_write_close();
         }
-        header("Location: $url", true, $HTTPCode);
+        header("Location: $url2", true, $HTTPCode);
         header('Connection: close');
-        die('<script type="text/javascript">window.location=' . json_encode($url) . ";</script>\n"
-            . '<a href=' . urlencode($url) . '>&rarr;</a>'
+        die('<script type="text/javascript">window.location=' . json_encode($url2) . ";</script>\n"
+            . '<a href="' . $url2 . '">&rarr;</a>' //yes, without escaping
         );
     }
 
@@ -1491,7 +1492,7 @@ class Tools
      * @return string
      * @copyright Jakub Vrána, https://php.vrana.cz/
      */
-    function xorCipher($text, $key) {
+    public static function xorCipher($text, $key) {
         $text2 = strlen($text) . ':' . str_pad($text, 17);
         $repeat = ceil(strlen($text2) / strlen($key));
         return $text2 ^ str_repeat($key, $repeat);
@@ -1505,7 +1506,7 @@ class Tools
      * @return string
      * @copyright Jakub Vrána, https://php.vrana.cz/
      */
-    function xorDecipher($cipher, $key) {
+    public static function xorDecipher($cipher, $key) {
         $repeat = ceil(strlen($cipher) / strlen($key));
         $text2 = $cipher ^ str_repeat($key, $repeat);
         list($length, $text) = explode(':', $text2, 2);
