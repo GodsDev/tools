@@ -771,7 +771,7 @@ class Tools
         header("Location: $url2", true, $HTTPCode);
         header('Connection: close');
         die('<script type="text/javascript">window.location=' . json_encode($url2) . ";</script>\n"
-            . '<a href="' . urlencode($url2) . '">&rarr;</a>'
+            . '<a href="' . $url2 . '">&rarr;</a>' //yes, without escaping
         );
     }
 
