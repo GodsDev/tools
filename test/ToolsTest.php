@@ -336,6 +336,8 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $ciphered = Tools::xorCipher($text, $key);
         $deciphered = Tools::xorDecipher($ciphered, $key);
         $this->assertSame(true, $text == $deciphered);
+        // preg_max
+        $this->assertSame('(0|[1-9][0-9]?|1[0-9]{2}|2[0-4][0-9]|25[0-5])', Tools::preg_max(255));
     }
 
 }

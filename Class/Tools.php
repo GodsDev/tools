@@ -1513,4 +1513,33 @@ class Tools
         return substr($text, 0, $length);
     }
 
+    /**
+     * Return RegEx pattern for an numberic range from zero to given number (included)
+     * 
+     * @example Tools::preg_max(255) --> "(0|[1-9][0-9]?|1[0-9]{2}|2[0-4][0-9]|25[0-5])"
+     * @param int $max maximum
+     * @return string RegEx pattern
+     */
+    public static function preg_max($max) {
+        if (($len = strlen($max = (int)$max)) == 1) {
+            return ($max ? "[0-$max]" : 0);
+        }
+        $result = '0|[1-9]' . ($len > 2 ? ($len == 3 ? '[0-9]?' : '[0-9]{0,' . ($len - 2) . '}') : '');
+        for ($i = 0; $i < $len; $i++) {
+            $digit = substr($max, $i, 1);
+            if ($i == 0 && $digit == '1') {
+                continue;
+            } elseif ($digit == '0') {
+                if ($i == $len - 1) {
+                    $result .= "|$max";
+                }
+                continue;
+            }
+            $digit += $i == $len - 1 ? 0 : -1;
+            $m = $i ? 0 : 1;
+            $result .= '|' . substr($max, 0, $i) . ($digit > $m ? '[' . $m . ($digit - $m > 1 ? '-' : '') . $digit . ']' : $digit)
+                . ($len - $i > 1 ? '[0-9]' . ($len - $i > 2 ? '{' . ($len - $i - 1) . '}': '') : '');
+        }
+        return "($result)";
+    }
 }
