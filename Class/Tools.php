@@ -43,18 +43,18 @@ class Tools
                 'Saturday' => 'sobota'
             ),
             'months' => array(
-                'January' => 'ledna',
-                'February' => 'února',
-                'March' => 'března',
-                'April' => 'dubna',
-                'May' => 'května',
-                'June' => 'června',
-                'July' => 'července',
-                'August' => 'srpna',
+                'January' => 'leden',
+                'February' => 'únor',
+                'March' => 'březen',
+                'April' => 'duben',
+                'May' => 'květen',
+                'June' => 'červen',
+                'July' => 'červenec',
+                'August' => 'srpen',
                 'September' => 'září',
-                'October' => 'října',
-                'November' => 'listopadu',
-                'December' => 'prosince'
+                'October' => 'říjen',
+                'November' => 'listopad',
+                'December' => 'prosinec'
             ),
             'time ago' => array(
                 'y' => array('rok', 'roky', 'let'),
