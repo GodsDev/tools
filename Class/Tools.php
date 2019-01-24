@@ -25,28 +25,28 @@ class Tools
     const ARRL_PREGQ = self::ARRL_ESC | self::ARRL_FLOAT;
 
     /** var array locale setting for few methods in the class */
-    static public $LOCALE = array(
-        'en' => array(
+    static public $LOCALE = [
+        'en' => [
             'date format' => 'jS F',
             'full date format' => 'jS F Y',
             'time format' => 'H:i:s',
-            'time ago' => array(
-                'y' => array('year', 'years', 'years'),
-                'm' => array('month', 'months', 'months'),
-                'd' => array('day', 'days', 'days'),
-                'h' => array('hour', 'hours', 'hours'),
-                'i' => array('minute', 'minutes', 'minutes'),
-                's' => array('second', 'seconds', 'seconds'),
+            'time ago' => [
+                'y' => ['year', 'years', 'years'],
+                'm' => ['month', 'months', 'months'],
+                'd' => ['day', 'days', 'days'],
+                'h' => ['hour', 'hours', 'hours'],
+                'i' => ['minute', 'minutes', 'minutes'],
+                's' => ['second', 'seconds', 'seconds'],
                 'ago' => 'ago',
                 'in' => 'in',
                 'moment' => 'a moment'
-            )
-        ),
-        'cs' => array(
+            ]
+        ],
+        'cs' => [
             'date format' => 'j. F',
             'full date format' => 'j. F Y',
             'time format' => 'H:i:s',
-            'weekdays' => array(
+            'weekdays' => [
                 'Sunday' => 'neděle',
                 'Monday' => 'pondělí',
                 'Tuesday' => 'úterý',
@@ -54,8 +54,8 @@ class Tools
                 'Thursday' => 'čtvrtek',
                 'Friday' => 'pátek',
                 'Saturday' => 'sobota'
-            ),
-            'months' => array(
+            ],
+            'months' => [
                 'January' => 'leden',
                 'February' => 'únor',
                 'March' => 'březen',
@@ -68,20 +68,20 @@ class Tools
                 'October' => 'říjen',
                 'November' => 'listopad',
                 'December' => 'prosinec'
-            ),
-            'time ago' => array(
-                'y' => array('rok', 'roky', 'let'),
-                'm' => array('měsíc', 'měsíce', 'měsíců'),
-                'd' => array('den', 'dny', 'dnů'),
-                'h' => array('hodina', 'hodiny', 'hodin'),
-                'i' => array('minuta', 'minuty', 'minut'),
-                's' => array('vteřina', 'vteřiny', 'vteřin'),
+            ],
+            'time ago' => [
+                'y' => ['rok', 'roky', 'let'],
+                'm' => ['měsíc', 'měsíce', 'měsíců'],
+                'd' => ['den', 'dny', 'dnů'],
+                'h' => ['hodina', 'hodiny', 'hodin'],
+                'i' => ['minuta', 'minuty', 'minut'],
+                's' => ['vteřina', 'vteřiny', 'vteřin'],
                 'ago' => 'zpátky',
                 'in' => 'za',
                 'moment' => 'okamžik'
-            )
-        )
-    );
+            ]
+        ]
+    ];
 
     /**
      * Add or concatenate $delta to given $variable. If the variable is not set, set it.
@@ -103,17 +103,17 @@ class Tools
     }
 
     /**
-     * Add a session message (i.e. a result of an data-changing operation).
+     * Add a session message (e.g. a result of an data-changing operation).
      *
-     * @param mixed $type type one of 'success', 'info' (or true), 'danger', 'warning' (or false)
+     * @param mixed $type type one of 'info', 'danger' (or 'error'), 'success' (or true), 'warning' (or false)
      * @param string $message message itself, in well-formatted HTML
      * @param bool $show (optional) true --> then call showMessages()
      * @return void
      */
     public static function addMessage($type, $message, $show = false)
     {
-        $_SESSION['messages'] = self::setarray($_SESSION['messages']) ? $_SESSION['messages'] : array();
-        $_SESSION['messages'] []= array(is_bool($type) ? ($type ? 'success' : 'warning') : ($type == 'error' ? 'danger' : $type), $message);
+        $_SESSION['messages'] = self::setarray($_SESSION['messages']) ? $_SESSION['messages'] : [];
+        $_SESSION['messages'] []= [is_bool($type) ? ($type ? 'success' : 'warning') : ($type == 'error' ? 'danger' : $type), $message];
         if ($show) {
             self::showMessages();
         }
@@ -184,11 +184,11 @@ class Tools
      */
     public static function arrayConfineKeys($array, $keys)
     {
-        $keys = is_array($keys) ? $keys : array($keys);
-        $result = array();
+        $keys = is_array($keys) ? $keys : [$keys];
+        $result = [];
         if (is_array($array)) {
             foreach ($array as $arrayKey => $item) {
-                $tmp = array();
+                $tmp = [];
                 foreach ($keys as $key) {
                     if (isset($item[$key])) {
                         $tmp[$key] = $item[$key];
@@ -212,7 +212,7 @@ class Tools
      */
     public static function arrayKeyAsValues($array)
     {
-        $result = array();
+        $result = [];
         foreach ($array as $key => $value) {
             $result[$value] = $value;
         }
@@ -221,7 +221,8 @@ class Tools
 
     /**
      * Like implode() but with more options.
-     * @example: Tools::arrayListed(array("Levi's", "Procter & Gamble"), 1, ", ", "<b>", "</b>") --> <b>Levi's</b>, <b>Procter &amp; Gamble</b>
+     *
+     * @example: Tools::arrayListed(["Levi's", "Procter & Gamble"], 1, ", ", "<b>", "</b>") --> <b>Levi's</b>, <b>Procter &amp; Gamble</b>
      *
      * @param mixed[] $array
      * @param int $flags (optional) set of the following bits
@@ -260,7 +261,7 @@ class Tools
                 }
                 if ($flags & self::ARRL_ESC) {
                     if ($flags & self::ARRL_INT) {
-                        $v = strtr($v, array('"' => '\"', "'" => "\\'", "\\" => "\\\\", '%' => '%%', '_' => '\_')); //like
+                        $v = strtr($v, ['"' => '\"', "'" => "\\'", "\\" => "\\\\", '%' => '%%', '_' => '\_']); //like
                     } elseif ($flags & self::ARRL_FLOAT) {
                         $v = preg_quote($v);
                     } else {
@@ -278,7 +279,7 @@ class Tools
                 }
                 if (!($flags & self::ARRL_EMPTY) || $v) {
                     if ($flags & self::ARRL_PATTERN) {
-                        $result .= $glue . strtr($before, array($after => $v));
+                        $result .= $glue . strtr($before, [$after => $v]);
                     } else {
                         $result .= $glue . $before . $v . $after;
                     }
@@ -290,7 +291,7 @@ class Tools
 
     /**
      * Take a hash of arrays and rebase its keys to the first item of each array's array.
-     * If resulting items have only one item, get rid of array(). 
+     * If resulting items have only one item, get rid of []. 
      *
      * @example $a = [[id=>5, name=>John, surname=>Doe], [id=>6, name=>Jane, surname=>Dean]]
      *          $b = [[id=>5, name=>John], [id=>6, name=>Jane]]
@@ -302,7 +303,7 @@ class Tools
      */
     public static function arrayReindex(array $array, $index = 0)
     {
-        $result = array();
+        $result = [];
         foreach ($array as $item) {
             if (isset($item[$index])) {
                 $key = $item[$index];
@@ -369,7 +370,7 @@ class Tools
      *      [partial] - non-zero -> search for at least one match (default: all must match)
      * @return mixed key for the $needle or false if array item was not found
      */
-    public static function arraySearchAssoc($needles, $haystack, $options = array())
+    public static function arraySearchAssoc($needles, $haystack, $options = [])
     {
         if (!is_array($haystack) || !is_array($needles)) {
             return false;
@@ -425,7 +426,7 @@ class Tools
     public static function begins($text, $beginning, $caseSensitive = true, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
-        $beginning = is_array($beginning) ? $beginning : array($beginning);  
+        $beginning = is_array($beginning) ? $beginning : [$beginning];  
         if ($caseSensitive) {
             foreach ($beginning as $value) {
                 if (mb_substr($text, 0, mb_strlen($value, $encoding), $encoding) === $value) {
@@ -480,15 +481,15 @@ class Tools
     }
 
     /**
-     * Make a cURL call and return its response. Supposes running cURL extension.
+     * Make a cURL call and return its response. Requires running cURL extension with certain defaults (see below).
      *
      * @param string $url URL to call
      * @param mixed[] options (optional) changing CURL options
      * @return string response or null if curl_errno() is non-zero
      */
-    public static function curlCall($url, $options = array(), &$error = null)
+    public static function curlCall($url, $options = [], &$error = null)
     {
-        $curlOptions = array(
+        $curlOptions = [
             CURLOPT_URL => $url,
             CURLOPT_HEADER => false,
             /* cannot be activated when in safe_mode or an open_basedir is set
@@ -501,7 +502,7 @@ class Tools
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_SSL_VERIFYPEER => false
-        );
+        ];
         $ch = curl_init();
         foreach ($options as $key => $value) {
             $curlOptions[$key] = $value;
@@ -555,7 +556,7 @@ class Tools
     public static function ends($text, $ending, $caseSensitive = true, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
-        $ending = is_array($ending) ? $ending : array($ending); 
+        $ending = is_array($ending) ? $ending : [$ending]; 
         if ($caseSensitive) {
             foreach ($ending as $value) {
                 if (mb_substr($text, -mb_strlen($value, $encoding), null, $encoding) === $value) {
@@ -628,7 +629,7 @@ class Tools
      */
     public static function escapeJS($string)
     {
-        return strtr($string, array(']]>' => ']]\x3E', '/' => '\/', "\\" => '\\', '"' => '\"', "'" => '\''));
+        return strtr($string, [']]>' => ']]\x3E', '/' => '\/', "\\" => '\\', '"' => '\"', "'" => "\\'"]);
     }
 
     /**
@@ -692,7 +693,7 @@ class Tools
     /**
      * HTML notation for the <input> tag. See self::htmlTextinput() for more info.
      */
-    public static function htmlInput($name, $label, $value, $options = array())
+    public static function htmlInput($name, $label, $value, $options = [])
     {
         return self::htmlTextInput($name, $label, $value, $options);
     }
@@ -727,15 +728,15 @@ class Tools
      *     [between] - what is between the input and its label (in raw HTML; default is " ")
      * @return string HTML code
      */
-    public static function htmlRadio($name, $input, $value = null, $options = array())
+    public static function htmlRadio($name, $input, $value = null, $options = [])
     {
         $result = '';
-        $input = is_array($input) ? $input : array($input => $input);
+        $input = is_array($input) ? $input : [$input => $input];
         if (is_array($value) && isset($value[$name])) {
             $value = $value[$name];
         }
         $name = self::h($name);
-        foreach (array('offset', 'separator' ,'label-class' ,'radio-class') as $key) {
+        foreach (['offset', 'separator' ,'label-class' ,'radio-class'] as $key) {
             self::set($options[$key], '');
         }
         $i = (int)$options['offset'];
@@ -748,7 +749,7 @@ class Tools
                 . ($inputKey === $value ? ' checked="checked"' : '')
                 . self::wrap($options['radio-class'], ' class="', '"');
             foreach ($options as $optionKey => $optionValue) {
-                if (!in_array($optionKey, array('separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value', 'between')) && !is_null($optionValue)) {
+                if (!in_array($optionKey, ['separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value', 'between']) && !is_null($optionValue)) {
                     $result .= ' ' . $optionKey . ($optionValue === true ? '' : '="' . self::escapeJS($optionValue) . '"');
                 }
             }
@@ -775,7 +776,7 @@ class Tools
      *  [class], [id], [onchange], ... optional HTML attributes to add to the <select> notation
      * @return string HTML code
      */
-    public static function htmlSelect($name, array $values, $default, $options = array())
+    public static function htmlSelect($name, array $values, $default, $options = [])
     {
         $result = '<select name="' . self::h($name) . '"';
         foreach ($options as $key => $value) {
@@ -783,11 +784,11 @@ class Tools
                 $result .= ' ' . $key . '="' . self::h($value) . '"';
             }
         }
-        $result .= '>' . PHP_EOL . self::htmlSelectAppend(self::set($options['prepend'], array()), $default);
+        $result .= '>' . PHP_EOL . self::htmlSelectAppend(self::set($options['prepend'], []), $default);
         foreach ($values as $key => $value) {
             $result .= self::htmlOption($key, $value, $default);
         }
-        return $result . self::htmlSelectAppend(Tools::set($options['append'], array()), $default) 
+        return $result . self::htmlSelectAppend(Tools::set($options['append'], []), $default) 
             . '</select>' . PHP_EOL;
     }
 
@@ -818,11 +819,11 @@ class Tools
      * @param mixed[] $options (optional) See self::htmlTextInput() for more info
      * @return string HTML code
      */
-    public static function htmlTextarea($name, $content, $cols = 60, $rows = 5, $options = array())
+    public static function htmlTextarea($name, $content, $cols = 60, $rows = 5, $options = [])
     {
         $label = self::set($options['label'], '');
         unset($options['label']);
-        $options = array_merge($options, array('cols' => $cols, 'rows' => $rows));
+        $options = array_merge($options, ['cols' => $cols, 'rows' => $rows]);
         return self::htmlTextInput($name, $label, $content, $options);
     }
 
@@ -843,14 +844,14 @@ class Tools
      *     other tag's attributes - will be specified (except for NULLs)
      * @return string HTML code
      */
-    protected static function htmlTextInput($name, $label, $value, $options = array())
+    protected static function htmlTextInput($name, $label, $value, $options = [])
     {
         $result = '';
         if (is_array($value)) {
             $value = self::set($value[$name], '');
         }
         if (is_string($options)) {
-            $options = array('type' => $options);
+            $options = ['type' => $options];
         }
         if ($label && !self::nonempty($options['id'])) {
             $options['id'] = 'input-' . self::webalize($name);
@@ -862,7 +863,7 @@ class Tools
             $options['type'] = 'text';
         }
         if (self::nonempty($options['table'])) {
-            foreach (array('before' => '<tr><td>', 'between' => '</td><td>', 'after' => '</td></tr>') as $k=>$v) {
+            foreach (['before' => '<tr><td>', 'between' => '</td><td>', 'after' => '</td></tr>'] as $k=>$v) {
                 self::setifempty($options[$k], $v);
             }
         }
@@ -879,7 +880,7 @@ class Tools
             $options['disabled'] = 'disabled';
         }
         $result .= '<' . (isset($options['rows']) ? 'textarea' : 'input');
-        $options = array_merge($options, array('name' => self::h($name), 'value' => $value));
+        $options = array_merge($options, ['name' => self::h($name), 'value' => $value]);
         foreach ($options as $k => $v) {
             if (is_string($k) && !is_null($v)
                 && !self::among($k, 'before', 'between', 'after', 'table', 'random-id', 'label-after', 'label-html', 'label-class', 'value')) {
@@ -901,13 +902,13 @@ class Tools
      *        $options['JSON'] = non-zero - apply json_decode() on response body
      * @return array containing ['headers'] with HTTP headers and ['body'] with response body
      */
-    public static function httpResponse($response, array $options = array())
+    public static function httpResponse($response, array $options = [])
     {
         static $HEADERS_BODY_SEPARATOR = "\r\n\r\n";
-        $result = array(
-            'headers' => array(), 
-            'body' => array()
-        );
+        $result = [
+            'headers' => [], 
+            'body' => []
+        ];
         if ($pos = strpos($response, $HEADERS_BODY_SEPARATOR)) {
             foreach (explode("\n", substr($response, 0, $pos)) as $key => $value) {
                 $value = trim($value, "\t\r\n ");
@@ -1190,7 +1191,7 @@ class Tools
                 : '');
         }
         $result = explode(',', $result);
-        $result = array_slice($result, 1, 2) ?: array(self::$LOCALE[$language]['time ago']['moment']);
+        $result = array_slice($result, 1, 2) ?: [self::$LOCALE[$language]['time ago']['moment']];
         return ($diff->invert ? self::$LOCALE[$language]['time ago']['in'] . ' ' : '') 
             . implode(', ', $result) . ($diff->invert ? '' : ' ' . self::$LOCALE[$language]['time ago']['ago']);
     }
@@ -1318,13 +1319,13 @@ class Tools
      */
     public static function showMessages($echo = true)
     {
-        $ICONS = array(
+        $ICONS = [
             'success' => 'glyphicon glyphicon-ok-sign fa fa-check-circle',
             'danger' => 'glyphicon glyphicon-exclamation-sign fa fa-times-circle',
             'warning' => 'glyphicon glyphicon-remove-sign fa fa-exclamation-circle',
             'info' => 'glyphicon glyphicon-info-sign fa fa-info-circle'
-        );
-        $_SESSION['messages'] = isset($_SESSION['messages']) && is_array($_SESSION['messages']) ? $_SESSION['messages'] : array();
+        ];
+        $_SESSION['messages'] = isset($_SESSION['messages']) && is_array($_SESSION['messages']) ? $_SESSION['messages'] : [];
         $result = '';
         foreach ((array)$_SESSION['messages'] as $key => $message) {
             if (isset($message[0], $message[1])) {
@@ -1356,7 +1357,7 @@ class Tools
         $domd->loadXML("<x>$html</x>");
         libxml_use_internal_errors(false);
         $domx = new \DOMXPath($domd);
-        foreach ((is_array($attributes) ? $attributes : array($attributes)) as $attribute) {
+        foreach ((is_array($attributes) ? $attributes : [$attributes]) as $attribute) {
             $items = $domx->query("//*[@$attribute]");
             foreach($items as $item) {
                 $item->removeAttribute($attribute);
@@ -1469,7 +1470,7 @@ class Tools
         } else {
             $string = @iconv('UTF-8', 'ASCII//TRANSLIT', $string); // intentionally @
         }
-        $string = str_replace(array('`', "'", '"', '^', '~'), '', $string);
+        $string = str_replace(['`', "'", '"', '^', '~'], '', $string);
         if ($lower === -1) {
             $string = strtoupper($string);
         } elseif ($lower) {
