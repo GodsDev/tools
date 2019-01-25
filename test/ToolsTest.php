@@ -163,6 +163,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('ZZ', Tools::columnName(701));
         $this->assertSame('AAA', Tools::columnName(702));
         // curlCall
+//        $error = false;
+//        $response = Tools::curlCall('example.com', [], $error);
+//        $this->assertSame(true, Tools::begins($response, '<!doctype html>'));
         // cutTill
         $text = 'Mary had a little lamb with wool as white as snow.';
         Tools::cutTill($text, 'with');

@@ -93,21 +93,6 @@ class Tools
         'info' => '<i class="fa fa-info-circle mr-1"></i>'
     ];
 
-    /** @var default options for ::curlCall() */
-    static public $CURL_OPTIONS = [
-        CURLOPT_HEADER => false,
-        /* cannot be activated when in safe_mode or an open_basedir is set
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_AUTOREFERER => true,
-         */
-        CURLOPT_CONNECTTIMEOUT => 30,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_SSL_VERIFYHOST => 0,
-        CURLOPT_SSL_VERIFYPEER => false
-    ];
-
     /** @var characters used in ::randomPassword() */
     static public $PASSWORD_CHARS = '-23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 
@@ -493,9 +478,22 @@ class Tools
      */
     public static function curlCall($url, $options = [], &$error = null)
     {
+        $CURL_OPTIONS = [
+            CURLOPT_HEADER => false,
+            /* cannot be activated when in safe_mode or an open_basedir is set
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_AUTOREFERER => true,
+             */
+            CURLOPT_CONNECTTIMEOUT => 30,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSL_VERIFYPEER => false
+        ];
         $ch = curl_init();
         $options[CURLOPT_URL] = $url;
-        curl_setopt_array($ch, $options + self::$CURL_OPTIONS);
+        curl_setopt_array($ch, $options + $CURL_OPTIONS);
         $response = curl_exec($ch);
         $error = curl_error($ch);
         $errno = curl_errno($ch);
@@ -1086,7 +1084,7 @@ class Tools
     }
 
     /**
-     * Return RegEx pattern for an numberic range from zero to given number (included)
+     * Return RegEx pattern for an numeric range from zero to given number (included)
      *
      * @example Tools::preg_max(255) --> "(0|[1-9][0-9]?|1[0-9]{2}|2[0-4][0-9]|25[0-5])"
      * @param int $max maximum
