@@ -2,16 +2,18 @@
 /**
  * A class with additional miscelaneous, general-purpose methods.
  *
- * Compatible with PHP 5.6.
- * Use of classes: DateTime (relativeTime()), DOMDocument, DOMXPath (stripAttributes).
- * str_putcsv() opens the "php://memory" stream
+ * Compatibility notes:
+ * PHP 5.6+
+ * ::relativeTime() creates new DateTime()
+ * ::stripAttributes() creates new DOMDocument(), new DOMXPath() and uses libxml
+ * ::str_putcsv() opens the "php://memory" stream
  */
 
 namespace GodsDev\Tools;
 
 class Tools
 {
-    /** constants for method arrayListed() */
+    /** @const constants used in ::arrayListed() */
     const ARRL_HTML = 1;
     const ARRL_ESC = 2;
     const ARRL_JS = 4;
@@ -24,7 +26,7 @@ class Tools
     const ARRL_LIKE = self::ARRL_ESC | self::ARRL_INT;
     const ARRL_PREGQ = self::ARRL_ESC | self::ARRL_FLOAT;
 
-    /** var array locale setting for few methods in the class */
+    /** var array locale settings used in ::localeDate(), ::localeTime(), ::relativeTime() */
     static public $LOCALE = [
         'en' => [
             'date format' => 'jS F',
@@ -83,6 +85,32 @@ class Tools
         ]
     ];
 
+    /** @var icons for each type of session messages used in ::showMessages() */
+    static public $MESSAGE_ICONS = [
+        'success' => '<i class="fa fa-check-circle mr-1"></i>',
+        'danger' => '<i class="fa fa-times-circle mr-1"></i>',
+        'warning' => '<i class="fa fa-exclamation-circle mr-1"></i>',
+        'info' => '<i class="fa fa-info-circle mr-1"></i>'
+    ];
+
+    /** @var default options for ::curlCall() */
+    static public $CURL_OPTIONS = [
+        CURLOPT_HEADER => false,
+        /* cannot be activated when in safe_mode or an open_basedir is set
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_AUTOREFERER => true,
+         */
+        CURLOPT_CONNECTTIMEOUT => 30,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_SSL_VERIFYHOST => 0,
+        CURLOPT_SSL_VERIFYPEER => false
+    ];
+
+    /** @var characters used in ::randomPassword() */
+    static public $PASSWORD_CHARS = '-23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+
     /**
      * Add or concatenate $delta to given $variable. If the variable is not set, set it.
      *
@@ -135,33 +163,12 @@ class Tools
 
     /**
      * Return true if any of given argument variables are set (ie. pass isset()).
-     * Version for PHP below 5.6 is limited to 100 arguments.
      * To test if all arguments are set, simply use isset($var1, $var2, ...).
      *
      * @example Tools::anyset($_GET['article'], $_GET['category'])
      * @param mixed &$n variable(s)
      * @return bool true if any (at least one) variable pass isset(), false otherwise
      */
-    public static function anyset(&$n0, &$n1 = 0, &$n2 = 0, &$n3 = 0, &$n4 = 0, &$n5 = 0, &$n6 = 0, &$n7 = 0, &$n8 = 0, &$n9 = 0,
-        &$n10 = 0, &$n11 = 0, &$n12 = 0, &$n13 = 0, &$n14 = 0, &$n15 = 0, &$n16 = 0, &$n17 = 0, &$n18 = 0, &$n19 = 0,
-        &$n20 = 0, &$n21 = 0, &$n22 = 0, &$n23 = 0, &$n24 = 0, &$n25 = 0, &$n26 = 0, &$n27 = 0, &$n28 = 0, &$n29 = 0,
-        &$n30 = 0, &$n31 = 0, &$n32 = 0, &$n33 = 0, &$n34 = 0, &$n35 = 0, &$n36 = 0, &$n37 = 0, &$n38 = 0, &$n39 = 0,
-        &$n40 = 0, &$n41 = 0, &$n42 = 0, &$n43 = 0, &$n44 = 0, &$n45 = 0, &$n46 = 0, &$n47 = 0, &$n48 = 0, &$n49 = 0,
-        &$n50 = 0, &$n51 = 0, &$n52 = 0, &$n53 = 0, &$n54 = 0, &$n55 = 0, &$n56 = 0, &$n57 = 0, &$n58 = 0, &$n59 = 0,
-        &$n60 = 0, &$n61 = 0, &$n62 = 0, &$n63 = 0, &$n64 = 0, &$n65 = 0, &$n66 = 0, &$n67 = 0, &$n68 = 0, &$n69 = 0,
-        &$n70 = 0, &$n71 = 0, &$n72 = 0, &$n73 = 0, &$n74 = 0, &$n75 = 0, &$n76 = 0, &$n77 = 0, &$n78 = 0, &$n79 = 0,
-        &$n80 = 0, &$n81 = 0, &$n82 = 0, &$n83 = 0, &$n84 = 0, &$n85 = 0, &$n86 = 0, &$n87 = 0, &$n88 = 0, &$n89 = 0,
-        &$n90 = 0, &$n91 = 0, &$n92 = 0, &$n93 = 0, &$n94 = 0, &$n95 = 0, &$n96 = 0, &$n97 = 0, &$n98 = 0, &$n99 = 0)
-    {
-        for ($i = 0, $len = func_num_args(); $i < $len; $i++) {
-            $var = "n$i";
-            if (isset($$var)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    /* version with "..." requires PHP 5.6+
     public static function anyset(&...$args)
     {
         foreach ($args as $arg) {
@@ -171,7 +178,6 @@ class Tools
         }
         return false;
     }
-    */
 
     /**
      * Walk through given array and extract only selected keys.
@@ -291,7 +297,7 @@ class Tools
 
     /**
      * Take a hash of arrays and rebase its keys to the first item of each array's array.
-     * If resulting items have only one item, get rid of []. 
+     * If resulting items have only one item, get rid of [].
      *
      * @example $a = [[id=>5, name=>John, surname=>Doe], [id=>6, name=>Jane, surname=>Dean]]
      *          $b = [[id=>5, name=>John], [id=>6, name=>Jane]]
@@ -363,7 +369,7 @@ class Tools
      * @example $array = [0=>['id'=>5,'name'=>'Joe'], 1=>['id'=>17,'name'=>'Irene']]; Tools::arraySearchAssoc(['name'=>'Irene'], $array) --> 1
      * Keys that don't exist are counted as non-matches.
      *
-     * @param array $needles 
+     * @param array $needles
      * @param array $haystack
      * @param array $options
      *      [strict] - non-zero -> strict comparison (default - false)
@@ -426,7 +432,7 @@ class Tools
     public static function begins($text, $beginning, $caseSensitive = true, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
-        $beginning = is_array($beginning) ? $beginning : [$beginning];  
+        $beginning = is_array($beginning) ? $beginning : [$beginning];
         if ($caseSensitive) {
             foreach ($beginning as $value) {
                 if (mb_substr($text, 0, mb_strlen($value, $encoding), $encoding) === $value) {
@@ -467,17 +473,15 @@ class Tools
      * @example Tools::columnName(0) --> A, Tools::columnName(25) --> Z, Tools::columnName(26) --> AA
      *
      * @param int $columnIndex Column index (base 0)
-     * @return string column name or empty string if the index is < 0 
+     * @return string column name or empty string if the index is < 0
      */
     public static function columnName($columnIndex = 0)
     {
-        if ($columnIndex < 0) {
-            return '';
-        }
+
         if ($columnIndex < 26) {
-            return chr(65 + $columnIndex);
+            return $columnIndex < 0 ? '' : chr(65 + $columnIndex);
         }
-        return self::columnName((int)($columnIndex / 26) - 1) . chr(65 + $columnIndex % 26);
+        return self::columnName((int)($columnIndex / 26) - 1) . chr(65 + $columnIndex % 26); //@todo intdiv() for PHP7
     }
 
     /**
@@ -489,25 +493,9 @@ class Tools
      */
     public static function curlCall($url, $options = [], &$error = null)
     {
-        $curlOptions = [
-            CURLOPT_URL => $url,
-            CURLOPT_HEADER => false,
-            /* cannot be activated when in safe_mode or an open_basedir is set
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_AUTOREFERER => true,
-             */
-            CURLOPT_CONNECTTIMEOUT => 30,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYHOST => 0,
-            CURLOPT_SSL_VERIFYPEER => false
-        ];
         $ch = curl_init();
-        foreach ($options as $key => $value) {
-            $curlOptions[$key] = $value;
-        }
-        curl_setopt_array($ch, $curlOptions);
+        $options[CURLOPT_URL] = $url;
+        curl_setopt_array($ch, $options + self::$CURL_OPTIONS);
         $response = curl_exec($ch);
         $error = curl_error($ch);
         $errno = curl_errno($ch);
@@ -520,7 +508,7 @@ class Tools
      *
      * @param string &$haystack
      * @param string $needle
-     * @return void; If substring is found, $haystack will be modified. 
+     * @return void; If substring is found, $haystack will be modified.
      */
     public static function cutTill(&$haystack, $needle)
     {
@@ -556,7 +544,7 @@ class Tools
     public static function ends($text, $ending, $caseSensitive = true, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
-        $ending = is_array($ending) ? $ending : [$ending]; 
+        $ending = is_array($ending) ? $ending : [$ending];
         if ($caseSensitive) {
             foreach ($ending as $value) {
                 if (mb_substr($text, -mb_strlen($value, $encoding), null, $encoding) === $value) {
@@ -635,7 +623,7 @@ class Tools
     /**
      * Basic escaping of a string for use in MySQL. Database-specific.
      * Outdated and discouraged to use. Use mysqli_real_escape_string() instead.
-     * 
+     *
      * @param string $input
      * @return string
      */
@@ -646,7 +634,7 @@ class Tools
     }
 
     /**
-     * Extract a string separated by a given separator on a given position. 
+     * Extract a string separated by a given separator on a given position.
      * @example Tools::exploded('-', '1996-07-30', 2) --> '30'
      *
      * @param string $separator
@@ -671,7 +659,7 @@ class Tools
     public function GoogleAuthenticatorCode($secret, $timeSlot = 0)
     {
         if ($timeSlot < 1000) {
-            $timeSlot += floor(time() / 30);
+            $timeSlot += floor(time() / 30); // @todo intdiv() for PHP7
         }
         $data = str_pad(pack('N', $timeSlot), 8, "\0", STR_PAD_LEFT);
         $hash = hash_hmac('sha1', $data, $secret, true);
@@ -682,8 +670,8 @@ class Tools
     /**
      * Converts ", ', &, <, > in $string to &quot; &#039/&apos; &lt;, &gt; respectively.
      *
-     * @param string $string unescaped string 
-     * @return string escaped string to use in HTML 
+     * @param string $string unescaped string
+     * @return string escaped string to use in HTML
      */
     public static function h($string)
     {
@@ -743,7 +731,7 @@ class Tools
         self::set($options['between'], ' ');
         self::set($_SESSION['fill'][$name], '');
         foreach ($input as $inputKey => $inputValue) {
-            $result .= $options['separator'] 
+            $result .= $options['separator']
                 . ($inputValue !== '' ? '<label' . self::wrap(trim(($_SESSION['fill'][$name] ? 'highlight' : '') . ' ' . $options['label-class'], ' '), ' class="', '"') . '>' : '')
                 . '<input type="radio" name="' . $name . '" value="' . self::h($inputKey) . '"'
                 . ($inputKey === $value ? ' checked="checked"' : '')
@@ -788,7 +776,7 @@ class Tools
         foreach ($values as $key => $value) {
             $result .= self::htmlOption($key, $value, $default);
         }
-        return $result . self::htmlSelectAppend(Tools::set($options['append'], []), $default) 
+        return $result . self::htmlSelectAppend(Tools::set($options['append'], []), $default)
             . '</select>' . PHP_EOL;
     }
 
@@ -803,13 +791,13 @@ class Tools
     {
         $result = '';
         foreach ($array as $key => $value) {
-            $option = is_string($value) ? explode("\0", $value) : array_values($value); 
+            $option = is_string($value) ? explode("\0", $value) : array_values($value);
             $result .= self::htmlOption($option[0], $option[1], $default);
         }
         return $result;
     }
 
-    /** 
+    /**
      * HTML notation for the <textarea> tag. See html_textinput() for more info.
      *
      * @param string $name
@@ -830,7 +818,7 @@ class Tools
     /**
      * HTML notation for the <input> or <textarea> tag. Used by self::htmlInput() and self::htmlTextarea().
      *
-     * @param string $name element name 
+     * @param string $name element name
      * @param string $label label, omitted if empty, translated if true
      * @param mixed $value value, either given directly or as an array in the [name] index
      * @param mixed $options (optional) options. Either an associative array or string containing type
@@ -888,7 +876,7 @@ class Tools
             }
         }
         $result .= isset($options['rows']) ? '>' . self::h($value) . '</textarea>' : ' value="' . self::h($value) . '"/>';
-        $label = self::among($label, '', false, null) ? '' : '<label' . self::wrap(self::h(self::set($options['id'])), ' for="', '"') 
+        $label = self::among($label, '', false, null) ? '' : '<label' . self::wrap(self::h(self::set($options['id'])), ' for="', '"')
             . self::wrap(self::h(self::set($options['label-class'], '')), ' class="', '"') . '>' . $label . '</label>';
         return self::setifempty($options['before']) . (self::nonempty($options['label-after']) ? $result : $label)
             . self::setifempty($options['between']) . (self::nonempty($options['label-after']) ? $label : $result) . self::setifempty($options['after']);
@@ -906,7 +894,7 @@ class Tools
     {
         static $HEADERS_BODY_SEPARATOR = "\r\n\r\n";
         $result = [
-            'headers' => [], 
+            'headers' => [],
             'body' => []
         ];
         if ($pos = strpos($response, $HEADERS_BODY_SEPARATOR)) {
@@ -1093,13 +1081,13 @@ class Tools
         $amount = abs((int)$amount);
         $amount = $mod100 ? $amount % 100 : $amount;
         $form234 = $form234 !== false ? $form234 : $form5plus;
-        $form0 = $form0 !== false ? $form0 : $form5plus;
+        $form0 = $form0 === false ? $form5plus : $form0;
         return $amount >= 5 ? $form5plus : ($amount == 1 ? $form1 : $form234);
     }
 
     /**
      * Return RegEx pattern for an numberic range from zero to given number (included)
-     * 
+     *
      * @example Tools::preg_max(255) --> "(0|[1-9][0-9]?|1[0-9]{2}|2[0-4][0-9]|25[0-5])"
      * @param int $max maximum
      * @return string RegEx pattern
@@ -1135,13 +1123,12 @@ class Tools
      */
     public static function randomPassword($length = 8)
     {
-        static $chars = '-23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-        $rand = function_exists('random_int') ? 'random_int' : 'rand'; 
-        $charsmax = strlen($chars) - 1;
+        $rand = function_exists('random_int') ? 'random_int' : 'rand';
+        $charsmax = strlen(self::$PASSWORD_CHARS) - 1;
         for ($i = 0, $result = ''; $i < $length; $i++) {
-            $result .= substr($chars, $rand(0, $charsmax), 1);
+            $result .= substr(self::$PASSWORD_CHARS, $rand(0, $charsmax), 1);
         }
-        return $result; 
+        return $result;
     }
 
     /**
@@ -1178,21 +1165,24 @@ class Tools
      */
     public static function relativeTime($datetime, $language = 'en')
     {
-        $diff = new DateTime($datetime);
-        $diff = $diff->diff(new DateTime());
+        if (is_numeric($datetime)) {
+            $datetime = date("Y-m-d\TH:i:sP", $datetime);
+        }
+        $diff = new \DateTime($datetime);
+        $diff = $diff->diff(new \DateTime());
         $language = isset(self::$LOCALE[$language]) ? $language : 'en';
         $result = '';
         foreach (explode(' ', 'y m d h i s') as $part) {
             $result .= ($diff->{$part} ? ',' . $diff->{$part} . ' '
-                . self::plural($diff->$part, 
-                    self::$LOCALE[$language]['time ago'][$part][0], 
-                    self::$LOCALE[$language]['time ago'][$part][1], 
+                . self::plural($diff->$part,
+                    self::$LOCALE[$language]['time ago'][$part][0],
+                    self::$LOCALE[$language]['time ago'][$part][1],
                     self::$LOCALE[$language]['time ago'][$part][2])
                 : '');
         }
         $result = explode(',', $result);
         $result = array_slice($result, 1, 2) ?: [self::$LOCALE[$language]['time ago']['moment']];
-        return ($diff->invert ? self::$LOCALE[$language]['time ago']['in'] . ' ' : '') 
+        return ($diff->invert ? self::$LOCALE[$language]['time ago']['in'] . ' ' : '')
             . implode(', ', $result) . ($diff->invert ? '' : ' ' . self::$LOCALE[$language]['time ago']['ago']);
     }
 
@@ -1215,7 +1205,8 @@ class Tools
 
     /**
      * If called with just one parameter, returns given variable if it is set and non-zero, false otherwise.
-     * If called with two parameters, assign the 2nd parameter to the 1st if the 1st variable is not set or not non-zero. 
+     * If called with two parameters, assign the 2nd parameter to the 1st if the 1st variable is not set or not non-zero.
+     * For PHP7+ use the ?? operator.
      *
      * @example unset($a); Tools::set($a); --> false
      * @example $a = 0; Tools::set($a); --> false
@@ -1319,27 +1310,20 @@ class Tools
      */
     public static function showMessages($echo = true)
     {
-        $ICONS = [
-            'success' => 'glyphicon glyphicon-ok-sign fa fa-check-circle',
-            'danger' => 'glyphicon glyphicon-exclamation-sign fa fa-times-circle',
-            'warning' => 'glyphicon glyphicon-remove-sign fa fa-exclamation-circle',
-            'info' => 'glyphicon glyphicon-info-sign fa fa-info-circle'
-        ];
         $_SESSION['messages'] = isset($_SESSION['messages']) && is_array($_SESSION['messages']) ? $_SESSION['messages'] : [];
         $result = '';
         foreach ((array)$_SESSION['messages'] as $key => $message) {
             if (isset($message[0], $message[1])) {
                 $result .= '<div class="alert alert-dismissible alert-' . self::h($message[0]) . '" role="alert">'
                     . '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
-                    . '<i class="' . $ICONS[$message[0]] . ' mr-1"></i> ' . $message[1] . '</div>' . PHP_EOL;
+                    . self::$MESSAGE_ICONS[$message[0]] . ' ' . $message[1] . '</div>' . PHP_EOL;
             }
             unset($_SESSION['messages'][$key]);
         }
-        if ($echo) {
-            echo $result;
-        } else {
+        if (!$echo) {
             return $result;
         }
+        echo $result;
     }
 
     /**
@@ -1363,7 +1347,9 @@ class Tools
                 $item->removeAttribute($attribute);
             }
         }
-        return substr($domd->saveXML(), 26, -6); //@todo: suboptimal, version-sensitive
+        $result = $domd->saveXML();
+        //strip "<"."?xml version="1.0"?".">\n<x>" from beginning and "</x>\n" @todo: version-sensitive
+        return substr($result, ($pos = strpos($result, '?' . ">") + 3) + ($result[$pos] == "\n" ? 1 : 0) + 3, substr($result,-1) == "\n" ? -5 : -4);
     }
 
     /**
@@ -1382,7 +1368,7 @@ class Tools
         if (($pos = $function($haystack, $needle, 0, $encoding)) === false) {
             return false;
         }
-        return substr($haystack, $pos + strlen($needle));
+        return mb_substr($haystack, $pos + mb_strlen($needle));
     }
 
     /**
@@ -1451,7 +1437,7 @@ class Tools
     }
 
     /**
-     * String conversion: diacritics --> ASCII, everything else than a-z, A-Z, 0-9, "_", "-" --> "-", then "--" --> "-" and "-" at the ends get trimmed. 
+     * String conversion: diacritics --> ASCII, everything else than a-z, A-Z, 0-9, "_", "-" --> "-", then "--" --> "-" and "-" at the ends get trimmed.
      *
      * @param $string string to webalize
      * @param $charlist (optional) string of chars to be used
@@ -1530,7 +1516,7 @@ class Tools
         $repeat = ceil(strlen($text2) / strlen($key));
         return $text2 ^ str_repeat($key, $repeat);
     }
-    
+
     /**
      * Decipher a text with a key using xor operator
      *

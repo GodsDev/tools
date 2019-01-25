@@ -264,10 +264,15 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(null, Tools::ifnull($a));
         // ifset
         // in_array_i
+        $fruits = ['Apple', 'Pear', 'Kiwi', 'Šípek'];
         $this->assertSame(false, Tools::in_array_i('kiwi2', $fruits));
         $this->assertSame(true, Tools::in_array_i('šípek', $fruits));
         // localeDate
+        $this->assertSame('1st February 2018', Tools::localeDate(mktime(0, 0, 0, 2, 1, 2018), 'en', false));
+        $this->assertSame('1. únor 2018', Tools::localeDate(mktime(0, 0, 0, 2, 1, 2018), 'cs', false));
+        $this->assertSame('1. únor 2018 15:16:17', Tools::localeDate(mktime(15, 16, 17, 2, 1, 2018), 'cs', true));
         // localeTime
+        $this->assertSame('15:16:17', Tools::localeTime(mktime(15, 16, 17)));
         // mb_lcfirst
         $this->assertSame('ďábelské ódy!', Tools::mb_lcfirst('Ďábelské ódy!'));
         // mb_ucfirst
@@ -276,15 +281,31 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         // nonzero
         // plural
         $this->assertSame('child', Tools::plural(1, 'child', false, 'children'));
+        $this->assertSame('children', Tools::plural(2, 'child', false, 'children'));
         $this->assertSame('Jahre', Tools::plural(2, 'Jahr', 'Jahre', 'Jahren'));
         $this->assertSame('child', Tools::plural(7601, 'child', false, 'children', false, true));
         // preg_max
-        $this->assertSame('(0|[1-9][0-9]?|1[0-9]{2}|2[0-4][0-9]|25[0-5])', Tools::preg_max(255));
+        $pattern = '/^' . Tools::preg_max(255) . '$/';
+        $this->assertSame(0, preg_match($pattern, '-1'));
+        $this->assertSame(1, preg_match($pattern, 0));
+        $this->assertSame(1, preg_match($pattern, 255));
+        $this->assertSame(0, preg_match($pattern, 256));
         // randomPassword
-        $this->assertSame(1, preg_match('/[-2-9A-HJ-NP-Za-km-z]{10}/', Tools::randomPassword(10)));
+        $this->assertSame(1, preg_match('/^[-2-9A-HJ-NP-Za-km-z]{10}$/', Tools::randomPassword(10)));
         // redir
         // relativeTime
+        $this->assertSame('1 second ago', Tools::relativeTime(date('Y-m-d H:i:s', time() - 1)));
+        $this->assertSame('in 1 second', Tools::relativeTime(date('Y-m-d H:i:s', time() + 1)));
+        $this->assertSame('1 vteřina zpátky', Tools::relativeTime(time() - 1, 'cs'));
+        $this->assertSame('za 1 vteřina', Tools::relativeTime(time() + 1, 'cs'));
         // resolve
+        $_SESSION['messages'] = [];
+        Tools::resolve(5 === 5, 'Equal', 'Not equal');
+        Tools::resolve(5 === '5', 'Equal!', 'Not equal!');
+        $this->assertSame($_SESSION['messages'], [
+            ['success', 'Equal'],
+            ['danger', 'Not equal!'],
+        ]);
         // set
         $this->assertSame(false, Tools::set($a));
         $a = 0;
@@ -332,22 +353,27 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         Tools::showMessages(false);
         $this->assertSame($_SESSION['messages'], []);
         // stripAttributes
+        $html = 'ab c<b data-id="2">de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i style="display:block;">t</i>h yug io<u>h</u>t';
+        $this->assertSame('ab c<b data-id="2">de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i>t</i>h yug io<u>h</u>t', Tools::stripAttributes($html, 'style'));
+        $this->assertSame('ab c<b>de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i>t</i>h yug io<u>h</u>t', Tools::stripAttributes($html, ['data-id', 'style']));
         // str_after
         $palindrom = 'Příliš žluťoučký kůň úpěl ďábelské ódy!';
-        $this->assertSame(' úpěl ďábelské ódy!', Tools::str_after($palindrom, 'Příliš žluťoučký kůň'));
+        $this->assertSame(' úpěl ďábelské ódy!', Tools::str_after($palindrom, 'žluťoučký kůň'));
         $this->assertSame(false, Tools::str_after($palindrom, 'PŘÍLIŠ ŽLUŤOUČKÝ KŮŇ'));
-        $this->assertSame(' úpěl ďábelské ódy!', Tools::str_after($palindrom, 'PŘÍLIŠ ŽLUŤOUČKÝ KŮŇ', true));
+        $this->assertSame(' úpěl ďábelské ódy!', Tools::str_after($palindrom, 'ŽLUŤOUČKÝ KŮŇ', true));
         // str_before
         $palindrom = 'Příliš žluťoučký kůň úpěl ďábelské ódy!';
         $this->assertSame('Příliš žluťoučký kůň', Tools::str_before($palindrom, ' úpěl ďábelské ódy!'));
-        $this->assertSame(false, Tools::str_before($palindrom, ' ÚPĚL ĎÁBELSKÉ ÓDY!'));
-        $this->assertSame('Příliš žluťoučký kůň', Tools::str_before($palindrom, ' ÚPĚL ĎÁBELSKÉ ÓDY!', true));
+        $this->assertSame(false, Tools::str_before($palindrom, ' ÚPĚL ĎÁBELSKÉ ÓDY'));
+        $this->assertSame('Příliš žluťoučký kůň', Tools::str_before($palindrom, ' ÚPĚL ĎÁBELSKÉ', true));
         // str_putcsv
         $fields = [2, null, false, true, 'ab;c', 'žluťoučký kůň', 'say "Hello"'];
         $this->assertSame('2;;;1;"ab;c";"žluťoučký kůň";"say ""Hello"""'."\n", Tools::str_putcsv($fields, ';'));
         // urlChange
         unset($_SERVER['QUERY_STRING']);
-        $this->assertSame('a=1&b=text', Tools::urlChange(['a' => 1, 'b' => 'text']));
+        $this->assertSame('a=1&color=b%26w', Tools::urlChange(['a' => 1, 'color' => 'b&w']));
+        $this->assertSame('a=1', Tools::urlChange(['a' => 1, 'color' => ('black' == 'white' ? 'b&w' : null)]));
+        $this->assertSame('array%5B0%5D=2&array%5B1%5D=3', Tools::urlChange(['array' => [2, 3]]));
         // webalize
         $this->assertSame('zlutoucky-kun', Tools::webalize('žluťoučký - kůň - '));
         // whitelist
