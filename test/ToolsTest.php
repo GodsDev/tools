@@ -297,7 +297,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1, preg_match('/^[-2-9A-HJ-NP-Za-km-z]{10}$/', Tools::randomPassword(10)));
         // redir
         // relativeTime
-        $this->assertSame('1 second ago', Tools::relativeTime(date('Y-m-d H:i:s', time() - 1)));
+        $this->assertRegExp('/(1 second ago|2 seconds ago)/', Tools::relativeTime(time() - 1)); //made more benevolent
         $this->assertSame('in 1 second', Tools::relativeTime(date('Y-m-d H:i:s', time() + 1)));
         $this->assertSame('1 vteřina zpátky', Tools::relativeTime(time() - 1, 'cs'));
         $this->assertSame('za 1 vteřina', Tools::relativeTime(time() + 1, 'cs'));
