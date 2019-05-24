@@ -1061,22 +1061,6 @@ class Tools
     }
 
     /**
-     * Output a message (in HTML) using given parameter
-     *
-     * @param array $message
-     * @return string message in HTML or void if $message[0] && $message[1] are not set
-     */
-    public static function outputMessage($message, $dismissible = true)
-    {
-        if (isset($message[0], $message[1])) {
-            $message[0] = $message[0] == 'error' ? 'danger' : $message[0];
-            return '<div class="alert' . ($dismissible ? ' alert-dismissible' : '') . ' alert-' . self::h($message[0]) . '" role="alert">'
-                . ($dismissible ? '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' : '')
-                . self::set(self::$MESSAGE_ICONS[$message[0]]) . ' ' . $message[1] . '</div>' . PHP_EOL;
-        }
-    }
-
-    /**
      * Plural form of a string according to a suplied number.
      *
      * @example Tools::plural(1, 'child', false, 'children') --> 'child'
@@ -1327,7 +1311,11 @@ class Tools
         $_SESSION['messages'] = isset($_SESSION['messages']) && is_array($_SESSION['messages']) ? $_SESSION['messages'] : [];
         $result = '';
         foreach ((array)$_SESSION['messages'] as $key => $message) {
-            $result .= self::outputMessage($message);
+            if (isset($message[0], $message[1])) {
+                $result .= '<div class="alert alert-dismissible alert-' . self::h($message[0]) . '" role="alert">'
+                    . '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+                    . self::$MESSAGE_ICONS[$message[0]] . ' ' . $message[1] . '</div>' . PHP_EOL;
+            }
             unset($_SESSION['messages'][$key]);
         }
         if (!$echo) {
@@ -1522,6 +1510,9 @@ class Tools
      * @copyright Jakub Vrána, https://php.vrana.cz/
      */
     public static function xorCipher($text, $key) {
+        if ($key == '') {
+            return '';
+        }
         $text2 = strlen($text) . ':' . str_pad($text, 17);
         $repeat = ceil(strlen($text2) / strlen($key));
         return $text2 ^ str_repeat($key, $repeat);
@@ -1536,10 +1527,13 @@ class Tools
      * @copyright Jakub Vrána, https://php.vrana.cz/
      */
     public static function xorDecipher($cipher, $key) {
+        if ($key == '') {
+            return '';
+        }
         $repeat = ceil(strlen($cipher) / strlen($key));
         $text2 = $cipher ^ str_repeat($key, $repeat);
-        list($length, $text) = explode(':', $text2, 2);
-        return substr($text, 0, $length);
+        $text2 = explode(':', $text2, 2);
+        return substr(isset($text2[1]) ? $text2[1] : '', 0, isset($text2[0]) ? $text2[0] : 0);
     }
 
 }

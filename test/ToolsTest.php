@@ -398,6 +398,8 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $ciphered = Tools::xorCipher($text, $key);
         $deciphered = Tools::xorDecipher($ciphered, $key);
         $this->assertSame(true, $text == $deciphered);
+        $this->assertSame('', Tools::xorCipher('abc', ''));
+        $this->assertSame('', Tools::xorDecipher('abc', ''));
     }
 
 }
