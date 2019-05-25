@@ -1533,7 +1533,7 @@ class Tools
         $repeat = ceil(strlen($cipher) / strlen($key));
         $text2 = $cipher ^ str_repeat($key, $repeat);
         $text2 = explode(':', $text2, 2);
-        return substr(isset($text2[1]) ? $text2[1] : '', 0, isset($text2[0]) ? $text2[0] : 0);
+        return substr(isset($text2[1]) ? $text2[1] : '', 0, isset($text2[0]) ? (int)$text2[0] : 0);
     }
 
 }
