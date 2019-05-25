@@ -1510,6 +1510,9 @@ class Tools
      * @copyright Jakub Vrána, https://php.vrana.cz/
      */
     public static function xorCipher($text, $key) {
+        if ($key == '') {
+            return '';
+        }
         $text2 = strlen($text) . ':' . str_pad($text, 17);
         $repeat = ceil(strlen($text2) / strlen($key));
         return $text2 ^ str_repeat($key, $repeat);
@@ -1524,10 +1527,13 @@ class Tools
      * @copyright Jakub Vrána, https://php.vrana.cz/
      */
     public static function xorDecipher($cipher, $key) {
+        if ($key == '') {
+            return '';
+        }
         $repeat = ceil(strlen($cipher) / strlen($key));
         $text2 = $cipher ^ str_repeat($key, $repeat);
-        list($length, $text) = explode(':', $text2, 2);
-        return substr($text, 0, $length);
+        $text2 = explode(':', $text2, 2);
+        return substr(isset($text2[1]) ? $text2[1] : '', 0, isset($text2[0]) ? (int)$text2[0] : 0);
     }
 
 }
