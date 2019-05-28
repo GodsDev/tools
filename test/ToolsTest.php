@@ -190,6 +190,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         // escapeIn
         $this->assertSame('0,1.5,"",0,1,NULL,"a\"b"', Tools::escapeIn([0, 1.5, '', false, true, null, 'a"b']));
         // escapeJS
+        $this->assertSame("a\\'b\\\"c\/d", Tools::escapeJS('a\'b"c/d'));
         // escapeSQL
         $this->assertSame("<a href=\\\"#\\\" class=\'btn\'>#</a>", Tools::escapeSQL('<a href="#" class=\'btn\'>#</a>'));
         // exploded
@@ -266,6 +267,10 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $a = null;
         $this->assertSame(null, Tools::ifnull($a));
         // ifset
+        unset($a);
+        $this->assertSame(4, Tools::ifset($a, 4));
+        $a = 5;
+        $this->assertSame(5, Tools::ifset($a, 4));
         // in_array_i
         $fruits = ['Apple', 'Pear', 'Kiwi', 'Šípek'];
         $this->assertSame(false, Tools::in_array_i('kiwi2', $fruits));
@@ -281,7 +286,16 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         // mb_ucfirst
         $this->assertSame('Ďábelské ódy!', Tools::mb_ucfirst('ďábelské ódy!'));
         // nonempty
+        unset($a);
+        $this->assertSame(5, Tools::setifempty($a, 5));
+        $this->assertSame(5, Tools::setifempty($a, 6));
         // nonzero
+        unset($a);
+        $this->assertSame(false, Tools::nonzero($a));
+        $a = 0;
+        $this->assertSame(false, Tools::nonzero($a));
+        $a = 5;
+        $this->assertSame(true, Tools::nonzero($a));
         // plural
         $this->assertSame('child', Tools::plural(1, 'child', false, 'children'));
         $this->assertSame('children', Tools::plural(2, 'child', false, 'children'));
@@ -310,6 +324,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
             ['danger', 'Not equal!'],
         ]);
         // set
+        unset($a);
         $this->assertSame(false, Tools::set($a));
         $a = 0;
         $this->assertSame(false, Tools::set($a));
@@ -331,6 +346,12 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $a = [];
         $this->assertSame(true, Tools::setarray($a));
         // setifempty
+        $a = 4;
+        $this->assertSame(4, Tools::setifempty($a, 5));
+        unset($a);
+        $this->assertSame(5, Tools::setifempty($a, 5));
+        $a = '0';
+        $this->assertSame(5, Tools::setifempty($a, 5));
         // setifnotset
         unset($a);
         Tools::setifnotset($a, 5);
@@ -399,8 +420,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $deciphered = Tools::xorDecipher($ciphered, $key);
         $this->assertSame(true, $text == $deciphered);
         $this->assertSame('', Tools::xorCipher('abc', ''));
-        $this->assertSame('', Tools::xorDecipher('abc', ''));
-        $this->assertSame('', Tools::xorDecipher('', 'abc'));
+        //$this->assertSame('', Tools::xorDecipher('abc', ''));
     }
 
 }
