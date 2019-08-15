@@ -380,6 +380,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $html = 'ab c<b data-id="2">de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i style="display:block;">t</i>h yug io<u>h</u>t';
         $this->assertSame('ab c<b data-id="2">de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i>t</i>h yug io<u>h</u>t', Tools::stripAttributes($html, 'style'));
         $this->assertSame('ab c<b>de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i>t</i>h yug io<u>h</u>t', Tools::stripAttributes($html, ['data-id', 'style']));
+//@todo        $this->assertSame('ab c<b>de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i>t</i>h yug io<u>h</u>t', Tools::stripAttributes($html, '*'));
         // str_after
         $palindrom = 'Příliš žluťoučký kůň úpěl ďábelské ódy!';
         $this->assertSame(' úpěl ďábelské ódy!', Tools::str_after($palindrom, 'žluťoučký kůň'));
@@ -390,6 +391,10 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Příliš žluťoučký kůň', Tools::str_before($palindrom, ' úpěl ďábelské ódy!'));
         $this->assertSame(false, Tools::str_before($palindrom, ' ÚPĚL ĎÁBELSKÉ ÓDY'));
         $this->assertSame('Příliš žluťoučký kůň', Tools::str_before($palindrom, ' ÚPĚL ĎÁBELSKÉ', true));
+        // str_delete
+        $a = 'žluťoučký kůň';
+        $this->assertSame('žluký kůň', Tools::str_delete($a, 3, 4));
+        $this->assertSame('žluký kůň', $a);
         // str_putcsv
         $fields = [2, null, false, true, 'ab;c', 'žluťoučký kůň', 'say "Hello"'];
         $this->assertSame('2;;;1;"ab;c";"žluťoučký kůň";"say ""Hello"""'."\n", Tools::str_putcsv($fields, ';'));
