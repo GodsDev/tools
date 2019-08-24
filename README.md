@@ -1,3 +1,4 @@
+
 # Tools
 A class with useful all-purpose functions (methods). The methods are static.
 Some methods for HTML-output adopt classes used in the [Bootstrap](http://getbootstrap.com) library.
@@ -14,7 +15,7 @@ The `composer.json` file should then contain current version of the class - some
 ```json
 {
     "require": {
-        "godsdev/tools": "^0.3.4",
+        "godsdev/tools": "^0.3.5"
     }
 }
 ```
@@ -131,27 +132,27 @@ After running `phpunit` you might get error messages saying that certain PHP ext
 
 Variable testing and setting
 * `anyset()` – is any of given variables set?
-* `equal()` – comparison with isset()
-* `ifempty()` – empty() with isset()
-* `ifnull()` – isnull() with isset()
-* `nonempty()` – !empty() with isset()
-* `nonzero()` – non-zero test with isset()
-* `set()` – test for isset() or set value to a variable
-* `setarray()` – shortcut for isset() and is_array()
-* `setifempty()` – shortcut for if isset() and empty() then set
-* `setifnotset()` – shortcut for if !isset() then set
-* `setifnull()` – shortcut for if isset() and is_null() then set
-* `setscalar()` – shortcut for isset() and is_scalar()
+* `equal()` – comparison with `isset()`
+* `ifempty()` – `empty()` with `isset()`
+* `ifnull()` – `isnull()` with `isset()`
+* `nonempty()` – `!empty()` with `isset()`
+* `nonzero()` – non-zero test with `isset()`
+* `set()` – test for `isset()` or set value to a variable
+* `setarray()` – shortcut for `isset()` and `is_array()`
+* `setifempty()` – shortcut for if `isset()` and `empty()` then set
+* `setifnotset()` – shortcut for if `!isset()` then set
+* `setifnull()` – shortcut for if `isset()` and `is_null()` then set
+* `setscalar()` – shortcut for `isset()` and `is_scalar()`
 
 HTML output
-* `dump()` – shortcut for var_dump() in <pre>...</pre>
-* `h()` – shortcut for htmlspecialchars in UTF-8
-* `htmlInput()` – output <input> of given type
-* `htmlOption()` – output <option>
-* `htmlRadio()` – output <input type="radio">
-* `htmlSelect()` – output <select> with given options
-* `htmlTextarea()` – output <textarea>
-* `htmlTextInput()` – output <input type="text">
+* `dump()` – shortcut for `var_dump()` in `<pre>`...`</pre>`
+* `h()` – shortcut for `htmlspecialchars()` in UTF-8
+* `htmlInput()` – output `<input>` of given type
+* `htmlOption()` – output `<option>`
+* `htmlRadio()` – output `<input type="radio">`
+* `htmlSelect()` – output `<select>` with given options
+* `htmlTextarea()` – output `<textarea>`
+* `htmlTextInput()` – output `<input type="text">`
 * `stripAttributes()` – strip attributes off a HTML code
 
 HTTP
@@ -163,25 +164,26 @@ HTTP
 Messages
 * `addMessage()` – add a message to a session
 * `outputMessage()` – output a message
-* `resolve()` – add a 'success' or 'error' message based on a result
+* `resolve()` – add either a 'success' or 'error' message based on a result
 * `showMessages()` – show messages from session
  
 Strings
 * `begins()` – does a string begin with given parameter?
 * `cutTill()` – cut string to first occurence of given parameter
 * `ends()` –  does a string end with given parameter?
-* `exploded()` – explode() and return item of given index
+* `exploded()` – `explode()` and return item of given index
 * `mb_lcfirst()` – lower case first character (multi-byte version)
 * `mb_ucfirst()` – upper case first character (multi-byte version)
 * `randomPassword()` – return random password
 * `str_after()` – return a part of a string after occurence of a parameter
 * `str_before()` – return a part of a string before occurence of a parameter
-* `str_putcsv()` – inverse to str_getcsv()
+* `str_delete()` – delete part of a byref variable
+* `str_putcsv()` – inverse to `str_getcsv()`
 
 Conversion
 * `columnName()` – convert number to 26-base (alphabetical) system
 * `escapeDbIdentifier()` – escape function for MySQL/MariaDb identifiers
-* `escapeIn()` – escape values in SQL's IN() clause
+* `escapeIn()` – escape values in SQL's `IN()` clause
 * `escapeJS()` – escape for JavaScript
 * `escapeSQL()` – basic escape for SQL (OBSOLETE)
 * `shortify()` – limit long string to given length, add optional ellipsis
@@ -195,20 +197,20 @@ Variables
 * `whitelist()` – set value to given default if not on whitelist
 
 Arrays
-* `array_search_i()` – case-sensitive array_search()
+* `array_search_i()` – case-insensitive `array_search()`
 * `arrayConfineKeys()` – extract and return selected keys of given array
 * `arrayKeyAsValues()` – refill array's values by its keys
 * `arrayListed()` – output list of array's items
 * `arrayReindex()` – reindex array of arrays by given index
 * `arrayRemoveItems()` – remove items from an array
 * `arraySearchAssoc()` – search array for given key:value pair(s)
-* `in_array_i()` – case-sensitive in_array()
+* `in_array_i()` – case-insensitive `in_array()`
 
 Locale
-* `localeDate()` – output date using ::$LOCALE[] settings
-* `localeTime()` – output time using ::$LOCALE[] settings
+* `localeDate()` – output date using ::`$LOCALE[]` settings
+* `localeTime()` – output time using ::`$LOCALE[]` settings
 * `plural()` – output appropriate singular/plural version of given word
-* `relativeTime()` – output relative from now() using ::$LOCALE[] settings
+* `relativeTime()` – output relative from `now()` using ::`$LOCALE[]` settings
 
 Specific
 * `GoogleAuthenticatorCode()` – GoogleAuthenticator hash

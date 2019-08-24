@@ -395,6 +395,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $a = 'žluťoučký kůň';
         $this->assertSame('žluký kůň', Tools::str_delete($a, 3, 4));
         $this->assertSame('žluký kůň', $a);
+        $this->assertSame('žl', Tools::str_delete($a, 2));
         // str_putcsv
         $fields = [2, null, false, true, 'ab;c', 'žluťoučký kůň', 'say "Hello"'];
         $this->assertSame('2;;;1;"ab;c";"žluťoučký kůň";"say ""Hello"""'."\n", Tools::str_putcsv($fields, ';'));

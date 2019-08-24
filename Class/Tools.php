@@ -391,7 +391,7 @@ class Tools
      * @param array $haystack
      * @param bool $strict (optional)
      * @param mixed $encoding (optional)
-     * @result mixed found key or false if needle not found
+     * @return mixed found key or false if needle not found
      */
     public static function array_search_i($needle, array $haystack, $strict = false, $encoding = null)
     {
@@ -963,7 +963,7 @@ class Tools
      * @param array $haystack
      * @param bool $strict (optional) default false
      * @param mixed $encoding (optional)
-     * @result bool true/false whether the needle was found
+     * @return bool true/false whether the needle was found
      */
     public static function in_array_i($needle, array $haystack, $strict = false, $encoding = null)
     {
@@ -1017,7 +1017,7 @@ class Tools
      *
      * @param string $string
      * @param string $encoding (optional)
-     * @result string
+     * @return string
      */
     public static function mb_lcfirst($string, $encoding = null)
     {
@@ -1030,7 +1030,7 @@ class Tools
      *
      * @param string $string
      * @param string $encoding (optional)
-     * @result string
+     * @return string
      */
     public static function mb_ucfirst($string, $encoding = null)
     {
@@ -1299,7 +1299,7 @@ class Tools
         }
         return $string;
     }
-                                  
+
     /**
      * Return or show session message variables as HTML <div>s and unset them. Bootstrap styling is used.
      *
@@ -1404,14 +1404,14 @@ class Tools
      *
      * @param string &$string
      * @param int $offset
-     * @param mixed $length length as number or null for "till the end" or string in which case mb_strlen() is applied
+     * @param mixed $length length as number or null for "till the end"
      * @param mixed $encoding (optional)
-     * @result string modified string
+     * @return string modified string
      */
     public static function str_delete(&$string, $offset = 0, $length = null, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
-        $length = is_string($length) ? mb_strlen($string, $encoding) : $length;
+        $length = is_null($length) ? mb_strlen($string, $encoding) - $offset : $length;
         return $string = mb_substr($string, 0, $offset, $encoding) . mb_substr($string, $offset + $length, null, $encoding);
     }
 
@@ -1424,7 +1424,7 @@ class Tools
      * @param string $delimiter (optional) default ','
      * @param string $enclosure (optional) default '"'
      * @param string $escape_char (optional) default "\\"
-     * @result string CSV of given arguments
+     * @return string CSV of given arguments
      */
     public static function str_putcsv(array $fields, $delimiter = ',', $enclosure = '"', $escape_char = "\\")
     {
