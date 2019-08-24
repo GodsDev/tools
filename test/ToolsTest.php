@@ -89,7 +89,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         // arrayKeyAsValues
         $fruits = ['Apple', 'Pear', 'Kiwi'];
         $this->assertSame(['Apple' => 'Apple', 'Pear' => 'Pear', 'Kiwi' => 'Kiwi'], Tools::arrayKeyAsValues($fruits));
-        // arrayListed($array, $flags = 0, $glue = ',', $before = '', $after = '')
+        // arrayListed
         $fruits = ['<b>Apple</b>', 'Levi\'s', 'H&M'];
         $this->assertSame("<b>Apple</b>,Levi's,H&M", Tools::arrayListed($fruits));
         $this->assertSame("&lt;b&gt;Apple&lt;/b&gt;,Levi&#039;s,H&amp;M", Tools::arrayListed($fruits, Tools::ARRL_HTML));
@@ -171,6 +171,15 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         Tools::cutTill($text, 'with');
         $this->assertSame('Mary had a little lamb ', $text);
         // dump
+        ob_start();
+        Tools::dump('a', 1, true, null);
+        $a = ob_get_contents();
+        ob_end_clean();
+        $this->assertSame("<pre>string(1) \"a\"\n"
+            . "int(1)\n"
+            . "bool(true)\n"
+            . "NULL\n"
+            . "</pre>", $a);
         // ends
         $palindrom = 'Příliš žluťoučký kůň úpěl ďábelské ódy!';
         $this->assertSame(true, Tools::ends($palindrom, 'ódy!'));
@@ -196,8 +205,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         // exploded
         $this->assertSame('30', Tools::exploded('-', '1996-07-30', 2));
         // GoogleAuthenticatorCode
+        $this->assertRegExp('~^\d+$~', (string)Tools::GoogleAuthenticatorCode('abc'));
         // h
-        $this->assertSame('a&amp;b&quot;c&apos;d&lt;e&gt;f', Tools::h('a&b"c\'d<e>f'));
+        $this->assertSame('a&amp;b&quot;c&apos;d&lt;e&gt;f&#0;g', Tools::h('a&b"c\'d<e>f' . "\0g"));
         // htmlInput
         $this->assertSame('<input type="text" name="info" value="a&apos;b&quot;c"/>', 
             Tools::htmlInput('info', '', 'a\'b"c')
@@ -419,14 +429,14 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('N/A', Tools::wrap('0', '<b>', '</b>', 'N/A'));
         $this->assertSame('N/A', Tools::wrap([], '<b>', '</b>', 'N/A'));
         // xorCipher
-        // xorDecipher
+        $this->assertSame('', Tools::xorCipher('abc', ''));
         $key = md5(uniqid(mt_rand(), true));
         $text = 'Mary had a little lamb.';
         $ciphered = Tools::xorCipher($text, $key);
+        // xorDecipher
         $deciphered = Tools::xorDecipher($ciphered, $key);
-        $this->assertSame(true, $text == $deciphered);
-        $this->assertSame('', Tools::xorCipher('abc', ''));
-        //$this->assertSame('', Tools::xorDecipher('abc', ''));
+        $this->assertSame(true, $text === $deciphered);
+        $this->assertSame('', Tools::xorDecipher('abc', ''));
     }
 
 }
