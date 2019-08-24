@@ -366,8 +366,8 @@ class Tools
         if (!is_array($haystack) || !is_array($needles)) {
             return false;
         }
-        Tools::set($options['strict'], false);
-        Tools::set($options['partial'], false);
+        self::set($options['strict'], false);
+        self::set($options['partial'], false);
         foreach ($haystack as $key => $value) {
             $matched = 0;
             foreach ($needles as $needleKey => $needleValue) {
@@ -391,7 +391,7 @@ class Tools
      * @param array $haystack
      * @param bool $strict (optional)
      * @param mixed $encoding (optional)
-     * @result mixed found key or false if needle not found
+     * @return mixed found key or false if needle not found
      */
     public static function array_search_i($needle, array $haystack, $strict = false, $encoding = null)
     {
@@ -474,6 +474,7 @@ class Tools
      *
      * @param string $url URL to call
      * @param mixed[] options (optional) changing CURL options
+     * @param &mixed byref variable to fill with possible error
      * @return string response or null if curl_errno() is non-zero
      */
     public static function curlCall($url, $options = [], &$error = null)
@@ -673,11 +674,11 @@ class Tools
      */
     public static function h($string)
     {
-        return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5);
+        return str_replace("\0",'&#0;', htmlspecialchars($string, ENT_QUOTES | ENT_HTML5));
     }
 
     /**
-     * HTML notation for the <input> tag. See self::htmlTextinput() for more info.
+     * HTML notation for the <input> tag. See Tools::htmlTextInput() for more info.
      */
     public static function htmlInput($name, $label, $value, $options = [])
     {
@@ -727,10 +728,9 @@ class Tools
         }
         $i = (int)$options['offset'];
         self::set($options['between'], ' ');
-        self::set($_SESSION['fill'][$name], '');
         foreach ($input as $inputKey => $inputValue) {
             $result .= $options['separator']
-                . ($inputValue !== '' ? '<label' . self::wrap(trim(($_SESSION['fill'][$name] ? 'highlight' : '') . ' ' . $options['label-class'], ' '), ' class="', '"') . '>' : '')
+                . ($inputValue !== '' ? '<label' . self::wrap(trim($options['label-class'], ' '), ' class="', '"') . '>' : '')
                 . '<input type="radio" name="' . $name . '" value="' . self::h($inputKey) . '"'
                 . ($inputKey === $value ? ' checked="checked"' : '')
                 . self::wrap($options['radio-class'], ' class="', '"');
@@ -739,7 +739,7 @@ class Tools
                     $result .= ' ' . $optionKey . ($optionValue === true ? '' : '="' . self::escapeJS($optionValue) . '"');
                 }
             }
-            $result .= '/>' . ($inputValue !== '' ? $options['between'] . Tools::h($inputValue) . '</label>' : '');
+            $result .= '/>' . ($inputValue !== '' ? $options['between'] . self::h($inputValue) . '</label>' : '');
             $i++;
         }
         return mb_substr($result, mb_strlen($options['separator']));
@@ -774,7 +774,7 @@ class Tools
         foreach ($values as $key => $value) {
             $result .= self::htmlOption($key, $value, $default);
         }
-        return $result . self::htmlSelectAppend(Tools::set($options['append'], []), $default)
+        return $result . self::htmlSelectAppend(self::set($options['append'], []), $default)
             . '</select>' . PHP_EOL;
     }
 
@@ -802,7 +802,7 @@ class Tools
      * @param string $content
      * @param int $cols (optional)
      * @param int $rows (optional)
-     * @param mixed[] $options (optional) See self::htmlTextInput() for more info
+     * @param mixed[] $options (optional) See Tools::htmlTextInput() for more info
      * @return string HTML code
      */
     public static function htmlTextarea($name, $content, $cols = 60, $rows = 5, $options = [])
@@ -814,7 +814,7 @@ class Tools
     }
 
     /**
-     * HTML notation for the <input> or <textarea> tag. Used by self::htmlInput() and self::htmlTextarea().
+     * HTML notation for the <input> or <textarea> tag. Used by Tools::htmlInput() and Tools::htmlTextarea().
      *
      * @param string $name element name
      * @param string $label label, omitted if empty, translated if true
@@ -963,7 +963,7 @@ class Tools
      * @param array $haystack
      * @param bool $strict (optional) default false
      * @param mixed $encoding (optional)
-     * @result bool true/false whether the needle was found
+     * @return bool true/false whether the needle was found
      */
     public static function in_array_i($needle, array $haystack, $strict = false, $encoding = null)
     {
@@ -972,7 +972,7 @@ class Tools
     }
 
     /**
-     * Date (and time) locally. Uses self::$LOCALE.
+     * Date (and time) locally. Uses Tools::$LOCALE.
      *
      * @param mixed $datetime date/time as a string or integer
      * @param string $language (optional) language code as key to Tools::LOCALE
@@ -997,7 +997,7 @@ class Tools
     }
 
     /**
-     * Return given date using self::$LOCALE.
+     * Return given date using Tools::$LOCALE.
      *
      * @param mixed $datetime a date/time as a string or integer
      * @param string $language (optional) language code as key to Tools::LOCALE
@@ -1017,7 +1017,7 @@ class Tools
      *
      * @param string $string
      * @param string $encoding (optional)
-     * @result string
+     * @return string
      */
     public static function mb_lcfirst($string, $encoding = null)
     {
@@ -1030,7 +1030,7 @@ class Tools
      *
      * @param string $string
      * @param string $encoding (optional)
-     * @result string
+     * @return string
      */
     public static function mb_ucfirst($string, $encoding = null)
     {
@@ -1139,11 +1139,11 @@ class Tools
     public static function redir($url = '', $HTTPCode = 303)
     {
         $url = parse_url($url);
-        $url2 = (Tools::set($url['scheme']) ? $url['scheme'] . '://' : (Tools::set($_SERVER['HTTPS']) == 'on' ? 'https://' : 'http://'))
-            . (Tools::set($url['host']) ? $url['host'] : $_SERVER['HTTP_HOST'])
-            . (Tools::set($url['path']) ? $url['path'] : $_SERVER['SCRIPT_NAME'])
-            . Tools::wrap(Tools::set($url['query']) ? $url['query'] : $_SERVER['QUERY_STRING'], '?')
-            . Tools::wrap(Tools::set($url['fragment']), '#');
+        $url2 = (self::set($url['scheme']) ? $url['scheme'] . '://' : (self::set($_SERVER['HTTPS']) == 'on' ? 'https://' : 'http://'))
+            . (self::set($url['host']) ? $url['host'] : $_SERVER['HTTP_HOST'])
+            . (self::set($url['path']) ? $url['path'] : $_SERVER['SCRIPT_NAME'])
+            . self::wrap(self::set($url['query']) ? $url['query'] : $_SERVER['QUERY_STRING'], '?')
+            . self::wrap(self::set($url['fragment']), '#');
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_write_close();
         }
@@ -1155,7 +1155,7 @@ class Tools
     }
 
     /**
-     * How much time ago $datetime was according to the current time. Uses self::$LOCALE.
+     * How much time ago $datetime was according to the current time. Uses Tools::$LOCALE.
      *
      * @param mixed $datetime elapsed time as a string or an integer timestamp
      * @param string $language (optional) language code as key to Tools::LOCALE
@@ -1336,18 +1336,27 @@ class Tools
     {
         $domd = new \DOMDocument();
         libxml_use_internal_errors(true);
-        $domd->loadXML("<x>$html</x>");
+        $rootTag = 'x' . rand(1e8, 1e9 - 1);
+        $domd->loadXML("<$rootTag>$html</$rootTag>");
         libxml_use_internal_errors(false);
         $domx = new \DOMXPath($domd);
-        foreach ((is_array($attributes) ? $attributes : [$attributes]) as $attribute) {
-            $items = $domx->query("//*[@$attribute]");
-            foreach($items as $item) {
-                $item->removeAttribute($attribute);
+        $attributes = is_array($attributes) ? $attributes : [$attributes];
+        if (in_array('*', $attributes)) { //strip all attributes
+            foreach ($domx->query("//*[@*]") as $element) {
+                for ($i = $element->attributes->length - 1; $i >= 0; --$i) {
+                    $element->removeAttributeNode($element->attributes->item($i));
+                }
+            }
+        } else {
+            foreach ($attributes as $attribute) {
+                foreach($domx->query("//*[@$attribute]") as $element) {
+                    $element->removeAttribute($attribute);
+                }
             }
         }
         $result = $domd->saveXML();
-        //strip "<"."?xml version="1.0"?".">\n<x>" from beginning and "</x>\n" @todo: version-sensitive
-        return substr($result, ($pos = strpos($result, '?' . ">") + 3) + ($result[$pos] == "\n" ? 1 : 0) + 3, substr($result,-1) == "\n" ? -5 : -4);
+        //strip "<"."?xml version="1.0"?".">\n<x100000000>" from beginning and "</x100000000>\n" @todo: version-sensitive
+        return substr($result, ($pos = strpos($result, '?' . ">") + 12) + ($result[$pos] == "\n" ? 1 : 0) + 3, substr($result, -1) == "\n" ? -14 : -13);
     }
 
     /**
@@ -1389,6 +1398,24 @@ class Tools
     }
 
     /**
+     * Delete from given string $length number of characters beginning from $offset.
+     *
+     * @example: $s = 'ábcdef'; Tools::str_delete($s, 2, 3); --> 'ábef' ($s = 'ábef')
+     *
+     * @param string &$string
+     * @param int $offset
+     * @param mixed $length length as number or null for "till the end"
+     * @param mixed $encoding (optional)
+     * @return string modified string
+     */
+    public static function str_delete(&$string, $offset = 0, $length = null, $encoding = null)
+    {
+        $encoding = $encoding ?: mb_internal_encoding();
+        $length = is_null($length) ? mb_strlen($string, $encoding) - $offset : $length;
+        return $string = mb_substr($string, 0, $offset, $encoding) . mb_substr($string, $offset + $length, null, $encoding);
+    }
+
+    /**
      * Inverse to str_getcsv() - return comma-separated-values out of given array.
      * For parameter details see PHP's fputcsv()
      * edited version from https://gist.github.com/johanmeiring/2894568
@@ -1397,7 +1424,7 @@ class Tools
      * @param string $delimiter (optional) default ','
      * @param string $enclosure (optional) default '"'
      * @param string $escape_char (optional) default "\\"
-     * @result string CSV of given arguments
+     * @return string CSV of given arguments
      */
     public static function str_putcsv(array $fields, $delimiter = ',', $enclosure = '"', $escape_char = "\\")
     {
