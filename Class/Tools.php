@@ -1340,10 +1340,18 @@ class Tools
         $domd->loadXML("<$rootTag>$html</$rootTag>");
         libxml_use_internal_errors(false);
         $domx = new \DOMXPath($domd);
-        foreach ((is_array($attributes) ? $attributes : [$attributes]) as $attribute) {
-            $items = $domx->query("//*[@$attribute]");
-            foreach($items as $item) {
-                $item->removeAttribute($attribute);
+        $attributes = is_array($attributes) ? $attributes : [$attributes];
+        if (in_array('*', $attributes)) { //strip all attributes
+            foreach ($domx->query("//*[@*]") as $element) {
+                for ($i = $element->attributes->length - 1; $i >= 0; --$i) {
+                    $element->removeAttributeNode($element->attributes->item($i));
+                }
+            }
+        } else {
+            foreach ($attributes as $attribute) {
+                foreach($domx->query("//*[@$attribute]") as $element) {
+                    $element->removeAttribute($attribute);
+                }
             }
         }
         $result = $domd->saveXML();

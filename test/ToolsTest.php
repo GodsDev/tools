@@ -380,7 +380,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $html = 'ab c<b data-id="2">de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i style="display:block;">t</i>h yug io<u>h</u>t';
         $this->assertSame('ab c<b data-id="2">de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i>t</i>h yug io<u>h</u>t', Tools::stripAttributes($html, 'style'));
         $this->assertSame('ab c<b>de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i>t</i>h yug io<u>h</u>t', Tools::stripAttributes($html, ['data-id', 'style']));
-//@todo        $this->assertSame('ab c<b>de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i>t</i>h yug io<u>h</u>t', Tools::stripAttributes($html, '*'));
+        $this->assertSame('ab c<b>de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i>t</i>h yug io<u>h</u>t', Tools::stripAttributes($html, '*'));
         // str_after
         $palindrom = 'Příliš žluťoučký kůň úpěl ďábelské ódy!';
         $this->assertSame(' úpěl ďábelské ódy!', Tools::str_after($palindrom, 'žluťoučký kůň'));
