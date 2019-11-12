@@ -594,7 +594,7 @@ class Tools
         if (is_array($input)) {
             $result = '';
             foreach ($input as $item) {
-                if (is_null($item)) {
+                if ($item === null) {
                     $result .= ',NULL';
                 } elseif (is_numeric($item) || is_bool($item)) {
                     $result .= "," . (float)$item;
@@ -735,7 +735,7 @@ class Tools
                 . ($inputKey === $value ? ' checked="checked"' : '')
                 . self::wrap($options['radio-class'], ' class="', '"');
             foreach ($options as $optionKey => $optionValue) {
-                if (!in_array($optionKey, ['separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value', 'between']) && !is_null($optionValue)) {
+                if (!in_array($optionKey, ['separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value', 'between']) && $optionValue !== null) {
                     $result .= ' ' . $optionKey . ($optionValue === true ? '' : '="' . self::escapeJS($optionValue) . '"');
                 }
             }
@@ -868,7 +868,7 @@ class Tools
         $result .= '<' . (isset($options['rows']) ? 'textarea' : 'input');
         $options = array_merge($options, ['name' => self::h($name), 'value' => $value]);
         foreach ($options as $k => $v) {
-            if (is_string($k) && !is_null($v)
+            if (is_string($k) && $v !== null
                 && !self::among($k, 'before', 'between', 'after', 'table', 'random-id', 'label-after', 'label-html', 'label-class', 'value')) {
                 $result .= ' ' . $k . ($v === true ? '' : '="' . (mb_substr($k, 0, 2)=='on' ? self::h($v) : self::h($v)) . '"');
             }
@@ -937,7 +937,7 @@ class Tools
     public static function ifnull($a)
     {
         foreach (func_get_args() as $arg) {
-            if (!is_null($arg)) {
+            if ($arg !== null) {
                 return $arg;
             }
         }
@@ -1269,7 +1269,7 @@ class Tools
      */
     public static function setifnull(&$a, $b = null)
     {
-        return $a = isset($a) ? (is_null($a) ? $b : $a) : $b;
+        return $a = isset($a) ? ($a === null ? $b : $a) : $b;
     }
 
     /**
@@ -1411,7 +1411,7 @@ class Tools
     public static function str_delete(&$string, $offset = 0, $length = null, $encoding = null)
     {
         $encoding = $encoding ?: mb_internal_encoding();
-        $length = is_null($length) ? mb_strlen($string, $encoding) - $offset : $length;
+        $length = $length === null ? mb_strlen($string, $encoding) - $offset : $length;
         return $string = mb_substr($string, 0, $offset, $encoding) . mb_substr($string, $offset + $length, null, $encoding);
     }
 
@@ -1448,7 +1448,7 @@ class Tools
     {
         parse_str(self::set($_SERVER['QUERY_STRING'], ''), $parameters);
         foreach ($changes as $key => $value) {
-            if (is_null($value)) {
+            if ($value === null) {
                 unset($parameters[$key]);
             } else {
                 $parameters[$key] = $value;
