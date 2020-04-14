@@ -454,6 +454,64 @@ class Tools
     }
 
     /**
+     * Transition between two colors with given progress.
+     * Colors are treated in 24-bit / 16.7M / 8-bit per component format.
+     * You can enter colors in hexadecimal/integer format, or per component.
+     *
+     * @example Tools::colorFade(16, 32, 64, 32, 64, 128, 0.5) --> "183060"
+     * @example Tools::colorFade(0x102040, 0x204080, 0.5) same
+     * @example Tools::colorFade('#102040', '#204080', 0.5) same
+     * @example Tools::colorFade('102040', '204080', 0.5) same
+     *
+     * @param int $sR source color, red component (0..255)
+     * @param int $sG source color, green component (0..255)
+     * @param int $sB source color, blue component (0..255)
+     * @param int $dR destination color, red component (0..255)
+     * @param int $dG destination color, green component (0..255)
+     * @param int $dB destination color, blue component (0..255)
+     * @param float $progress number between 0.0 (source) and 1.0 (destination color)
+     * @return string 6-hexadecimal result color in rrggbb format (without initial #)
+     */
+    public static function colorChange($sR, $sG, $sB, $dR = 0, $dG = 0, $dB = 0, $progress = 0.5)
+    {
+        if (func_num_args() == 3) { //colors entered compressed
+            $progress = $sB; //set parameters correctly
+            if (is_string($sG)) {
+                $sG = substr($sG, substr($sG, 0, 1) == '#' ? 1 : 0);
+                $dB = hexdec(substr($sG, -2));
+                $dG = hexdec(substr($sG, 2, 2));
+                $dR = hexdec(substr($sG, 0, 2));
+            } else {
+                $dB = $sG & 0xFF;
+                $dG = ($sG >> 8) & 0xFF;
+                $dR = ($sG >> 16) & 0xFF;
+            }
+            if (is_string($sR)) {
+                $sR = substr($sR, substr($sR, 0, 1) == '#' ? 1 : 0);
+                $sB = hexdec(substr($sR, -2));
+                $sG = hexdec(substr($sR, 2, 2));
+                $sR = hexdec(substr($sR, 0, 2));
+            } else {
+                $sB = $sR & 0xFF;
+                $sG = ($sR >> 8) & 0xFF;
+                $sR = ($sR >> 16) & 0xFF;
+            }
+        }
+        // we'll be working with $dR,$dG,$dB
+        if ($progress <= 0) {
+            $dR = $sR;
+            $dG = $sG;
+            $dB = $sB;
+        } elseif ($progress < 1) {
+            $dR = $dR * $progress + $sR * (1 - $progress);
+            $dG = $dG * $progress + $sG * (1 - $progress);
+            $dB = $dB * $progress + $sB * (1 - $progress);
+        }
+        // components returned hexadecimal, 3 * 2-digits
+        return substr('0' . dechex($dR), -2) . substr('0' . dechex($dG), -2) . substr('0' . dechex($dB), -2);
+    }
+
+    /**
      * Return alphabetical column name (like A, B, C ... Z, AA, AB, ...) from integer index
      * @example Tools::columnName(0) --> A, Tools::columnName(25) --> Z, Tools::columnName(26) --> AA
      *

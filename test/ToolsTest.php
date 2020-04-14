@@ -153,6 +153,13 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $word = 'violence';
         Tools::blacklist($word, ['violence', 'sex'], '');
         $this->assertSame('', $word);
+        // colorChange
+        $this->assertSame('142850', Tools::colorChange(0x10, 0x20, 0x40, 0x20, 0x40, 0x80, 0.25));
+        $this->assertSame('142850', Tools::colorChange(0x102040, '#204080', 0.25));
+        $this->assertSame('1c3870', Tools::colorChange('#102040', 0x204080, 0.75));
+        $this->assertSame('1c3870', Tools::colorChange('102040', '204080', 0.75));
+        $this->assertSame('000000', Tools::colorChange(0x101214, '000000', 0.99));
+        $this->assertSame('1c3870', Tools::colorChange(0x1c3870, '204080', -0.5));
         // columnName
         $this->assertSame('', Tools::columnName(-1));
         $this->assertSame('A', Tools::columnName(0));
