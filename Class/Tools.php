@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A class with additional miscelaneous, general-purpose methods.
  *
@@ -13,6 +14,7 @@ namespace GodsDev\Tools;
 
 class Tools
 {
+
     /** @const constants used in ::arrayListed() */
     const ARRL_HTML = 1;
     const ARRL_ESC = 2;
@@ -106,7 +108,7 @@ class Tools
     public static function add(&$variable, $delta = 1)
     {
         if (isset($variable) && is_array($variable)) {
-            $variable []= $delta;
+            $variable [] = $delta;
         } elseif (is_numeric($delta)) {
             $variable = (isset($variable) ? $variable : 0) + $delta;
         } else {
@@ -126,7 +128,7 @@ class Tools
     public static function addMessage($type, $message, $show = false)
     {
         $_SESSION['messages'] = self::setarray($_SESSION['messages']) ? $_SESSION['messages'] : [];
-        $_SESSION['messages'] []= [is_bool($type) ? ($type ? 'success' : 'warning') : ($type == 'error' ? 'danger' : $type), $message];
+        $_SESSION['messages'] [] = [is_bool($type) ? ($type ? 'success' : 'warning') : ($type == 'error' ? 'danger' : $type), $message];
         if ($show) {
             self::showMessages();
         }
@@ -266,7 +268,7 @@ class Tools
                     $v = intval($v);
                 }
                 if ($flags & self::ARRL_FLOAT) {
-                    $v = (float)$v;
+                    $v = (float) $v;
                 }
                 if (!($flags & self::ARRL_EMPTY) || $v) {
                     if ($flags & self::ARRL_PATTERN) {
@@ -303,8 +305,8 @@ class Tools
                     $item = reset($item);
                 }
                 if (isset($result[$key])) {
-                    $result[$key] = (array)$result[$key];
-                    $result[$key] []= $item;
+                    $result[$key] = (array) $result[$key];
+                    $result[$key] [] = $item;
                 } else {
                     $result[$key] = $item;
                 }
@@ -466,7 +468,7 @@ class Tools
         if ($columnIndex < 26) {
             return $columnIndex < 0 ? '' : chr(65 + $columnIndex);
         }
-        return self::columnName((int)($columnIndex / 26) - 1) . chr(65 + $columnIndex % 26); //@todo intdiv() for PHP7
+        return self::columnName((int) ($columnIndex / 26) - 1) . chr(65 + $columnIndex % 26); //@todo intdiv() for PHP7
     }
 
     /**
@@ -482,9 +484,9 @@ class Tools
         $CURL_OPTIONS = [
             CURLOPT_HEADER => false,
             /* cannot be activated when in safe_mode or an open_basedir is set
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_AUTOREFERER => true,
+              CURLOPT_FOLLOWLOCATION => true,
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_AUTOREFERER => true,
              */
             CURLOPT_CONNECTTIMEOUT => 30,
             CURLOPT_TIMEOUT => 30,
@@ -597,7 +599,7 @@ class Tools
                 if (is_null($item)) {
                     $result .= ',NULL';
                 } elseif (is_numeric($item) || is_bool($item)) {
-                    $result .= "," . (float)$item;
+                    $result .= "," . (float) $item;
                 } else {
                     $result .= ',"' . self::escapeSQL($item) . '"';
                 }
@@ -674,7 +676,7 @@ class Tools
      */
     public static function h($string)
     {
-        return str_replace("\0",'&#0;', htmlspecialchars($string, ENT_QUOTES | ENT_HTML5));
+        return str_replace("\0", '&#0;', htmlspecialchars($string, ENT_QUOTES | ENT_HTML5));
     }
 
     /**
@@ -723,10 +725,10 @@ class Tools
             $value = $value[$name];
         }
         $name = self::h($name);
-        foreach (['offset', 'separator' ,'label-class' ,'radio-class'] as $key) {
+        foreach (['offset', 'separator', 'label-class', 'radio-class'] as $key) {
             self::set($options[$key], '');
         }
-        $i = (int)$options['offset'];
+        $i = (int) $options['offset'];
         self::set($options['between'], ' ');
         foreach ($input as $inputKey => $inputValue) {
             $result .= $options['separator']
@@ -843,13 +845,13 @@ class Tools
             $options['id'] = 'input-' . self::webalize($name);
         }
         if (self::nonempty($options['random-id'])) {
-            $options['id'] = self::set($options['id'], 'input') . '-' . rand(1e8, 1e9-1);
+            $options['id'] = self::set($options['id'], 'input') . '-' . rand(1e8, 1e9 - 1);
         }
-        if (!isset($options['rows']) and !self::nonempty($options['type'])) {
+        if (!isset($options['rows']) and ! self::nonempty($options['type'])) {
             $options['type'] = 'text';
         }
         if (self::nonempty($options['table'])) {
-            foreach (['before' => '<tr><td>', 'between' => '</td><td>', 'after' => '</td></tr>'] as $k=>$v) {
+            foreach (['before' => '<tr><td>', 'between' => '</td><td>', 'after' => '</td></tr>'] as $k => $v) {
                 self::setifempty($options[$k], $v);
             }
         }
@@ -868,9 +870,8 @@ class Tools
         $result .= '<' . (isset($options['rows']) ? 'textarea' : 'input');
         $options = array_merge($options, ['name' => self::h($name), 'value' => $value]);
         foreach ($options as $k => $v) {
-            if (is_string($k) && !is_null($v)
-                && !self::among($k, 'before', 'between', 'after', 'table', 'random-id', 'label-after', 'label-html', 'label-class', 'value')) {
-                $result .= ' ' . $k . ($v === true ? '' : '="' . (mb_substr($k, 0, 2)=='on' ? self::h($v) : self::h($v)) . '"');
+            if (is_string($k) && !is_null($v) && !self::among($k, 'before', 'between', 'after', 'table', 'random-id', 'label-after', 'label-html', 'label-class', 'value')) {
+                $result .= ' ' . $k . ($v === true ? '' : '="' . (mb_substr($k, 0, 2) == 'on' ? self::h($v) : self::h($v)) . '"');
             }
         }
         $result .= isset($options['rows']) ? '>' . self::h($value) . '</textarea>' : ' value="' . self::h($value) . '"/>';
@@ -1076,7 +1077,7 @@ class Tools
      */
     public static function plural($amount, $form1, $form234, $form5plus, $form0 = false, $mod100 = false)
     {
-        $amount = abs((int)$amount);
+        $amount = abs((int) $amount);
         $amount = $mod100 ? $amount % 100 : $amount;
         $form234 = $form234 !== false ? $form234 : $form5plus;
         $form0 = $form0 === false ? $form5plus : $form0;
@@ -1090,8 +1091,9 @@ class Tools
      * @param int $max maximum
      * @return string RegEx pattern
      */
-    public static function preg_max($max) {
-        if (($len = strlen($max = (int)$max)) == 1) {
+    public static function preg_max($max)
+    {
+        if (($len = strlen($max = (int) $max)) == 1) {
             return ($max ? "[0-$max]" : 0);
         }
         $result = '0|[1-9]' . ($len > 2 ? ($len == 3 ? '[0-9]?' : '[0-9]{0,' . ($len - 2) . '}') : '');
@@ -1108,7 +1110,7 @@ class Tools
             $digit += $i == $len - 1 ? 0 : -1;
             $m = $i ? 0 : 1;
             $result .= '|' . substr($max, 0, $i) . ($digit > $m ? '[' . $m . ($digit - $m > 1 ? '-' : '') . $digit . ']' : $digit)
-                . ($len - $i > 1 ? '[0-9]' . ($len - $i > 2 ? '{' . ($len - $i - 1) . '}': '') : '');
+                . ($len - $i > 1 ? '[0-9]' . ($len - $i > 2 ? '{' . ($len - $i - 1) . '}' : '') : '');
         }
         return "($result)";
     }
@@ -1156,6 +1158,7 @@ class Tools
 
     /**
      * How much time ago $datetime was according to the current time. Uses Tools::$LOCALE.
+     * The method works with current time and allows for "overflow" to the next second.
      *
      * @param mixed $datetime elapsed time as a string or an integer timestamp
      * @param string $language (optional) language code as key to Tools::LOCALE
@@ -1175,8 +1178,7 @@ class Tools
                 . self::plural($diff->$part,
                     self::$LOCALE[$language]['time ago'][$part][0],
                     self::$LOCALE[$language]['time ago'][$part][1],
-                    self::$LOCALE[$language]['time ago'][$part][2])
-                : '');
+                    self::$LOCALE[$language]['time ago'][$part][2]) : '');
         }
         $result = explode(',', $result);
         $result = array_slice($result, 1, 2) ?: [self::$LOCALE[$language]['time ago']['moment']];
@@ -1310,7 +1312,7 @@ class Tools
     {
         $_SESSION['messages'] = isset($_SESSION['messages']) && is_array($_SESSION['messages']) ? $_SESSION['messages'] : [];
         $result = '';
-        foreach ((array)$_SESSION['messages'] as $key => $message) {
+        foreach ((array) $_SESSION['messages'] as $key => $message) {
             if (isset($message[0], $message[1])) {
                 $result .= '<div class="alert alert-dismissible alert-' . self::h($message[0]) . '" role="alert">'
                     . '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
@@ -1349,7 +1351,7 @@ class Tools
             }
         } else {
             foreach ($attributes as $attribute) {
-                foreach($domx->query("//*[@$attribute]") as $element) {
+                foreach ($domx->query("//*[@$attribute]") as $element) {
                     $element->removeAttribute($attribute);
                 }
             }
@@ -1536,7 +1538,8 @@ class Tools
      * @return string
      * @copyright Jakub Vrána, https://php.vrana.cz/
      */
-    public static function xorCipher($text, $key) {
+    public static function xorCipher($text, $key)
+    {
         if ($key == '') {
             return '';
         }
@@ -1553,14 +1556,15 @@ class Tools
      * @return string
      * @copyright Jakub Vrána, https://php.vrana.cz/
      */
-    public static function xorDecipher($cipher, $key) {
+    public static function xorDecipher($cipher, $key)
+    {
         if ($key == '') {
             return '';
         }
         $repeat = ceil(strlen($cipher) / strlen($key));
         $text2 = $cipher ^ str_repeat($key, $repeat);
         $text2 = explode(':', $text2, 2);
-        return substr(isset($text2[1]) ? $text2[1] : '', 0, isset($text2[0]) ? (int)$text2[0] : 0);
+        return substr(isset($text2[1]) ? $text2[1] : '', 0, isset($text2[0]) ? (int) $text2[0] : 0);
     }
 
 }
