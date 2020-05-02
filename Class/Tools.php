@@ -1216,6 +1216,7 @@ class Tools
 
     /**
      * How much time ago $datetime was according to the current time. Uses Tools::$LOCALE.
+     * The method works with current time and allows for "overflow" to the next second.
      *
      * @param mixed $datetime elapsed time as a string or an integer timestamp
      * @param string $language (optional) language code as key to Tools::LOCALE

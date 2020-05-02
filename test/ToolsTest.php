@@ -11,9 +11,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * @var Backyard
+     * @var Tools
      */
-    protected $object;
+    protected $tools;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -21,7 +21,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        
+        $this->tools = new Tools();
     }
 
     /**
@@ -33,7 +33,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         
     }
 
-    public function testAll()
+    public function testAll_A_E()
     {
         // add
         unset($a);
@@ -214,8 +214,16 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame("<a href=\\\"#\\\" class=\'btn\'>#</a>", Tools::escapeSQL('<a href="#" class=\'btn\'>#</a>'));
         // exploded
         $this->assertSame('30', Tools::exploded('-', '1996-07-30', 2));
+    }
+
+    public function testGoogleAuthenticatorCode()
+    {
         // GoogleAuthenticatorCode
-        $this->assertRegExp('~^\d+$~', (string) Tools::GoogleAuthenticatorCode('abc'));
+        $this->assertRegExp('~^\d+$~', (string) $this->tools->GoogleAuthenticatorCode('abc'));
+    }
+
+    public function testAll_H_P()
+    {
         // h
         $this->assertSame('a&amp;b&quot;c&apos;d&lt;e&gt;f&#0;g', Tools::h('a&b"c\'d<e>f' . "\0g"));
         // htmlInput
@@ -329,12 +337,25 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0, preg_match($pattern, 256));
         // randomPassword
         $this->assertSame(1, preg_match('/^[-2-9A-HJ-NP-Za-km-z]{10}$/', Tools::randomPassword(10)));
+    }
+
+    public function testRedir()
+    {
         // redir
+        $this->markTestSkipped();
+    }
+
+    public function testRelativeTime()
+    {
         // relativeTime
         $this->assertRegExp('/(1 second ago|2 seconds ago)/', Tools::relativeTime(time() - 1)); //made more benevolent
-        $this->assertSame('in 1 second', Tools::relativeTime(date('Y-m-d H:i:s', time() + 1)));
+        $this->assertRegExp('/(in 1 second|in a moment)/', Tools::relativeTime(date('Y-m-d H:i:s', time() + 1))); //to work with PHP7.3
         $this->assertSame('1 vteřina zpátky', Tools::relativeTime(time() - 1, 'cs'));
-        $this->assertSame('za 1 vteřina', Tools::relativeTime(time() + 1, 'cs'));
+        $this->assertRegExp('/(za 1 vteřina|za okamžik)/', Tools::relativeTime(time() + 1, 'cs')); //to work with PHP7.3
+    }
+
+    public function testResolve()
+    {
         // resolve
         $_SESSION['messages'] = [];
         Tools::resolve(5 === 5, 'Equal', 'Not equal');
@@ -343,6 +364,10 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
             ['success', 'Equal'],
             ['danger', 'Not equal!'],
         ]);
+    }
+
+    public function testAll_S_Z()
+    {
         // set
         unset($a);
         $this->assertSame(false, Tools::set($a));
