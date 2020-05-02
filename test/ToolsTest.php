@@ -21,6 +21,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+        
     }
 
     /**
@@ -29,9 +30,11 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
+        
     }
 
-    public function testAll() {
+    public function testAll()
+    {
         // add
         unset($a);
         $this->assertSame(1, Tools::add($a));
@@ -83,8 +86,8 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
             ['name' => 'Lucy', 'age' => 28]
         ];
         $this->assertSame([
-                ['age'=>43],
-                ['age'=>28]
+            ['age' => 43],
+            ['age' => 28]
             ], Tools::arrayConfineKeys($employees, 'age'));
         // arrayKeyAsValues
         $fruits = ['Apple', 'Pear', 'Kiwi'];
@@ -98,23 +101,23 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('<a href="/en/about" title="about">about</a> | <a href="/en/links" title="links">links</a>', Tools::arrayListed(['about', 'links'], Tools::ARRL_PATTERN, ' | ', '<a href="/en/#" title="#">#</a>', '#'));
         // arrayReindex
         $a = [
-            ['id' => 5, 'name' => 'John', 'surname' => 'Doe'], 
+            ['id' => 5, 'name' => 'John', 'surname' => 'Doe'],
             ['id' => 6, 'name' => 'Jane', 'surname' => 'Dean']
         ];
         $b = [
-            ['id' => 5, 'name' => 'John'], 
+            ['id' => 5, 'name' => 'John'],
             ['id' => 6, 'name' => 'Jane']
         ];
         $this->assertSame(
             [
-                5 => ['name' => 'John', 'surname' => 'Doe'], 
+                5 => ['name' => 'John', 'surname' => 'Doe'],
                 6 => ['name' => 'Jane', 'surname' => 'Dean']
             ],
             Tools::arrayReindex($a, 'id')
-        ); 
+        );
         $this->assertSame(
             [
-                5 => 'John', 
+                5 => 'John',
                 6 => 'Jane'
             ],
             Tools::arrayReindex($b, 'id')
@@ -128,10 +131,10 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $a = [
             0 => ['id' => 5, 'name' => 'Joe', 'surname' => 'Doe', 'age' => 35],
             1 => ['id' => 17, 'name' => 'Irene', 'surname' => 'Smith', 'age' => 28]
-        ]; 
+        ];
         $this->assertSame(1, Tools::arraySearchAssoc(['name' => 'Irene'], $a));
         $this->assertSame(false, Tools::arraySearchAssoc(['name' => 'Mary'], $a));
-        $this->assertSame(1, Tools::arraySearchAssoc(['name' => 'Irene','surname' => 'Smith'], $a));
+        $this->assertSame(1, Tools::arraySearchAssoc(['name' => 'Irene', 'surname' => 'Smith'], $a));
         $this->assertSame(false, Tools::arraySearchAssoc(['name' => 'Irene', 'surname' => 'Miller'], $a));
         $this->assertSame(1, Tools::arraySearchAssoc(['name' => 'Irene', 'surname' => 'Miller'], $a, ['partial' => true]));
         $this->assertSame(false, Tools::arraySearchAssoc(['job' => 'accountant', 'age' => 35], $a));
@@ -212,15 +215,15 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         // exploded
         $this->assertSame('30', Tools::exploded('-', '1996-07-30', 2));
         // GoogleAuthenticatorCode
-        $this->assertRegExp('~^\d+$~', (string)Tools::GoogleAuthenticatorCode('abc'));
+        $this->assertRegExp('~^\d+$~', (string) Tools::GoogleAuthenticatorCode('abc'));
         // h
         $this->assertSame('a&amp;b&quot;c&apos;d&lt;e&gt;f&#0;g', Tools::h('a&b"c\'d<e>f' . "\0g"));
         // htmlInput
-        $this->assertSame('<input type="text" name="info" value="a&apos;b&quot;c"/>', 
+        $this->assertSame('<input type="text" name="info" value="a&apos;b&quot;c"/>',
             Tools::htmlInput('info', '', 'a\'b"c')
         );
         $this->assertSame('<label for="input-info">info:</label>'
-            . '<input id="input-info" type="text" name="info" value="a&apos;b&quot;c"/>', 
+            . '<input id="input-info" type="text" name="info" value="a&apos;b&quot;c"/>',
             Tools::htmlInput('info', 'info:', 'a\'b"c')
         );
         $this->assertSame('<input class="text-right" id="info1" type="text" name="info" value="a&apos;b&quot;c"/>' . "\n"
@@ -236,10 +239,10 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
             Tools::htmlRadio('platform', $platforms, '1', [])
         );
         $this->assertSame('<label class="ml-1"><input type="radio" name="platform" value="0" class="mr-1"/>…Android</label>,'
-            . '<label class="ml-1"><input type="radio" name="platform" value="1" checked="checked" class="mr-1"/>…iOS</label>', 
+            . '<label class="ml-1"><input type="radio" name="platform" value="1" checked="checked" class="mr-1"/>…iOS</label>',
             Tools::htmlRadio('platform', $platforms, 1, ['label-class' => 'ml-1', 'radio-class' => 'mr-1', 'separator' => ',', 'between' => '…'])
         );
-        $this->assertSame('<input type="radio" name="platform" value=""/>', 
+        $this->assertSame('<input type="radio" name="platform" value=""/>',
             Tools::htmlRadio('platform', '', 1)
         );
         // htmlSelect
@@ -247,14 +250,14 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('<select name="platform">' . PHP_EOL
             . '<option value="0">Android</option>' . PHP_EOL
             . '<option value="1" selected="selected">iOS</option>' . PHP_EOL
-            . '</select>' . PHP_EOL, 
+            . '</select>' . PHP_EOL,
             Tools::htmlSelect('platform', $platforms, 1, [])
         );
         // htmlTextarea
-        $this->assertSame('<textarea cols="60" rows="5" name="info">abc</textarea>', 
+        $this->assertSame('<textarea cols="60" rows="5" name="info">abc</textarea>',
             Tools::htmlTextarea('info', 'abc')
         );
-        $this->assertSame('<textarea class="my-3" cols="61" rows="6" name="info">a&apos;b&quot;c</textarea>', 
+        $this->assertSame('<textarea class="my-3" cols="61" rows="6" name="info">a&apos;b&quot;c</textarea>',
             Tools::htmlTextarea('info', 'a\'b"c', 61, 6, ['class' => 'my-3'])
         );
         // httpResponse
@@ -265,12 +268,12 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
                 'pragma' => 'no cache'
             ],
             'body' => "<p>Hello, world!</p>\n"
-        ], Tools::httpResponse($response));
+            ], Tools::httpResponse($response));
         $response = "pragma: no cache\r\n\r\n" . '["abc", 2, true, false, null, {"d": "e"}]';
         $this->assertSame([
             'headers' => ['pragma' => 'no cache'],
             'body' => ['abc', 2, true, false, null, ['d' => 'e']]
-        ], Tools::httpResponse($response, ['JSON' => true]));
+            ], Tools::httpResponse($response, ['JSON' => true]));
         // ifempty
         $a = 5;
         $this->assertSame(5, Tools::ifempty($a, 6));
@@ -415,7 +418,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('žl', Tools::str_delete($a, 2));
         // str_putcsv
         $fields = [2, null, false, true, 'ab;c', 'žluťoučký kůň', 'say "Hello"'];
-        $this->assertSame('2;;;1;"ab;c";"žluťoučký kůň";"say ""Hello"""'."\n", Tools::str_putcsv($fields, ';'));
+        $this->assertSame('2;;;1;"ab;c";"žluťoučký kůň";"say ""Hello"""' . "\n", Tools::str_putcsv($fields, ';'));
         // urlChange
         unset($_SERVER['QUERY_STRING']);
         $this->assertSame('a=1&color=b%26w', Tools::urlChange(['a' => 1, 'color' => 'b&w']));
