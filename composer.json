@@ -14,6 +14,11 @@
             "GodsDev\\Tools\\": "Class/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "GodsDev\\Tools\\Test\\": "test/"
+        }
+    },
     "authors": [
         {
             "name": "Karel Seidl",
