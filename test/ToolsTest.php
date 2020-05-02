@@ -342,9 +342,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
     {
         // relativeTime
         $this->assertRegExp('/(1 second ago|2 seconds ago)/', Tools::relativeTime(time() - 1)); //made more benevolent
-        $this->assertSame('in 1 second', Tools::relativeTime(date('Y-m-d H:i:s', time() + 1)));
+        $this->assertRegExp('/(in 1 second|in a moment)/', Tools::relativeTime(date('Y-m-d H:i:s', time() + 1))); //to work with PHP7.3
         $this->assertSame('1 vteřina zpátky', Tools::relativeTime(time() - 1, 'cs'));
-        $this->assertSame('za 1 vteřina', Tools::relativeTime(time() + 1, 'cs'));
+        $this->assertRegExp('/(za 1 vteřina|za okamžik)/', Tools::relativeTime(time() + 1, 'cs')); //to work with PHP7.3
     }
 
     public function testResolve()
