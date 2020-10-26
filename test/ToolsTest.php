@@ -30,7 +30,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        
+        // no action
     }
 
     public function testAll_A_E()
@@ -227,14 +227,17 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         // h
         $this->assertSame('a&amp;b&quot;c&apos;d&lt;e&gt;f&#0;g', Tools::h('a&b"c\'d<e>f' . "\0g"));
         // htmlInput
-        $this->assertSame('<input type="text" name="info" value="a&apos;b&quot;c"/>',
+        $this->assertSame(
+            '<input type="text" name="info" value="a&apos;b&quot;c"/>',
             Tools::htmlInput('info', '', 'a\'b"c')
         );
-        $this->assertSame('<label for="input-info">info:</label>'
+        $this->assertSame(
+            '<label for="input-info">info:</label>'
             . '<input id="input-info" type="text" name="info" value="a&apos;b&quot;c"/>',
             Tools::htmlInput('info', 'info:', 'a\'b"c')
         );
-        $this->assertSame('<input class="text-right" id="info1" type="text" name="info" value="a&apos;b&quot;c"/>' . "\n"
+        $this->assertSame(
+            '<input class="text-right" id="info1" type="text" name="info" value="a&apos;b&quot;c"/>' . "\n"
             . '<label for="info1" class="ml-1">info:</label>',
             Tools::htmlInput('info', 'info:', 'a\'b"c', ['class' => 'text-right', 'label-class' => 'ml-1', 'id' => 'info1', 'label-after' => true, 'between' => "\n"])
         );
@@ -242,30 +245,36 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('<option value="1">Android</option>' . PHP_EOL, Tools::htmlOption(1, 'Android'));
         // htmlRadio
         $platforms = ['Android', 'iOS'];
-        $this->assertSame('<label><input type="radio" name="platform" value="0"/> Android</label>'
+        $this->assertSame(
+            '<label><input type="radio" name="platform" value="0"/> Android</label>'
             . '<label><input type="radio" name="platform" value="1"/> iOS</label>', //should not be checked <==> strict comparison between 1 and '1'
             Tools::htmlRadio('platform', $platforms, '1', [])
         );
-        $this->assertSame('<label class="ml-1"><input type="radio" name="platform" value="0" class="mr-1"/>…Android</label>,'
+        $this->assertSame(
+            '<label class="ml-1"><input type="radio" name="platform" value="0" class="mr-1"/>…Android</label>,'
             . '<label class="ml-1"><input type="radio" name="platform" value="1" checked="checked" class="mr-1"/>…iOS</label>',
             Tools::htmlRadio('platform', $platforms, 1, ['label-class' => 'ml-1', 'radio-class' => 'mr-1', 'separator' => ',', 'between' => '…'])
         );
-        $this->assertSame('<input type="radio" name="platform" value=""/>',
+        $this->assertSame(
+            '<input type="radio" name="platform" value=""/>',
             Tools::htmlRadio('platform', '', 1)
         );
         // htmlSelect
         $platforms = ['Android', 'iOS'];
-        $this->assertSame('<select name="platform">' . PHP_EOL
+        $this->assertSame(
+            '<select name="platform">' . PHP_EOL
             . '<option value="0">Android</option>' . PHP_EOL
             . '<option value="1" selected="selected">iOS</option>' . PHP_EOL
             . '</select>' . PHP_EOL,
             Tools::htmlSelect('platform', $platforms, 1, [])
         );
         // htmlTextarea
-        $this->assertSame('<textarea cols="60" rows="5" name="info">abc</textarea>',
+        $this->assertSame(
+            '<textarea cols="60" rows="5" name="info">abc</textarea>',
             Tools::htmlTextarea('info', 'abc')
         );
-        $this->assertSame('<textarea class="my-3" cols="61" rows="6" name="info">a&apos;b&quot;c</textarea>',
+        $this->assertSame(
+            '<textarea class="my-3" cols="61" rows="6" name="info">a&apos;b&quot;c</textarea>',
             Tools::htmlTextarea('info', 'a\'b"c', 61, 6, ['class' => 'my-3'])
         );
         // httpResponse
@@ -473,5 +482,4 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(true, $text === $deciphered);
         $this->assertSame('', Tools::xorDecipher('abc', ''));
     }
-
 }
