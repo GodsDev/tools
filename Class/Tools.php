@@ -87,7 +87,7 @@ class Tools
         ]
     ];
 
-    /** @var icons for each type of session messages used in ::showMessages() */
+    /** @var array icons for each type of session messages used in ::showMessages() */
     static public $MESSAGE_ICONS = [
         'success' => '<i class="fa fa-check-circle mr-1"></i>',
         'danger' => '<i class="fa fa-times-circle mr-1"></i>',
@@ -95,13 +95,13 @@ class Tools
         'info' => '<i class="fa fa-info-circle mr-1"></i>'
     ];
 
-    /** @var characters used in ::randomPassword() */
+    /** @var string characters used in ::randomPassword() */
     static public $PASSWORD_CHARS = '-23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 
     /**
      * Add or concatenate $delta to given $variable. If the variable is not set, set it.
      *
-     * @param mixed &$variable
+     * @param mixed $variable by reference
      * @param mixed $delta = 1, what to add. []= used for $variable being an array, otherwise += used for numeric $delta and .= otherwise
      * @return mixed variable after addition
      */
@@ -153,7 +153,7 @@ class Tools
      * To test if all arguments are set, simply use isset($var1, $var2, ...).
      *
      * @example Tools::anyset($_GET['article'], $_GET['category'])
-     * @param mixed &$n variable(s)
+     * @param mixed $args n variable(s) by reference
      * @return bool true if any (at least one) variable pass isset(), false otherwise
      */
     public static function anyset(&...$args)
@@ -363,8 +363,9 @@ class Tools
      *      [partial] - non-zero -> search for at least one match (default: all must match)
      * @return mixed key for the $needle or false if array item was not found
      */
-    public static function arraySearchAssoc($needles, $haystack, $options = [])
+    public static function arraySearchAssoc(array $needles, array $haystack, array $options = [])
     {
+        // TODO nehodí chybu rovnou PHP?
         if (!is_array($haystack) || !is_array($needles)) {
             return false;
         }
@@ -441,7 +442,7 @@ class Tools
      *
      * @example $word = 'vitamins'; Tools::blacklist($product, ['violence', 'sex'], null); //$word remains 'vitamins'
      * @example $word = 'violence'; Tools::blacklist($product, ['violence', 'sex'], null); //$word set to null
-     * @param mixed &$value
+     * @param mixed $value by reference
      * @param array $list
      * @param mixed $else
      * @return bool if the value was in the list
@@ -465,9 +466,9 @@ class Tools
      * @example Tools::colorFade('#102040', '#204080', 0.5) same
      * @example Tools::colorFade('102040', '204080', 0.5) same
      *
-     * @param int $sR source color, red component (0..255)
-     * @param int $sG source color, green component (0..255)
-     * @param int $sB source color, blue component (0..255)
+     * @param mixed $sR int source color, red component (0..255) | string hex representation of source RGB
+     * @param mixed $sG int source color, green component (0..255) | string hex representation of destination RGB
+     * @param mixed $sB int source color, blue component (0..255) | float progress
      * @param int $dR destination color, red component (0..255)
      * @param int $dG destination color, green component (0..255)
      * @param int $dB destination color, blue component (0..255)
@@ -534,7 +535,7 @@ class Tools
      *
      * @param string $url URL to call
      * @param mixed[] options (optional) changing CURL options
-     * @param &mixed byref variable to fill with possible error
+     * @param mixed $error byref variable to fill with possible error
      * @return string response or null if curl_errno() is non-zero
      */
     public static function curlCall($url, $options = [], &$error = null)
@@ -565,7 +566,7 @@ class Tools
     /**
      * Cut a given string from the beginning to the first occurence of a substring.
      *
-     * @param string &$haystack
+     * @param string $haystack by reference
      * @param string $needle
      * @return void; If substring is found, $haystack will be modified.
      */
@@ -623,7 +624,7 @@ class Tools
     /**
      * Shortcut for isset($a) && $a == $b; useful for long variables.
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @param mixed $b tested value
      * @return bool
      */
@@ -1006,7 +1007,7 @@ class Tools
     /**
      * Shortcut for isset($a) ? $a : $b;
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @param mixed $b optional variable in case $a is not set
      * @return mixed
      */
@@ -1100,7 +1101,7 @@ class Tools
     /**
      * Shortcut for isset($a) && !empty($a); useful for long variables.
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @return bool
      */
     public static function nonempty(&$a)
@@ -1111,7 +1112,7 @@ class Tools
     /**
      * Shortcut for isset($a) && $a; useful for long variables.
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @return bool
      */
     public static function nonzero(&$a)
@@ -1273,7 +1274,7 @@ class Tools
      * @example $a = 0; Tools::set($a, 5); --> 5 ($a = 5)
      * @example $a = 4; Tools::set($a, 5); --> 4 ($a = 4)
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @param mixed $b (optional) value to assign to the first variable
      * @return mixed
      */
@@ -1288,7 +1289,7 @@ class Tools
     /**
      * Shortcut for isset($a) && is_array($a);
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @return bool
      */
     public static function setarray(&$a)
@@ -1299,7 +1300,7 @@ class Tools
     /**
      * Shortcut for if (isset($a) && !$a) $a = $b; useful for long variables.
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @param mixed $b (optional) value in case $a is not set or empty
      * @return mixed
      */
@@ -1311,7 +1312,7 @@ class Tools
     /**
      * Shortcut for $a = isset($a) ? $a : $b;
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @param mixed $b (optional) value in case $a is set
      * @return mixed
      */
@@ -1323,7 +1324,7 @@ class Tools
     /**
      * Shortcut for if (isset($a) && is_null($a)) $a = $b; useful for long variables.
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @param mixed $b (optional) value in case $a is not set or null
      * @return mixed
      */
@@ -1335,7 +1336,7 @@ class Tools
     /**
      * Shortcut for isset($a) && is_scalar($a);
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @return bool
      */
     public static function setscalar(&$a)
@@ -1349,6 +1350,7 @@ class Tools
      * @param string $string
      * @param int $limit
      * @param string $ellipsis (optional) string to signify ellipsis
+     * @param mixed $encoding (optional)
      * @return string
      */
     public static function shortify($string, $limit, $ellipsis = '…', $encoding = null)
@@ -1396,7 +1398,7 @@ class Tools
     {
         $domd = new \DOMDocument();
         libxml_use_internal_errors(true);
-        $rootTag = 'x' . rand(1e8, 1e9 - 1);
+        $rootTag = 'x' . rand((int) 1e8, (int) (1e9 - 1));
         $domd->loadXML("<$rootTag>$html</$rootTag>");
         libxml_use_internal_errors(false);
         $domx = new \DOMXPath($domd);
@@ -1462,7 +1464,7 @@ class Tools
      *
      * @example: $s = 'ábcdef'; Tools::str_delete($s, 2, 3); --> 'ábef' ($s = 'ábef')
      *
-     * @param string &$string
+     * @param string $string by reference
      * @param int $offset
      * @param mixed $length length as number or null for "till the end"
      * @param mixed $encoding (optional)
@@ -1557,7 +1559,7 @@ class Tools
      *
      * @example $os = 'Windows'; Tools::whitelist($os, ['Windows', 'Unix'], 'unsupported'); //$os remains 'Windows'
      * @example $os = 'Solaris'; Tools::whitelist($os, ['Windows', 'Unix'], 'unsupported'); //$os set to 'unsupported'
-     * @param mixed &$value
+     * @param mixed $value by reference
      * @param array $list
      * @param mixed $else
      * @return bool if the value was in the list
