@@ -273,7 +273,8 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertSame(
             '<label class="ml-1"><input type="radio" name="platform" value="0" class="mr-1"/>…Android</label>,'
-            . '<label class="ml-1"><input type="radio" name="platform" value="1" checked="checked" class="mr-1"/>…iOS</label>',
+            . '<label class="ml-1">'
+            . '<input type="radio" name="platform" value="1" checked="checked" class="mr-1"/>…iOS</label>',
             Tools::htmlRadio(
                 'platform',
                 $platforms,
