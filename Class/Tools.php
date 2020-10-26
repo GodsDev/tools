@@ -323,8 +323,8 @@ class Tools
      *      Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Orange') --> [2=>'Kiwi'];
      *      Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Kiwi') --> [];
      *
-     * @param array $array1 array to remove items from
-     * @param mixed $array2 either array containing values that are keys to be removed
+     * @param array $array array to remove items from
+     * @param mixed $remove either array containing values that are keys to be removed
      *              or key(s) to be removed
      * @return array with removed keys
      *
@@ -533,7 +533,7 @@ class Tools
      * Make a cURL call and return its response. Requires running cURL extension with certain defaults (see below).
      *
      * @param string $url URL to call
-     * @param mixed[] options (optional) changing CURL options
+     * @param mixed[] $options (optional) changing CURL options
      * @param mixed $error byref variable to fill with possible error
      * @return string response or null if curl_errno() is non-zero
      */
@@ -816,7 +816,7 @@ class Tools
      * @param string $name
      * @param array $values
      * @param string $default value
-     * @param mixed[] options (optional)
+     * @param mixed[] $options (optional)
      *  [prepend] array of options to prepend before $values
      *  [append] array of options to append after $values
      *  [class], [id], [onchange], ... optional HTML attributes to add to the <select> notation
@@ -903,7 +903,7 @@ class Tools
             $options['id'] = 'input-' . self::webalize($name);
         }
         if (self::nonempty($options['random-id'])) {
-            $options['id'] = self::set($options['id'], 'input') . '-' . rand(1e8, 1e9 - 1);
+            $options['id'] = self::set($options['id'], 'input') . '-' . rand((int) 1e8, (int) (1e9 - 1));
         }
         if (!isset($options['rows']) and ! self::nonempty($options['type'])) {
             $options['type'] = 'text';
@@ -990,8 +990,7 @@ class Tools
      * Return first non-null parameter passed to this function, or null.
      *
      * @param mixed $a tested value
-     * @param mixed $b value returned if parameter #1 is null
-     * @return mixed
+     * @return mixed next parameter returned if parameter #1 is null
      */
     public static function ifnull($a)
     {
@@ -1527,9 +1526,9 @@ class Tools
     /**
      * String conversion: diacritics --> ASCII, everything else than a-z, A-Z, 0-9, "_", "-" --> "-", then "--" --> "-" and "-" at the ends get trimmed.
      *
-     * @param $string string to webalize
-     * @param $charlist (optional) string of chars to be used
-     * @param $lower bool (optional) convert to lower-case?
+     * @param string $string string to webalize
+     * @param string $charlist (optional) string of chars to be used
+     * @param bool $lower (optional) convert to lower-case?
      * @return string converted text
      * @author Daniel Grudl (Nette)
      */
@@ -1597,8 +1596,8 @@ class Tools
     /**
      * Cipher a text with a key using xor operator
      *
-     * @param string text to cipher
-     * @param string key
+     * @param string $text to cipher
+     * @param string $key
      * @return string
      * @copyright Jakub Vrána, https://php.vrana.cz/
      */
@@ -1615,8 +1614,8 @@ class Tools
     /**
      * Decipher a text with a key using xor operator
      *
-     * @param string ciphered data
-     * @param string key
+     * @param string $cipher ciphered data
+     * @param string $key
      * @return string
      * @copyright Jakub Vrána, https://php.vrana.cz/
      */

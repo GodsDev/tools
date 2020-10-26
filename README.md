@@ -156,7 +156,7 @@ HTML output
 * `stripAttributes()` – strip attributes off a HTML code
 
 HTTP
-* `curlCall()` – call a URL, return result 
+* `curlCall()` – call a URL, return result
 * `httpResponse()` – HTTP response split into headers and body
 * `redir()` – make an HTTP redirection
 * `urlChange()` – add/delete/modify GET variables of an URL
@@ -166,7 +166,7 @@ Messages
 * `outputMessage()` – output a message
 * `resolve()` – add either a 'success' or 'error' message based on a result
 * `showMessages()` – show messages from session
- 
+
 Strings
 * `begins()` – does a string begin with given parameter?
 * `cutTill()` – cut string to first occurence of given parameter

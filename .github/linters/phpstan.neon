@@ -1,2 +1,8 @@
 includes:
       - ../../phpstan.common.neon
+
+parameters:
+    ignoreErrors:
+      - 
+        message: '#Reflection error: PHPUnit_Framework_TestCase not found.#'
+        path: ../../test/*.php

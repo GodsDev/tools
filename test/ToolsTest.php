@@ -33,7 +33,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         // no action
     }
 
-    public function testAll_A_E()
+    public function testAllFromAToE()
     {
         // add
         unset($a);
@@ -95,10 +95,16 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         // arrayListed
         $fruits = ['<b>Apple</b>', 'Levi\'s', 'H&M'];
         $this->assertSame("<b>Apple</b>,Levi's,H&M", Tools::arrayListed($fruits));
-        $this->assertSame("&lt;b&gt;Apple&lt;/b&gt;,Levi&#039;s,H&amp;M", Tools::arrayListed($fruits, Tools::ARRL_HTML));
+        $this->assertSame(
+            "&lt;b&gt;Apple&lt;/b&gt;,Levi&#039;s,H&amp;M",
+            Tools::arrayListed($fruits, Tools::ARRL_HTML)
+        );
         $this->assertSame("<b>Apple</b>,Levi\\'s,H&M", Tools::arrayListed($fruits, Tools::ARRL_ESC));
         $this->assertSame("A,B,C", Tools::arrayListed(['A', 'B', 0, '', false, null, 'C'], Tools::ARRL_EMPTY));
-        $this->assertSame('<a href="/en/about" title="about">about</a> | <a href="/en/links" title="links">links</a>', Tools::arrayListed(['about', 'links'], Tools::ARRL_PATTERN, ' | ', '<a href="/en/#" title="#">#</a>', '#'));
+        $this->assertSame(
+            '<a href="/en/about" title="about">about</a> | <a href="/en/links" title="links">links</a>',
+            Tools::arrayListed(['about', 'links'], Tools::ARRL_PATTERN, ' | ', '<a href="/en/#" title="#">#</a>', '#')
+        );
         // arrayReindex
         $a = [
             ['id' => 5, 'name' => 'John', 'surname' => 'Doe'],
@@ -136,7 +142,10 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(false, Tools::arraySearchAssoc(['name' => 'Mary'], $a));
         $this->assertSame(1, Tools::arraySearchAssoc(['name' => 'Irene', 'surname' => 'Smith'], $a));
         $this->assertSame(false, Tools::arraySearchAssoc(['name' => 'Irene', 'surname' => 'Miller'], $a));
-        $this->assertSame(1, Tools::arraySearchAssoc(['name' => 'Irene', 'surname' => 'Miller'], $a, ['partial' => true]));
+        $this->assertSame(
+            1,
+            Tools::arraySearchAssoc(['name' => 'Irene', 'surname' => 'Miller'], $a, ['partial' => true])
+        );
         $this->assertSame(false, Tools::arraySearchAssoc(['job' => 'accountant', 'age' => 35], $a));
         $this->assertSame(0, Tools::arraySearchAssoc(['job' => 'accountant', 'age' => 35], $a, ['partial' => true]));
         $this->assertSame(1, Tools::arraySearchAssoc(['age' => 28], $a));
@@ -222,7 +231,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('~^\d+$~', (string) $this->tools->GoogleAuthenticatorCode('abc'));
     }
 
-    public function testAll_H_P()
+    public function testAllFromHToP()
     {
         // h
         $this->assertSame('a&amp;b&quot;c&apos;d&lt;e&gt;f&#0;g', Tools::h('a&b"c\'d<e>f' . "\0g"));
@@ -239,7 +248,18 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(
             '<input class="text-right" id="info1" type="text" name="info" value="a&apos;b&quot;c"/>' . "\n"
             . '<label for="info1" class="ml-1">info:</label>',
-            Tools::htmlInput('info', 'info:', 'a\'b"c', ['class' => 'text-right', 'label-class' => 'ml-1', 'id' => 'info1', 'label-after' => true, 'between' => "\n"])
+            Tools::htmlInput(
+                'info',
+                'info:',
+                'a\'b"c',
+                [
+                    'class' => 'text-right',
+                    'label-class' => 'ml-1',
+                    'id' => 'info1',
+                    'label-after' => true,
+                    'between' => "\n"
+                ]
+            )
         );
         // htmlOption
         $this->assertSame('<option value="1">Android</option>' . PHP_EOL, Tools::htmlOption(1, 'Android'));
@@ -247,13 +267,19 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $platforms = ['Android', 'iOS'];
         $this->assertSame(
             '<label><input type="radio" name="platform" value="0"/> Android</label>'
-            . '<label><input type="radio" name="platform" value="1"/> iOS</label>', //should not be checked <==> strict comparison between 1 and '1'
+            //should not be checked <==> strict comparison between 1 and '1'
+            . '<label><input type="radio" name="platform" value="1"/> iOS</label>',
             Tools::htmlRadio('platform', $platforms, '1', [])
         );
         $this->assertSame(
             '<label class="ml-1"><input type="radio" name="platform" value="0" class="mr-1"/>…Android</label>,'
             . '<label class="ml-1"><input type="radio" name="platform" value="1" checked="checked" class="mr-1"/>…iOS</label>',
-            Tools::htmlRadio('platform', $platforms, 1, ['label-class' => 'ml-1', 'radio-class' => 'mr-1', 'separator' => ',', 'between' => '…'])
+            Tools::htmlRadio(
+                'platform',
+                $platforms,
+                1,
+                ['label-class' => 'ml-1', 'radio-class' => 'mr-1', 'separator' => ',', 'between' => '…']
+            )
         );
         $this->assertSame(
             '<input type="radio" name="platform" value=""/>',
@@ -358,9 +384,10 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
     {
         // relativeTime
         $this->assertRegExp('/(1 second ago|2 seconds ago)/', Tools::relativeTime(time() - 1)); //made more benevolent
-        $this->assertRegExp('/(in 1 second|in a moment)/', Tools::relativeTime(date('Y-m-d H:i:s', time() + 1))); //to work with PHP7.3
         $this->assertSame('1 vteřina zpátky', Tools::relativeTime(time() - 1, 'cs'));
-        $this->assertRegExp('/(za 1 vteřina|za okamžik)/', Tools::relativeTime(time() + 1, 'cs')); //to work with PHP7.3
+        //to work with PHP7.3
+        $this->assertRegExp('/(in 1 second|in a moment)/', Tools::relativeTime(date('Y-m-d H:i:s', time() + 1)));
+        $this->assertRegExp('/(za 1 vteřina|za okamžik)/', Tools::relativeTime(time() + 1, 'cs'));
     }
 
     public function testResolve()
@@ -375,7 +402,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
-    public function testAll_S_Z()
+    public function testAllFromSToZ()
     {
         // set
         unset($a);
@@ -431,10 +458,10 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         Tools::showMessages(false);
         $this->assertSame($_SESSION['messages'], []);
         // stripAttributes
-        $html = 'ab c<b data-id="2">de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i style="display:block;">t</i>h yug io<u>h</u>t';
-        $this->assertSame('ab c<b data-id="2">de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i>t</i>h yug io<u>h</u>t', Tools::stripAttributes($html, 'style'));
-        $this->assertSame('ab c<b>de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i>t</i>h yug io<u>h</u>t', Tools::stripAttributes($html, ['data-id', 'style']));
-        $this->assertSame('ab c<b>de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i>t</i>h yug io<u>h</u>t', Tools::stripAttributes($html, '*'));
+        $html = 'ab c<b data-id="2">de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i style="display:block;">t</i>h yug io<u>h</u>t'; // phpcs:ignore
+        $this->assertSame('ab c<b data-id="2">de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i>t</i>h yug io<u>h</u>t', Tools::stripAttributes($html, 'style')); // phpcs:ignore
+        $this->assertSame('ab c<b>de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i>t</i>h yug io<u>h</u>t', Tools::stripAttributes($html, ['data-id', 'style'])); // phpcs:ignore
+        $this->assertSame('ab c<b>de f</b>g q<x>w</x>e <details><summary>afh</summary>jkdlg</details> r<i>t</i>h yug io<u>h</u>t', Tools::stripAttributes($html, '*')); // phpcs:ignore
         // str_after
         $palindrom = 'Příliš žluťoučký kůň úpěl ďábelské ódy!';
         $this->assertSame(' úpěl ďábelské ódy!', Tools::str_after($palindrom, 'žluťoučký kůň'));
