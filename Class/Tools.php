@@ -365,10 +365,6 @@ class Tools
      */
     public static function arraySearchAssoc(array $needles, array $haystack, array $options = [])
     {
-        // TODO nehodí chybu rovnou PHP?
-        if (!is_array($haystack) || !is_array($needles)) {
-            return false;
-        }
         self::set($options['strict'], false);
         self::set($options['partial'], false);
         foreach ($haystack as $key => $value) {
