@@ -502,7 +502,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('N/A', Tools::wrap([], '<b>', '</b>', 'N/A'));
         // xorCipher
         $this->assertSame('', Tools::xorCipher('abc', ''));
-        $key = md5(uniqid(mt_rand(), true));
+        $key = md5(uniqid((string) mt_rand(), true));
         $text = 'Mary had a little lamb.';
         $ciphered = Tools::xorCipher($text, $key);
         // xorDecipher
