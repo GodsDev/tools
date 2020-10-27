@@ -1362,7 +1362,7 @@ class Tools
      * Return or show session message variables as HTML <div>s and unset them. Bootstrap styling is used.
      *
      * @param bool $echo (optional) echo the messages immediately?
-     * @return void or array with session messages or void if $echo == true
+     * @return string of session messages or empty string if $echo == false
      */
     public static function showMessages($echo = true)
     {
@@ -1380,6 +1380,7 @@ class Tools
             return $result;
         }
         echo $result;
+        return '';
     }
 
     /**
