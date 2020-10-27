@@ -1146,12 +1146,12 @@ class Tools
      */
     public static function preg_max($max)
     {
-        if (($len = strlen($max = (int) $max)) == 1) {
+        if (($len = strlen((string) ($max = (int) $max))) == 1) {
             return ($max ? "[0-$max]" : 0);
         }
         $result = '0|[1-9]' . ($len > 2 ? ($len == 3 ? '[0-9]?' : '[0-9]{0,' . ($len - 2) . '}') : '');
         for ($i = 0; $i < $len; $i++) {
-            $digit = substr($max, $i, 1);
+            $digit = substr((string) $max, $i, 1);
             if ($i == 0 && $digit == '1') {
                 continue;
             } elseif ($digit == '0') {
@@ -1162,7 +1162,7 @@ class Tools
             }
             $digit += $i == $len - 1 ? 0 : -1;
             $m = $i ? 0 : 1;
-            $result .= '|' . substr($max, 0, $i) . ($digit > $m ? '[' . $m . ($digit - $m > 1 ? '-' : '') . $digit . ']' : $digit)
+            $result .= '|' . substr((string) $max, 0, $i) . ($digit > $m ? '[' . $m . ($digit - $m > 1 ? '-' : '') . $digit . ']' : $digit)
                 . ($len - $i > 1 ? '[0-9]' . ($len - $i > 2 ? '{' . ($len - $i - 1) . '}' : '') : '');
         }
         return "($result)";

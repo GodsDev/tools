@@ -368,9 +368,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         // preg_max
         $pattern = '/^' . Tools::preg_max(255) . '$/';
         $this->assertSame(0, preg_match($pattern, '-1'));
-        $this->assertSame(1, preg_match($pattern, 0));
-        $this->assertSame(1, preg_match($pattern, 255));
-        $this->assertSame(0, preg_match($pattern, 256));
+        $this->assertSame(1, preg_match($pattern, '0'));
+        $this->assertSame(1, preg_match($pattern, '255'));
+        $this->assertSame(0, preg_match($pattern, '256'));
         // randomPassword
         $this->assertSame(1, preg_match('/^[-2-9A-HJ-NP-Za-km-z]{10}$/', Tools::randomPassword(10)));
     }
