@@ -36,7 +36,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
     public function testAllFromAToE()
     {
         // add
-        unset($a);
+        // unset($a); // not necessary to unset a variable at the beginning of scope
         $this->assertSame(1, Tools::add($a));
         $this->assertSame(2, Tools::add($a));
         $this->assertSame(4, Tools::add($a, 2));
@@ -406,7 +406,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
     public function testAllFromSToZ()
     {
         // set
-        unset($a);
+        // unset($a); // not necessary to unset a variable at the beginning of scope
         $this->assertSame(false, Tools::set($a));
         $a = 0;
         $this->assertSame(false, Tools::set($a));
