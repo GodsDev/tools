@@ -2,6 +2,9 @@ name: PHP Composer
 
 on: [push, pull_request]
 
+env:
+  LANG: "en_US.UTF-8"
+
 jobs:
   build:
 
