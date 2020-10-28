@@ -3,7 +3,7 @@ name: PHP Composer
 on: [push, pull_request]
 
 env:
-  LANG: "en_US.UTF-8"
+  LANG: "pt_BR.UTF-8"
 
 jobs:
   build:
@@ -11,6 +11,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: pt_BR.UTF-8
+      run: |
+          sudo locale-gen pt_BR.UTF-8
+          sudo update-locale LANG=pt_BR.UTF-8
+    - name: date
+      run: |
+          date
+
     - uses: actions/checkout@v2
 
     - uses: michaelw90/PHP-Lint@master
