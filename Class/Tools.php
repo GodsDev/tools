@@ -763,7 +763,7 @@ class Tools
      *
      * @param string $name name attribute of the element
      * @param mixed $input associative array of value=>label pairs or one value (in case of one item)
-     * @param scalar $value value that should be checked
+     * @param array|scalar $value value that should be checked
      * @param mixed[] $options (optional)
      *     [separator] - between items,
      *     [radio-class] - optional class for <input type=radio>,
