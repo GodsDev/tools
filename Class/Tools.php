@@ -439,11 +439,7 @@ class Tools
             }
         } else {
             foreach ($beginning as $value) {
-                if (mb_strtolower(mb_substr(
-                    $text,
-                    0,
-                    mb_strlen($value, $encoding)
-                ), $encoding) === mb_strtolower($value)) {
+                if (mb_strtolower(mb_substr($text, 0, mb_strlen($value, $encoding)), $encoding) === mb_strtolower($value)) { // phpcs:ignore
                     return true;
                 }
             }
@@ -626,12 +622,7 @@ class Tools
             }
         } else {
             foreach ($ending as $value) {
-                if (mb_strtolower(mb_substr(
-                    $text,
-                    -mb_strlen($value, $encoding),
-                    null,
-                    $encoding
-                )) === mb_strtolower($value)) {
+                if (mb_strtolower(mb_substr($text, -mb_strlen($value, $encoding), null, $encoding)) === mb_strtolower($value)) { // phpcs:ignore
                     return true;
                 }
             }
@@ -819,10 +810,7 @@ class Tools
                 . ($inputKey === $value ? ' checked="checked"' : '')
                 . self::wrap($options['radio-class'], ' class="', '"');
             foreach ($options as $optionKey => $optionValue) {
-                if (!in_array(
-                    $optionKey,
-                    ['separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value', 'between']
-                ) && $optionValue !== null) {
+                if (!in_array($optionKey, ['separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value', 'between']) && $optionValue !== null) { // phpcs:ignore
                     $result .= ' ' . $optionKey
                         . ($optionValue === true ? '' : '="' . self::escapeJS($optionValue) . '"');
                 }
@@ -956,18 +944,20 @@ class Tools
         $result .= '<' . (isset($options['rows']) ? 'textarea' : 'input');
         $options = array_merge($options, ['name' => self::h($name), 'value' => $value]);
         foreach ($options as $k => $v) {
-            if (is_string($k) && $v !== null && !self::among(
-                $k,
-                'before',
-                'between',
-                'after',
-                'table',
-                'random-id',
-                'label-after',
-                'label-html',
-                'label-class',
-                'value'
-            )) {
+            if (
+                is_string($k) && $v !== null && !self::among(
+                    $k,
+                    'before',
+                    'between',
+                    'after',
+                    'table',
+                    'random-id',
+                    'label-after',
+                    'label-html',
+                    'label-class',
+                    'value'
+                )
+            ) {
                 $result .= ' ' . $k
                     . ($v === true ? '' : '="' . (mb_substr($k, 0, 2) == 'on' ? self::h($v) : self::h($v)) . '"');
             }
@@ -1093,10 +1083,12 @@ class Tools
 //        unset($characterClassificationConversion[1]);
         if (in_array($characterClassificationConversion[0], ['C', 'POSIX'])) {
 //            echo "needs fix";
-            if (array_key_exists(
-                1,
-                $characterClassificationConversion
-            ) && $characterClassificationConversion[1] == '1250') {
+            if (
+                array_key_exists(
+                    1,
+                    $characterClassificationConversion
+                ) && $characterClassificationConversion[1] == '1250'
+            ) {
                 setlocale(LC_CTYPE, 'Czech_Czechia.1250');
             } else {
                 //setlocale(LC_CTYPE, 'cs_CZ.UTF-8');
