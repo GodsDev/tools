@@ -811,7 +811,7 @@ class Tools
      *
      * @param string $name
      * @param array $values
-     * @param string $default value
+     * @param mixed $default value
      * @param mixed[] $options (optional)
      *  [prepend] array of options to prepend before $values
      *  [append] array of options to append after $values
@@ -1122,7 +1122,7 @@ class Tools
      *
      * @param int $amount amount
      * @param string $form1 form for amount of 1
-     * @param string $form234 form for amount of 2, 3, or 4 (if false is given, $form5plus will be used)
+     * @param bool|string $form234 form for amount of 2, 3, or 4 (if false is given, $form5plus will be used)
      * @param string $form5plus form for amount of 5+
      * @param bool|string $form0 = false (optional) form for amount of 0 (omit it or submit false to use $form5plus instead)
      * @param bool $mod100 = false get modulo of 100 from $amount
@@ -1328,6 +1328,7 @@ class Tools
      */
     public static function setifnull(&$a, $b = null)
     {
+        // ignore phpstan warning: Strict comparison using === between mixed and null will always evaluate to false.
         return $a = isset($a) ? ($a === null ? $b : $a) : $b;
     }
 
@@ -1546,6 +1547,7 @@ class Tools
             $string = @iconv('UTF-8', 'ASCII//TRANSLIT', $string); // intentionally @
         }
         $string = str_replace(['`', "'", '"', '^', '~'], '', $string);
+        // todo fix Strict comparison using === between bool and -1 will always evaluate to false.
         if ($lower === -1) {
             $string = strtoupper($string);
         } elseif ($lower) {
