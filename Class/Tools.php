@@ -98,6 +98,9 @@ class Tools
     /** @var string characters used in ::randomPassword() */
     public static $PASSWORD_CHARS = '-23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 
+    /** @var bool */
+    private static $LC_CTYPE_OK = false;
+
     /**
      * Add or concatenate $delta to given $variable. If the variable is not set, set it.
      *
@@ -1026,6 +1029,37 @@ class Tools
     }
 
     /**
+     * Check LC_CTYPE settings: when locale category LC_CTYPE is set to C or POSIX,
+     * then iconv and strtolower don't work properly.
+     *
+     * @return void
+     */
+    private static function lcTypeOk()
+    {
+        if (self::$LC_CTYPE_OK) {
+//            echo "should be already ok";
+//            var_dump('LC_CTYPE:', setlocale(LC_CTYPE, 0));
+            return;
+        }
+        $characterClassificationConversion = explode('.', setlocale(LC_CTYPE, 0));
+//        var_dump('LC_CTYPE:', setlocale(LC_CTYPE, 0), $characterClassificationConversion);
+//        $characterClassificationConversion[0] = 'C';
+//        unset($characterClassificationConversion[1]);
+        if (in_array($characterClassificationConversion[0], ['C', 'POSIX'])) {
+//            echo "needs fix";
+            if (array_key_exists(1, $characterClassificationConversion) && $characterClassificationConversion[1] == '1250') {
+                setlocale(LC_CTYPE, 'Czech_Czechia.1250');
+            } else {
+                setlocale(LC_CTYPE, 'cs_CZ.UTF-8');
+            }
+//        } else {
+//            echo "Doesnt need fix";
+        }
+        self::$LC_CTYPE_OK = true;
+        return;
+    }
+
+    /**
      * Date (and time) locally. Uses Tools::$LOCALE.
      *
      * @param mixed $datetime date/time as a string or integer
@@ -1534,6 +1568,7 @@ class Tools
      */
     public static function webalize($string, $charlist = null, $lower = true)
     {
+        self::lcTypeOk(); // set LC_CTYPE so that iconv and strtolower work
         $string = strtr($string, '`\'"^~', '-----');
         if (ICONV_IMPL === 'glibc') {
             $string = iconv('UTF-8', 'WINDOWS-1250//TRANSLIT', $string); // intentionally @
@@ -1553,9 +1588,7 @@ class Tools
         } elseif ($lower) {
             $string = strtolower($string);
         }
-        $string = preg_replace('#[^a-z0-9' . preg_quote($charlist, '#') . ']+#i', '-', $string);
-        $string = trim($string, '-');
-        return $string;
+        return trim(preg_replace('#[^a-z0-9' . preg_quote($charlist, '#') . ']+#i', '-', $string), '-');
     }
 
     /**
