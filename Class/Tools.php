@@ -1089,14 +1089,17 @@ class Tools
                     $characterClassificationConversion
                 ) && $characterClassificationConversion[1] == '1250'
             ) {
-                setlocale(LC_CTYPE, 'Czech_Czechia.1250');
+                //setlocale(LC_CTYPE, 'Czech_Czechia.1250');
+                setlocale(LC_ALL, 'Czech_Czechia.1250');
             } else {
                 //setlocale(LC_CTYPE, 'cs_CZ.UTF-8');
-                setlocale(LC_CTYPE, 'en_US.UTF-8');
+                //setlocale(LC_CTYPE, 'en_US.UTF-8');
+                setlocale(LC_ALL, 'en_US.UTF-8');
             }
 //        } else {
 //            echo "Doesnt need fix";
         }
+        setlocale(LC_ALL, 'en_US.UTF-8'); // temp - if it works - remove br_PT from yml
         self::$LC_CTYPE_OK = true;
         return;
     }
