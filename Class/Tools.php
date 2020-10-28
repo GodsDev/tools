@@ -1124,7 +1124,7 @@ class Tools
      * @param string $form1 form for amount of 1
      * @param string $form234 form for amount of 2, 3, or 4 (if false is given, $form5plus will be used)
      * @param string $form5plus form for amount of 5+
-     * @param string $form0 = false (optional) form for amount of 0 (omit it or submit false to use $form5plus instead)
+     * @param bool|string $form0 = false (optional) form for amount of 0 (omit it or submit false to use $form5plus instead)
      * @param bool $mod100 = false get modulo of 100 from $amount
      * @return string result form
      */
@@ -1160,9 +1160,11 @@ class Tools
                 }
                 continue;
             }
+            // todo fix Binary operation "+=" between string and -1|0 results in an error.
             $digit += $i == $len - 1 ? 0 : -1;
             $m = $i ? 0 : 1;
-            $result .= '|' . substr((string) $max, 0, $i) . ($digit > $m ? '[' . $m . ($digit - $m > 1 ? '-' : '') . $digit . ']' : $digit)
+            $result .= '|' . substr((string) $max, 0, $i)
+                . ($digit > $m ? '[' . $m . ($digit - $m > 1 ? '-' : '') . $digit . ']' : $digit)
                 . ($len - $i > 1 ? '[0-9]' . ($len - $i > 2 ? '{' . ($len - $i - 1) . '}' : '') : '');
         }
         return "($result)";
