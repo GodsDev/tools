@@ -1075,7 +1075,7 @@ class Tools
 //            var_dump('LC_CTYPE:', setlocale(LC_CTYPE, "0"));
             return;
         }
-        echo "first run LC_CTYPE:" . setlocale(LC_CTYPE, "0");
+        echo "first run LC_ALL:" . setlocale(LC_ALL, "0");
         echo strtolower('StRiDaVe PiSmEnA');
         $characterClassificationConversion = explode('.', setlocale(LC_CTYPE, "0"));
 //        var_dump('LC_CTYPE:', setlocale(LC_CTYPE, "0"), $characterClassificationConversion);
@@ -1642,7 +1642,7 @@ class Tools
             );
             echo "$string " . __LINE__; // debug
         } else {
-            echo 'iconv ASCII//TRANSLIT';// debug
+            echo 'iconv ASCII//TRANSLIT ' . __LINE__;// debug
             $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string); // @ was used intentionally
             echo "$string " . __LINE__; // debug
         }
