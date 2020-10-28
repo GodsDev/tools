@@ -412,8 +412,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
     public function testRelativeTime()
     {
         // relativeTime
-        $this->assertRegExp('/(1 second ago|2 seconds ago)/', Tools::relativeTime(time() - 1)); //made more benevolent
-        $this->assertSame('1 vteřina zpátky', Tools::relativeTime(time() - 1, 'cs'));
+        // 2 seconds are more benevolent
+        $this->assertRegExp('/(1 second ago|2 seconds ago)/', Tools::relativeTime(time() - 1));
+        $this->assertRegExp('/(1 vteřina zpátky|2 vteřiny zpátky)/', Tools::relativeTime(time() - 1, 'cs'));
         //to work with PHP7.3
         $this->assertRegExp('/(in 1 second|in a moment)/', Tools::relativeTime(date('Y-m-d H:i:s', time() + 1)));
         $this->assertRegExp('/(za 1 vteřina|za okamžik)/', Tools::relativeTime(time() + 1, 'cs'));
@@ -520,8 +521,8 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
     public function testWebalize()
     {
         // webalize
-        echo 'LC_CTYPE: ' . setlocale(LC_CTYPE, 0); // debug
-        $this->assertSame('zlutoucky-kun', Tools::webalize('žluťoučký - kůň - '), 'LC_CTYPE: ' . setlocale(LC_CTYPE, 0));
+        echo 'LC_CTYPE: ' . setlocale(LC_CTYPE, "0"); // debug
+        $this->assertSame('zlutoucky-kun', Tools::webalize('žluťoučký - kůň - '), 'LC_CTYPE: ' . setlocale(LC_CTYPE, "0"));
     }
 
     public function testWhitelist()

@@ -1038,11 +1038,11 @@ class Tools
     {
         if (self::$LC_CTYPE_OK) {
 //            echo "should be already ok";
-//            var_dump('LC_CTYPE:', setlocale(LC_CTYPE, 0));
+//            var_dump('LC_CTYPE:', setlocale(LC_CTYPE, "0"));
             return;
         }
-        $characterClassificationConversion = explode('.', setlocale(LC_CTYPE, 0));
-//        var_dump('LC_CTYPE:', setlocale(LC_CTYPE, 0), $characterClassificationConversion);
+        $characterClassificationConversion = explode('.', setlocale(LC_CTYPE, "0"));
+//        var_dump('LC_CTYPE:', setlocale(LC_CTYPE, "0"), $characterClassificationConversion);
 //        $characterClassificationConversion[0] = 'C';
 //        unset($characterClassificationConversion[1]);
         if (in_array($characterClassificationConversion[0], ['C', 'POSIX'])) {
