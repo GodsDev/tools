@@ -105,7 +105,8 @@ class Tools
      * Add or concatenate $delta to given $variable. If the variable is not set, set it.
      *
      * @param mixed $variable by reference
-     * @param mixed $delta = 1, what to add. []= used for $variable being an array, otherwise += used for numeric $delta and .= otherwise
+     * @param mixed $delta = 1, what to add. []= used for $variable being an array,
+     *     otherwise += used for numeric $delta and .= otherwise
      * @return mixed variable after addition
      */
     public static function add(&$variable, $delta = 1)
@@ -115,7 +116,8 @@ class Tools
         } elseif (is_numeric($delta)) {
             $variable = (isset($variable) ? $variable : 0) + $delta;
         } else {
-            $variable = (isset($variable) ? $variable : '') . $delta; //$delta == true becomes '1'; false and null become ''
+            //$delta == true becomes '1'; false and null become ''
+            $variable = (isset($variable) ? $variable : '') . $delta;
         }
         return $variable;
     }
@@ -131,7 +133,10 @@ class Tools
     public static function addMessage($type, $message, $show = false)
     {
         $_SESSION['messages'] = self::setarray($_SESSION['messages']) ? $_SESSION['messages'] : [];
-        $_SESSION['messages'] [] = [is_bool($type) ? ($type ? 'success' : 'warning') : ($type == 'error' ? 'danger' : $type), $message];
+        $_SESSION['messages'] [] = [
+            is_bool($type) ? ($type ? 'success' : 'warning') : ($type == 'error' ? 'danger' : $type),
+            $message
+        ];
         if ($show) {
             self::showMessages();
         }
@@ -218,7 +223,8 @@ class Tools
     /**
      * Like implode() but with more options.
      *
-     * @example: Tools::arrayListed(["Levi's", "Procter & Gamble"], 1, ", ", "<b>", "</b>") --> <b>Levi's</b>, <b>Procter &amp; Gamble</b>
+     * @example: Tools::arrayListed(["Levi's", "Procter & Gamble"], 1, ", ", "<b>", "</b>")
+     *     --> <b>Levi's</b>, <b>Procter &amp; Gamble</b>
      *
      * @param mixed[] $array
      * @param int $flags (optional) set of the following bits
@@ -238,7 +244,8 @@ class Tools
      * @return string
      * @example Tools::arrayListed(["<b>Apple</b>", "Levi's", "H&M"]) --> "<b>Apple</b>,Levi's,H&M"
      * @example Tools::arrayListed(['A', 'B', 0, '', false, null, 'C'], Tools::ARRL_EMPTY) --> "A,B,C"
-     * @example Tools::arrayListed(['about', 'links'], Tools::ARRL_PATTERN, ' | ', '<a href="/en/#" title="#">#</a>', '#')
+     * @example Tools::arrayListed(['about', 'links'], Tools::ARRL_PATTERN, ' | ',
+     *     '<a href="/en/#" title="#">#</a>', '#')
      *  --> '<a href="/en/about" title="about">about</a> | <a href="/en/links" title="links">links</a>'
      */
     public static function arrayListed($array, $flags = 0, $glue = ',', $before = '', $after = '')
@@ -356,7 +363,8 @@ class Tools
 
     /**
      * Return the key of given array whose index .. equals ...
-     * @example $array = [0=>['id'=>5,'name'=>'Joe'], 1=>['id'=>17,'name'=>'Irene']]; Tools::arraySearchAssoc(['name'=>'Irene'], $array) --> 1
+     * @example $array = [0=>['id'=>5,'name'=>'Joe'], 1=>['id'=>17,'name'=>'Irene']];
+     *     Tools::arraySearchAssoc(['name'=>'Irene'], $array) --> 1
      * Keys that don't exist are counted as non-matches.
      *
      * @param array $needles
@@ -373,7 +381,10 @@ class Tools
         foreach ($haystack as $key => $value) {
             $matched = 0;
             foreach ($needles as $needleKey => $needleValue) {
-                if (isset($value[$needleKey]) && ($options['strict'] ? $value[$needleKey] === $needleValue : $value[$needleKey] == $needleValue)) {
+                if (
+                    isset($value[$needleKey]) &&
+                    ($options['strict'] ? $value[$needleKey] === $needleValue : $value[$needleKey] == $needleValue)
+                ) {
                     $matched++;
                 } elseif (!$options['partial']) {
                     break;
@@ -428,7 +439,11 @@ class Tools
             }
         } else {
             foreach ($beginning as $value) {
-                if (mb_strtolower(mb_substr($text, 0, mb_strlen($value, $encoding)), $encoding) === mb_strtolower($value)) {
+                if (mb_strtolower(mb_substr(
+                    $text,
+                    0,
+                    mb_strlen($value, $encoding)
+                ), $encoding) === mb_strtolower($value)) {
                     return true;
                 }
             }
@@ -611,7 +626,12 @@ class Tools
             }
         } else {
             foreach ($ending as $value) {
-                if (mb_strtolower(mb_substr($text, -mb_strlen($value, $encoding), null, $encoding)) === mb_strtolower($value)) {
+                if (mb_strtolower(mb_substr(
+                    $text,
+                    -mb_strlen($value, $encoding),
+                    null,
+                    $encoding
+                )) === mb_strtolower($value)) {
                     return true;
                 }
             }
@@ -663,7 +683,11 @@ class Tools
             }
             return substr($result, 1);
         }
-        preg_match_all('~([-\+]?(0x[0-9a-f]+|(0|[1-9][0-9]*)(\.[0-9]+)?(e[-\+]?[0-9]+)?)|\'(\.|[^\'])*\'|"(\.|[^"])*")~i', $input, $matches);
+        preg_match_all(
+            '~([-\+]?(0x[0-9a-f]+|(0|[1-9][0-9]*)(\.[0-9]+)?(e[-\+]?[0-9]+)?)|\'(\.|[^\'])*\'|"(\.|[^"])*")~i',
+            $input,
+            $matches
+        );
         return implode(',', $matches[0]);
     }
 
@@ -789,13 +813,18 @@ class Tools
         self::set($options['between'], ' ');
         foreach ($input as $inputKey => $inputValue) {
             $result .= $options['separator']
-                . ($inputValue !== '' ? '<label' . self::wrap(trim($options['label-class'], ' '), ' class="', '"') . '>' : '')
+                . ($inputValue !== '' ? '<label' . self::wrap(trim($options['label-class'], ' '), ' class="', '"')
+                . '>' : '')
                 . '<input type="radio" name="' . $name . '" value="' . self::h($inputKey) . '"'
                 . ($inputKey === $value ? ' checked="checked"' : '')
                 . self::wrap($options['radio-class'], ' class="', '"');
             foreach ($options as $optionKey => $optionValue) {
-                if (!in_array($optionKey, ['separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value', 'between']) && $optionValue !== null) {
-                    $result .= ' ' . $optionKey . ($optionValue === true ? '' : '="' . self::escapeJS($optionValue) . '"');
+                if (!in_array(
+                    $optionKey,
+                    ['separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value', 'between']
+                ) && $optionValue !== null) {
+                    $result .= ' ' . $optionKey
+                        . ($optionValue === true ? '' : '="' . self::escapeJS($optionValue) . '"');
                 }
             }
             $result .= '/>' . ($inputValue !== '' ? $options['between'] . self::h($inputValue) . '</label>' : '');
@@ -927,15 +956,30 @@ class Tools
         $result .= '<' . (isset($options['rows']) ? 'textarea' : 'input');
         $options = array_merge($options, ['name' => self::h($name), 'value' => $value]);
         foreach ($options as $k => $v) {
-            if (is_string($k) && $v !== null && !self::among($k, 'before', 'between', 'after', 'table', 'random-id', 'label-after', 'label-html', 'label-class', 'value')) {
-                $result .= ' ' . $k . ($v === true ? '' : '="' . (mb_substr($k, 0, 2) == 'on' ? self::h($v) : self::h($v)) . '"');
+            if (is_string($k) && $v !== null && !self::among(
+                $k,
+                'before',
+                'between',
+                'after',
+                'table',
+                'random-id',
+                'label-after',
+                'label-html',
+                'label-class',
+                'value'
+            )) {
+                $result .= ' ' . $k
+                    . ($v === true ? '' : '="' . (mb_substr($k, 0, 2) == 'on' ? self::h($v) : self::h($v)) . '"');
             }
         }
-        $result .= isset($options['rows']) ? '>' . self::h($value) . '</textarea>' : ' value="' . self::h($value) . '"/>';
-        $label = self::among($label, '', false, null) ? '' : '<label' . self::wrap(self::h(self::set($options['id'])), ' for="', '"')
+        $result .= isset($options['rows']) ? '>' . self::h($value) . '</textarea>' : ' value="'
+            . self::h($value) . '"/>';
+        $label = self::among($label, '', false, null) ? '' : '<label'
+            . self::wrap(self::h(self::set($options['id'])), ' for="', '"')
             . self::wrap(self::h(self::set($options['label-class'], '')), ' class="', '"') . '>' . $label . '</label>';
         return self::setifempty($options['before']) . (self::nonempty($options['label-after']) ? $result : $label)
-            . self::setifempty($options['between']) . (self::nonempty($options['label-after']) ? $label : $result) . self::setifempty($options['after']);
+            . self::setifempty($options['between']) . (self::nonempty($options['label-after']) ? $label : $result)
+            . self::setifempty($options['after']);
     }
 
     /**
@@ -1048,7 +1092,10 @@ class Tools
 //        unset($characterClassificationConversion[1]);
         if (in_array($characterClassificationConversion[0], ['C', 'POSIX'])) {
 //            echo "needs fix";
-            if (array_key_exists(1, $characterClassificationConversion) && $characterClassificationConversion[1] == '1250') {
+            if (array_key_exists(
+                1,
+                $characterClassificationConversion
+            ) && $characterClassificationConversion[1] == '1250') {
                 setlocale(LC_CTYPE, 'Czech_Czechia.1250');
             } else {
                 //setlocale(LC_CTYPE, 'cs_CZ.UTF-8');
@@ -1075,7 +1122,7 @@ class Tools
             $datetime = strtotime($datetime);
         }
         $language = isset(self::$LOCALE[$language]) ? $language : 'en';
-        $format = date('Y', $datetime) == date('Y') ? self::$LOCALE[$language]['date format'] : self::$LOCALE[$language]['full date format'];
+        $format = date('Y', $datetime) == date('Y') ? self::$LOCALE[$language]['date format'] : self::$LOCALE[$language]['full date format']; // phpcs:ignore
         $date = date($format, +$datetime);
         if ($language != 'en') {
             $date = strtr($date, self::$LOCALE[$language]['months']);
@@ -1160,7 +1207,8 @@ class Tools
      * @param string $form1 form for amount of 1
      * @param bool|string $form234 form for amount of 2, 3, or 4 (if false is given, $form5plus will be used)
      * @param string $form5plus form for amount of 5+
-     * @param bool|string $form0 = false (optional) form for amount of 0 (omit it or submit false to use $form5plus instead)
+     * @param bool|string $form0 = false (optional) form for amount of 0
+     *     (omit it or submit false to use $form5plus instead)
      * @param bool $mod100 = false get modulo of 100 from $amount
      * @return string result form
      */
@@ -1232,7 +1280,8 @@ class Tools
     public static function redir($url = '', $HTTPCode = 303)
     {
         $url = parse_url($url);
-        $url2 = (self::set($url['scheme']) ? $url['scheme'] . '://' : (self::set($_SERVER['HTTPS']) == 'on' ? 'https://' : 'http://'))
+        $url2 = (self::set($url['scheme']) ? $url['scheme']
+            . '://' : (self::set($_SERVER['HTTPS']) == 'on' ? 'https://' : 'http://'))
             . (self::set($url['host']) ? $url['host'] : $_SERVER['HTTP_HOST'])
             . (self::set($url['path']) ? $url['path'] : $_SERVER['SCRIPT_NAME'])
             . self::wrap(self::set($url['query']) ? $url['query'] : $_SERVER['QUERY_STRING'], '?')
@@ -1298,7 +1347,7 @@ class Tools
 
     /**
      * If called with just one parameter, returns given variable if it is set and non-zero, false otherwise.
-     * If called with two parameters, assign the 2nd parameter to the 1st if the 1st variable is not set or not non-zero.
+     * If called with 2 parameters, assign the 2nd parameter to the 1st if the 1st variable is not set or not non-zero.
      * For PHP7+ use the ?? operator.
      *
      * @example unset($a); Tools::set($a); --> false
@@ -1380,7 +1429,8 @@ class Tools
     }
 
     /**
-     * Shorten a string to given $limit of characters (with $ellipsis concatenated at the end), shorter strings are returned the same.
+     * Shorten a string to given $limit of characters (with $ellipsis concatenated at the end),
+     * shorter strings are returned the same.
      *
      * @param string $string
      * @param int $limit
@@ -1405,12 +1455,13 @@ class Tools
      */
     public static function showMessages($echo = true)
     {
-        $_SESSION['messages'] = isset($_SESSION['messages']) && is_array($_SESSION['messages']) ? $_SESSION['messages'] : [];
+        $_SESSION['messages'] = isset($_SESSION['messages']) && is_array($_SESSION['messages']) ? $_SESSION['messages'] : []; // phpcs:ignore
         $result = '';
         foreach ((array) $_SESSION['messages'] as $key => $message) {
             if (isset($message[0], $message[1])) {
                 $result .= '<div class="alert alert-dismissible alert-' . self::h($message[0]) . '" role="alert">'
-                    . '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+                    . '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
+                    . '<span aria-hidden="true">&times;</span></button>'
                     . self::$MESSAGE_ICONS[$message[0]] . ' ' . $message[1] . '</div>' . PHP_EOL;
             }
             unset($_SESSION['messages'][$key]);
@@ -1453,8 +1504,16 @@ class Tools
             }
         }
         $result = $domd->saveXML();
-        //strip "<"."?xml version="1.0"?".">\n<x100000000>" from beginning and "</x100000000>\n" @todo: version-sensitive
-        return substr($result, ($pos = strpos($result, '?' . ">") + 12) + ($result[$pos] == "\n" ? 1 : 0) + 3, substr($result, -1) == "\n" ? -14 : -13);
+        //strip "<"."?xml version="1.0"?".">\n<x100000000>" from beginning and "</x100000000>\n"
+        //@todo: version-sensitive
+        return substr(
+            $result,
+            ($pos = strpos(
+                $result,
+                '?' . ">"
+            ) + 12) + ($result[$pos] == "\n" ? 1 : 0) + 3,
+            substr($result, -1) == "\n" ? -14 : -13
+        );
     }
 
     /**
@@ -1510,7 +1569,8 @@ class Tools
     {
         $encoding = $encoding ?: mb_internal_encoding();
         $length = $length === null ? mb_strlen($string, $encoding) - $offset : $length;
-        return $string = mb_substr($string, 0, $offset, $encoding) . mb_substr($string, $offset + $length, null, $encoding);
+        $string = mb_substr($string, 0, $offset, $encoding) . mb_substr($string, $offset + $length, null, $encoding);
+        return $string;
     }
 
     /**
@@ -1560,7 +1620,8 @@ class Tools
     }
 
     /**
-     * String conversion: diacritics --> ASCII, everything else than a-z, A-Z, 0-9, "_", "-" --> "-", then "--" --> "-" and "-" at the ends get trimmed.
+     * String conversion: diacritics --> ASCII, everything else than a-z, A-Z, 0-9, "_", "-" --> "-",
+     *     then "--" --> "-" and "-" at the ends get trimmed.
      *
      * @param string $string string to webalize
      * @param string $charlist (optional) string of chars to be used
@@ -1573,15 +1634,15 @@ class Tools
         self::lcTypeOk(); // set LC_CTYPE so that iconv and strtolower work
         $string = strtr($string, '`\'"^~', '-----');
         if (ICONV_IMPL === 'glibc') {
-            $string = iconv('UTF-8', 'WINDOWS-1250//TRANSLIT', $string); // intentionally @
+            $string = iconv('UTF-8', 'WINDOWS-1250//TRANSLIT', $string); // @ was used intentionally
             $string = strtr(
                 $string,
-                "\xa5\xa3\xbc\x8c\xa7\x8a\xaa\x8d\x8f\x8e\xaf\xb9\xb3\xbe\x9c\x9a\xba\x9d\x9f\x9e\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2"
-                . "\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf8\xf9\xfa\xfb\xfc\xfd\xfe",
+                "\xa5\xa3\xbc\x8c\xa7\x8a\xaa\x8d\x8f\x8e\xaf\xb9\xb3\xbe\x9c\x9a\xba\x9d\x9f\x9e\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2" // phpcs:ignore
+                . "\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf8\xf9\xfa\xfb\xfc\xfd\xfe", // phpcs:ignore
                 "ALLSSSSTZZZallssstzzzRAAAALCCCEEEEIIDDNNOOOOxRUUUUYTsraaaalccceeeeiiddnnooooruuuuyt"
             );
         } else {
-            $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string); // intentionally @
+            $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string); // @ was used intentionally
         }
         $string = str_replace(['`', "'", '"', '^', '~'], '', $string);
         // todo fix Strict comparison using === between bool and -1 will always evaluate to false.
