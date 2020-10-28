@@ -520,7 +520,8 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
     public function testWebalize()
     {
         // webalize
-        $this->assertSame('zlutoucky-kun', Tools::webalize('žluťoučký - kůň - '));
+        echo 'LC_CTYPE: ' . setlocale(LC_CTYPE, 0); // debug
+        $this->assertSame('zlutoucky-kun', Tools::webalize('žluťoučký - kůň - '), 'LC_CTYPE: ' . setlocale(LC_CTYPE, 0));
     }
 
     public function testWhitelist()
