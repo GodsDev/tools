@@ -22,7 +22,7 @@ jobs:
     - name: PHPUnit (php-actions)
       uses: php-actions/phpunit@v5
       with:
-        configuration: ../../phpunit.xml
+        configuration: phpunit.xml
 
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
     # Docs: https://getcomposer.org/doc/articles/scripts.md
