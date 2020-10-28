@@ -1086,6 +1086,7 @@ class Tools
             return;
         }
         echo "first run LC_CTYPE:" . setlocale(LC_CTYPE, "0");
+        echo strtolower('StRiDaVe PiSmEnA');
         $characterClassificationConversion = explode('.', setlocale(LC_CTYPE, "0"));
 //        var_dump('LC_CTYPE:', setlocale(LC_CTYPE, "0"), $characterClassificationConversion);
 //        $characterClassificationConversion[0] = 'C';
