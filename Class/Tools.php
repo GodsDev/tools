@@ -1100,11 +1100,11 @@ class Tools
 //            echo "Doesnt need fix";
         }
         //setlocale(LC_ALL, 'en_US.UTF-8'); // temp - if it works - remove br_PT from yml
-        setlocale(LC_CTYPE, 'en_US.UTF-8'); // todo refactor
-        setlocale(LC_COLLATE, 'en_US.UTF-8');// todo refactor
-        mb_internal_encoding('UTF-8'); // voodoo
+//        setlocale(LC_CTYPE, 'en_US.UTF-8'); // todo refactor
+//        setlocale(LC_COLLATE, 'en_US.UTF-8');// todo refactor
+//        mb_internal_encoding('UTF-8'); // voodoo
         error_reporting(E_ALL); // incl E_NOTICE
-        echo "after setting en_US.UTF-8:" . setlocale(LC_ALL, "0");
+//        echo "after setting en_US.UTF-8:" . setlocale(LC_ALL, "0");
         self::$LC_CTYPE_OK = true;
         return;
     }
