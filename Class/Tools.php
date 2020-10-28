@@ -1050,7 +1050,8 @@ class Tools
             if (array_key_exists(1, $characterClassificationConversion) && $characterClassificationConversion[1] == '1250') {
                 setlocale(LC_CTYPE, 'Czech_Czechia.1250');
             } else {
-                setlocale(LC_CTYPE, 'cs_CZ.UTF-8');
+                //setlocale(LC_CTYPE, 'cs_CZ.UTF-8');
+                setlocale(LC_CTYPE, 'en_US.UTF-8');
             }
 //        } else {
 //            echo "Doesnt need fix";
