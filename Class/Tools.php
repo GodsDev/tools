@@ -1100,6 +1100,7 @@ class Tools
 //            echo "Doesnt need fix";
         }
         setlocale(LC_ALL, 'en_US.UTF-8'); // temp - if it works - remove br_PT from yml
+        echo "after setting en_US.UTF-8:" . setlocale(LC_ALL, "0");
         self::$LC_CTYPE_OK = true;
         return;
     }
@@ -1633,7 +1634,7 @@ class Tools
         if (ICONV_IMPL === 'glibc') {
             echo 'ICONV_IMPL === glibc';// debug
             $string = iconv('UTF-8', 'WINDOWS-1250//TRANSLIT', $string); // @ was used intentionally
-            echo "$string " . __LINE__; // debug            
+            echo "$string " . __LINE__; // debug
             $string = strtr(
                 $string,
                 "\xa5\xa3\xbc\x8c\xa7\x8a\xaa\x8d\x8f\x8e\xaf\xb9\xb3\xbe\x9c\x9a\xba\x9d\x9f\x9e\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2" // phpcs:ignore
