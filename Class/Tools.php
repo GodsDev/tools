@@ -1427,7 +1427,7 @@ class Tools
      * @param string $needle
      * @param bool $caseInsensitive (optional) default: false
      * @param string $encoding (optional)
-     * @return string substring after $needle or false is $needle wasn't found
+     * @return string|bool substring after $needle or false if $needle wasn't found
      */
     public static function str_after($haystack, $needle, $caseInsensitive = false, $encoding = null)
     {
@@ -1446,7 +1446,7 @@ class Tools
      * @param string $needle
      * @param bool $caseInsensitive (optional) default: false
      * @param string $encoding (optional)
-     * @return string substring before $needle or false is $needle wasn't found
+     * @return string|bool substring before $needle or false if $needle wasn't found
      */
     public static function str_before($haystack, $needle, $caseInsensitive = false, $encoding = null)
     {
