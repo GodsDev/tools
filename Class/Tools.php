@@ -1536,7 +1536,7 @@ class Tools
     {
         $string = strtr($string, '`\'"^~', '-----');
         if (ICONV_IMPL === 'glibc') {
-            $string = @iconv('UTF-8', 'WINDOWS-1250//TRANSLIT', $string); // intentionally @
+            $string = iconv('UTF-8', 'WINDOWS-1250//TRANSLIT', $string); // intentionally @
             $string = strtr(
                 $string,
                 "\xa5\xa3\xbc\x8c\xa7\x8a\xaa\x8d\x8f\x8e\xaf\xb9\xb3\xbe\x9c\x9a\xba\x9d\x9f\x9e\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2"
@@ -1544,7 +1544,7 @@ class Tools
                 "ALLSSSSTZZZallssstzzzRAAAALCCCEEEEIIDDNNOOOOxRUUUUYTsraaaalccceeeeiiddnnooooruuuuyt"
             );
         } else {
-            $string = @iconv('UTF-8', 'ASCII//TRANSLIT', $string); // intentionally @
+            $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string); // intentionally @
         }
         $string = str_replace(['`', "'", '"', '^', '~'], '', $string);
         // todo fix Strict comparison using === between bool and -1 will always evaluate to false.
