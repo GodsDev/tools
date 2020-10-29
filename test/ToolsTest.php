@@ -21,6 +21,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+        error_reporting(E_ALL); // incl E_NOTICE
         $this->tools = new Tools();
     }
 
@@ -231,10 +232,17 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('~^\d+$~', (string) $this->tools->GoogleAuthenticatorCode('abc'));
     }
 
-    public function testAllFromHToP()
+    public function testH()
     {
         // h
         $this->assertSame('a&amp;b&quot;c&apos;d&lt;e&gt;f&#0;g', Tools::h('a&b"c\'d<e>f' . "\0g"));
+    }
+
+    /**
+     * @group iconvtranslit
+     */
+    public function testHtmlInput()
+    {
         // htmlInput
         $this->assertSame(
             '<input type="text" name="info" value="a&apos;b&quot;c"/>',
@@ -261,8 +269,16 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
                 ]
             )
         );
+    }
+
+    public function testHtmlOption()
+    {
         // htmlOption
         $this->assertSame('<option value="1">Android</option>' . PHP_EOL, Tools::htmlOption(1, 'Android'));
+    }
+
+    public function testHtmlRadio()
+    {
         // htmlRadio
         $platforms = ['Android', 'iOS'];
         $this->assertSame(
@@ -286,6 +302,10 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
             '<input type="radio" name="platform" value=""/>',
             Tools::htmlRadio('platform', '', 1)
         );
+    }
+
+    public function testHtmlSelect()
+    {
         // htmlSelect
         $platforms = ['Android', 'iOS'];
         $this->assertSame(
@@ -295,6 +315,10 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
             . '</select>' . PHP_EOL,
             Tools::htmlSelect('platform', $platforms, 1, [])
         );
+    }
+
+    public function testHtmlTextArea()
+    {
         // htmlTextarea
         $this->assertSame(
             '<textarea cols="60" rows="5" name="info">abc</textarea>',
@@ -304,6 +328,10 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
             '<textarea class="my-3" cols="61" rows="6" name="info">a&apos;b&quot;c</textarea>',
             Tools::htmlTextarea('info', 'a\'b"c', 61, 6, ['class' => 'my-3'])
         );
+    }
+
+    public function testHttpResponse()
+    {
         // httpResponse
         $response = "content-type: text/html; charset=utf-8\r\npragma: no cache\r\n\r\n<p>Hello, world!</p>\n";
         $this->assertSame([
@@ -318,6 +346,10 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
             'headers' => ['pragma' => 'no cache'],
             'body' => ['abc', 2, true, false, null, ['d' => 'e']]
             ], Tools::httpResponse($response, ['JSON' => true]));
+    }
+
+    public function testAllFromIToP()
+    {
         // ifempty
         $a = 5;
         $this->assertSame(5, Tools::ifempty($a, 6));
@@ -384,8 +416,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
     public function testRelativeTime()
     {
         // relativeTime
-        $this->assertRegExp('/(1 second ago|2 seconds ago)/', Tools::relativeTime(time() - 1)); //made more benevolent
-        $this->assertSame('1 vteřina zpátky', Tools::relativeTime(time() - 1, 'cs'));
+        // 2 seconds are more benevolent
+        $this->assertRegExp('/(1 second ago|2 seconds ago)/', Tools::relativeTime(time() - 1));
+        $this->assertRegExp('/(1 vteřina zpátky|2 vteřiny zpátky)/', Tools::relativeTime(time() - 1, 'cs'));
         //to work with PHP7.3
         $this->assertRegExp('/(in 1 second|in a moment)/', Tools::relativeTime(date('Y-m-d H:i:s', time() + 1)));
         $this->assertRegExp('/(za 1 vteřina|za okamžik)/', Tools::relativeTime(time() + 1, 'cs'));
@@ -404,7 +437,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
-    public function testAllFromSToZ()
+    public function testAllFromSToU()
     {
         // set
         // unset($a); // not necessary to unset a variable at the beginning of scope
@@ -487,8 +520,24 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('a=1&color=b%26w', Tools::urlChange(['a' => 1, 'color' => 'b&w']));
         $this->assertSame('a=1', Tools::urlChange(['a' => 1, 'color' => ('black' == 'white' ? 'b&w' : null)]));
         $this->assertSame('array%5B0%5D=2&array%5B1%5D=3', Tools::urlChange(['array' => [2, 3]]));
+    }
+
+    /**
+     * @group iconvtranslit
+     */
+    public function testWebalize()
+    {
         // webalize
-        $this->assertSame('zlutoucky-kun', Tools::webalize('žluťoučký - kůň - '));
+//        echo 'LC_CTYPE: ' . setlocale(LC_CTYPE, "0"); // debug
+        $this->assertSame(
+            'zlutoucky-kun',
+            Tools::webalize('žluťoučký - kůň - '),
+            'LC_CTYPE: ' . setlocale(LC_CTYPE, "0")
+        );
+    }
+
+    public function testWhitelist()
+    {
         // whitelist
         $os = 'Windows';
         Tools::whitelist($os, ['Windows', 'Unix'], 'unsupported');
@@ -496,11 +545,19 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $os = 'Solaris';
         Tools::whitelist($os, ['Windows', 'Unix'], 'unsupported');
         $this->assertSame('unsupported', $os);
+    }
+
+    public function testWrap()
+    {
         // wrap
         $this->assertSame('<b>Hello</b>', Tools::wrap('Hello', '<b>', '</b>'));
         $this->assertSame('N/A', Tools::wrap('', '<b>', '</b>', 'N/A'));
         $this->assertSame('N/A', Tools::wrap('0', '<b>', '</b>', 'N/A'));
         $this->assertSame('N/A', Tools::wrap([], '<b>', '</b>', 'N/A'));
+    }
+
+    public function testXorCipherDecipher()
+    {
         // xorCipher
         $this->assertSame('', Tools::xorCipher('abc', ''));
         $key = md5(uniqid((string) mt_rand(), true));

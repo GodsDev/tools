@@ -24,7 +24,9 @@ jobs:
     - name: PHPUnit (php-actions)
       uses: php-actions/phpunit@v5
       with:
-        configuration: phpunit.xml
+        # PHP included in ubunut-latest does not support iconv //TRANSLIT flag as iconv implementation is unknown
+        # therefore PHPUnit group iconvtranslit is excluded
+        configuration: phpunit-github-actions.xml
 
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
     # Docs: https://getcomposer.org/doc/articles/scripts.md

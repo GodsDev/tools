@@ -14,7 +14,7 @@ The `composer.json` file should then contain current version of the class - some
 ```json
 {
     "require": {
-        "godsdev/tools": "^0.3.5"
+        "godsdev/tools": "^0.3.7"
     }
 }
 ```
@@ -120,7 +120,8 @@ Testing is implemented using `phpunit` in projects folder `vendor/phpunit/phpuni
 vendor/phpunit/phpunit/phpunit
 ```
 
-*Note: The `redir()` method (which performs HTTP redirection) is not included in unit testing.*
+* Note: The `redir()` method (which performs HTTP redirection) is not included in unit testing.*
+* Note: PHP included in ubuntu-latest (for GitHub Actions) does not support iconv //TRANSLIT flag as iconv implementation is unknown, therefore PHPUnit group iconvtranslit is excluded
 
 ### Troubleshooting
 After running `phpunit` you might get error messages saying that certain PHP extension is not available. (See chapter *PHP Extensions* for more). If your project does not require said extension(s), it will run without error messages of this kind. If it does, it's up to You to provide enabling of this/these extension(s).
