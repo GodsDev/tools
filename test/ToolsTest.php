@@ -21,6 +21,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+        phpinfo();exit;//debug
         $this->tools = new Tools();
     }
 
