@@ -3,10 +3,10 @@ includes:
 
 parameters:
     ignoreErrors:
-      - 
+      -
         message: '#Reflection error: PHPUnit_Framework_TestCase not found.#'
         path: ../../test/*.php
       -
-        message: '#Error: Strict comparison using === between mixed and null will always evaluate to false.#'
+        message: '#Strict comparison using === between mixed and null will always evaluate to false.#'
         path: ../../Class/Tools.php
         count: 1
