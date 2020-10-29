@@ -237,6 +237,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('a&amp;b&quot;c&apos;d&lt;e&gt;f&#0;g', Tools::h('a&b"c\'d<e>f' . "\0g"));
     }
 
+    /**
+     * @group iconvtranslit
+     */
     public function testHtmlInput()
     {
         // htmlInput
@@ -518,6 +521,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('array%5B0%5D=2&array%5B1%5D=3', Tools::urlChange(['array' => [2, 3]]));
     }
 
+    /**
+     * @group iconvtranslit
+     */
     public function testWebalize()
     {
         // webalize
