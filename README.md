@@ -14,7 +14,7 @@ The `composer.json` file should then contain current version of the class - some
 ```json
 {
     "require": {
-        "godsdev/tools": "^0.3.5"
+        "godsdev/tools": "^0.3.7"
     }
 }
 ```
