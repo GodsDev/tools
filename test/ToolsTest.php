@@ -21,7 +21,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        phpinfo();exit;//debug
+        error_reporting(E_ALL); // incl E_NOTICE
         $this->tools = new Tools();
     }
 
@@ -528,7 +528,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
     public function testWebalize()
     {
         // webalize
-        echo 'LC_CTYPE: ' . setlocale(LC_CTYPE, "0"); // debug
+//        echo 'LC_CTYPE: ' . setlocale(LC_CTYPE, "0"); // debug
         $this->assertSame(
             'zlutoucky-kun',
             Tools::webalize('žluťoučký - kůň - '),

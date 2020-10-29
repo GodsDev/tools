@@ -99,7 +99,7 @@ class Tools
     public static $PASSWORD_CHARS = '-23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 
     /** @var bool */
-    private static $LC_CTYPE_OK = false;
+//    private static $LC_CTYPE_OK = false;
 
     /**
      * Add or concatenate $delta to given $variable. If the variable is not set, set it.
@@ -1068,46 +1068,46 @@ class Tools
      *
      * @return void
      */
-    private static function lcTypeOk()
-    {
-        if (self::$LC_CTYPE_OK) {
-//            echo "should be already ok";
-//            var_dump('LC_CTYPE:', setlocale(LC_CTYPE, "0"));
-            return;
-        }
-        echo "first run LC_ALL:" . setlocale(LC_ALL, "0");
-        echo strtolower('StRiDaVe PiSmEnA');
-        $characterClassificationConversion = explode('.', setlocale(LC_CTYPE, "0"));
-//        var_dump('LC_CTYPE:', setlocale(LC_CTYPE, "0"), $characterClassificationConversion);
-//        $characterClassificationConversion[0] = 'C';
-//        unset($characterClassificationConversion[1]);
-        if (in_array($characterClassificationConversion[0], ['C', 'POSIX'])) {
-//            echo "needs fix";
-            if (
-                array_key_exists(
-                    1,
-                    $characterClassificationConversion
-                ) && $characterClassificationConversion[1] == '1250'
-            ) {
-                //setlocale(LC_CTYPE, 'Czech_Czechia.1250');
-                setlocale(LC_ALL, 'Czech_Czechia.1250');
-            } else {
-                //setlocale(LC_CTYPE, 'cs_CZ.UTF-8');
-                //setlocale(LC_CTYPE, 'en_US.UTF-8');
-                setlocale(LC_ALL, 'en_US.UTF-8');
-            }
-//        } else {
-//            echo "Doesnt need fix";
-        }
-        //setlocale(LC_ALL, 'en_US.UTF-8'); // temp - if it works - remove br_PT from yml
-//        setlocale(LC_CTYPE, 'en_US.UTF-8'); // todo refactor
-//        setlocale(LC_COLLATE, 'en_US.UTF-8');// todo refactor
-//        mb_internal_encoding('UTF-8'); // voodoo
-        error_reporting(E_ALL); // incl E_NOTICE
-//        echo "after setting en_US.UTF-8:" . setlocale(LC_ALL, "0");
-        self::$LC_CTYPE_OK = true;
-        return;
-    }
+//    private static function lcTypeOk()
+//    {
+//        if (self::$LC_CTYPE_OK) {
+////            echo "should be already ok";
+////            var_dump('LC_CTYPE:', setlocale(LC_CTYPE, "0"));
+//            return;
+//        }
+//        echo "first run LC_ALL:" . setlocale(LC_ALL, "0");
+//        echo strtolower('StRiDaVe PiSmEnA');
+//        $characterClassificationConversion = explode('.', setlocale(LC_CTYPE, "0"));
+////        var_dump('LC_CTYPE:', setlocale(LC_CTYPE, "0"), $characterClassificationConversion);
+////        $characterClassificationConversion[0] = 'C';
+////        unset($characterClassificationConversion[1]);
+//        if (in_array($characterClassificationConversion[0], ['C', 'POSIX'])) {
+////            echo "needs fix";
+//            if (
+//                array_key_exists(
+//                    1,
+//                    $characterClassificationConversion
+//                ) && $characterClassificationConversion[1] == '1250'
+//            ) {
+//                //setlocale(LC_CTYPE, 'Czech_Czechia.1250');
+//                setlocale(LC_ALL, 'Czech_Czechia.1250');
+//            } else {
+//                //setlocale(LC_CTYPE, 'cs_CZ.UTF-8');
+//                //setlocale(LC_CTYPE, 'en_US.UTF-8');
+//                setlocale(LC_ALL, 'en_US.UTF-8');
+//            }
+////        } else {
+////            echo "Doesnt need fix";
+//        }
+//        //setlocale(LC_ALL, 'en_US.UTF-8'); // temp - if it works - remove br_PT from yml
+////        setlocale(LC_CTYPE, 'en_US.UTF-8'); // todo refactor
+////        setlocale(LC_COLLATE, 'en_US.UTF-8');// todo refactor
+////        mb_internal_encoding('UTF-8'); // voodoo
+//        error_reporting(E_ALL); // incl E_NOTICE
+////        echo "after setting en_US.UTF-8:" . setlocale(LC_ALL, "0");
+//        self::$LC_CTYPE_OK = true;
+//        return;
+//    }
 
     /**
      * Date (and time) locally. Uses Tools::$LOCALE.
@@ -1632,38 +1632,40 @@ class Tools
      */
     public static function webalize($string, $charlist = null, $lower = true)
     {
-        self::lcTypeOk(); // set LC_CTYPE so that iconv and strtolower work
+//        self::lcTypeOk(); // set LC_CTYPE so that iconv and strtolower work
         $string = strtr($string, '`\'"^~', '-----');
-        echo "$string " . __LINE__; // debug
+//        echo "$string " . __LINE__; // debug
         if (ICONV_IMPL === 'glibc') {
-            echo 'ICONV_IMPL === glibc';// debug
+//            echo 'ICONV_IMPL === glibc';// debug
             $string = iconv('UTF-8', 'WINDOWS-1250//TRANSLIT', $string); // @ was used intentionally
-            echo "$string " . __LINE__; // debug
+//            echo "$string " . __LINE__; // debug
             $string = strtr(
                 $string,
                 "\xa5\xa3\xbc\x8c\xa7\x8a\xaa\x8d\x8f\x8e\xaf\xb9\xb3\xbe\x9c\x9a\xba\x9d\x9f\x9e\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2" // phpcs:ignore
                 . "\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf8\xf9\xfa\xfb\xfc\xfd\xfe", // phpcs:ignore
                 "ALLSSSSTZZZallssstzzzRAAAALCCCEEEEIIDDNNOOOOxRUUUUYTsraaaalccceeeeiiddnnooooruuuuyt"
             );
-            echo "$string " . __LINE__; // debug
+//            echo "$string " . __LINE__; // debug
         } else {
-            echo 'iconv ASCII//TRANSLIT ' . __LINE__;// debug
+//            echo 'iconv ASCII//TRANSLIT ' . __LINE__;// debug
             $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string); // @ was used intentionally
-            echo "$string " . __LINE__; // debug
+//            echo "$string " . __LINE__; // debug
         }
         $string = str_replace(['`', "'", '"', '^', '~'], '', $string);
-        echo "$string " . __LINE__; // debug
+//        echo "$string " . __LINE__; // debug
         // todo fix Strict comparison using === between bool and -1 will always evaluate to false.
         if ($lower === -1) {
             $string = strtoupper($string);
-            echo "$string " . __LINE__; // debug
+//            echo "$string " . __LINE__; // debug
         } elseif ($lower) {
             $string = strtolower($string);
-            echo "$string " . __LINE__; // debug
+//            echo "$string " . __LINE__; // debug
         }
-        $string = trim(preg_replace('#[^a-z0-9' . preg_quote($charlist, '#') . ']+#i', '-', $string), '-');
-        echo "$string " . __LINE__; // debug
-        return $string;
+        return
+//        $string =
+            trim(preg_replace('#[^a-z0-9' . preg_quote($charlist, '#') . ']+#i', '-', $string), '-');
+//        echo "$string " . __LINE__; // debug
+//        return $string;
     }
 
     /**
