@@ -478,18 +478,18 @@ class Tools
      * Colors are treated in 24-bit / 16.7M / 8-bit per component format.
      * You can enter colors in hexadecimal/integer format, or per component.
      *
-     * @example Tools::colorFade(16, 32, 64, 32, 64, 128, 0.5) --> "183060"
-     * @example Tools::colorFade(0x102040, 0x204080, 0.5) same
-     * @example Tools::colorFade('#102040', '#204080', 0.5) same
-     * @example Tools::colorFade('102040', '204080', 0.5) same
+     * @example Tools::colorChange(16, 32, 64, 32, 64, 128, 0.5) --> "183060"
+     * @example Tools::colorChange(0x102040, 0x204080, 0.5) same
+     * @example Tools::colorChange('#102040', '#204080', 0.5) same
+     * @example Tools::colorChange('102040', '204080', 0.5) same
      *
-     * @param mixed $sR int source color, red component (0..255) | string hex representation of source RGB
-     * @param mixed $sG int source color, green component (0..255) | string hex representation of destination RGB
-     * @param mixed $sB int source color, blue component (0..255) | float progress
-     * @param int $dR destination color, red component (0..255)
-     * @param int $dG destination color, green component (0..255)
-     * @param int $dB destination color, blue component (0..255)
-     * @param float $progress number between 0.0 (source) and 1.0 (destination color)
+     * @param int|string $sR int source color, red component (0..255) | string hex representation of source RGB
+     * @param int|string $sG int source color, green component (0..255) | string hex representation of destination RGB
+     * @param int|float $sB int source color, blue component (0..255) | float progress
+     * @param int $dR OPTIONAL destination color, red component (0..255)
+     * @param int $dG OPTIONAL destination color, green component (0..255)
+     * @param int $dB OPTIONAL destination color, blue component (0..255)
+     * @param float $progress OPTIONAL number between 0.0 (source) and 1.0 (destination color)
      * @return string 6-hexadecimal result color in rrggbb format (without initial #)
      */
     public static function colorChange($sR, $sG, $sB, $dR = 0, $dG = 0, $dB = 0, $progress = 0.5)
@@ -771,7 +771,7 @@ class Tools
      *
      * @param mixed $value
      * @param string $text
-     * @param mixed $default (optional)
+     * @param int|string $default (optional)
      * @param bool $disabled (optional)
      * @return string HTML code
      */
@@ -838,7 +838,7 @@ class Tools
      *
      * @param string $name
      * @param array $values
-     * @param mixed $default value
+     * @param int|string $default value
      * @param mixed[] $options (optional)
      *  [prepend] array of options to prepend before $values
      *  [append] array of options to append after $values
@@ -865,7 +865,7 @@ class Tools
      * Used in ::htmlSelect().
      *
      * @param array $array key:value pairs to be converted to <option>s
-     * @param mixed $default
+     * @param int|string $default
      * @return string
      */
     protected static function htmlSelectAppend(array $array, $default)
@@ -1373,7 +1373,7 @@ class Tools
      */
     public static function setifnull(&$a, $b = null)
     {
-        // ignore phpstan warning: Strict comparison using === between mixed and null will always evaluate to false.
+        // ignore phpstan locally: Strict comparison using === between mixed and null will always evaluate to false.
         return $a = isset($a) ? ($a === null ? $b : $a) : $b;
     }
 
@@ -1483,7 +1483,7 @@ class Tools
      * @param string $needle
      * @param bool $caseInsensitive (optional) default: false
      * @param string $encoding (optional)
-     * @return string|bool substring after $needle or false if $needle wasn't found
+     * @return bool|string substring after $needle or false if $needle wasn't found
      */
     public static function str_after($haystack, $needle, $caseInsensitive = false, $encoding = null)
     {
@@ -1502,7 +1502,7 @@ class Tools
      * @param string $needle
      * @param bool $caseInsensitive (optional) default: false
      * @param string $encoding (optional)
-     * @return string|bool substring before $needle or false if $needle wasn't found
+     * @return bool|string substring before $needle or false if $needle wasn't found
      */
     public static function str_before($haystack, $needle, $caseInsensitive = false, $encoding = null)
     {
