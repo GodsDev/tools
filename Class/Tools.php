@@ -1636,17 +1636,14 @@ class Tools
      * If $text is set and non-zero, return it with prefix and postfix around, return $else otherwise.
      *
      * @param mixed $text value to be wrapped or replaced by $else
-     * @param mixed $prefix
-     * @param mixed $postfix (optional)
+     * @param string $prefix
+     * @param string $postfix (optional)
      * @param mixed $else (optional) value to be returned if $text is zero
      * @return string
      */
     public static function wrap($text, $prefix, $postfix = '', $else = '')
     {
-        if ($text) {
-            return $prefix . $text . $postfix;
-        }
-        return $else;
+        return $text ? ($prefix . (string) $text . $postfix) : (string) $else;
     }
 
     /**
