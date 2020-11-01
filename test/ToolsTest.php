@@ -403,6 +403,17 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1, preg_match($pattern, '0'));
         $this->assertSame(1, preg_match($pattern, '255'));
         $this->assertSame(0, preg_match($pattern, '256'));
+        $this->assertSame(0, preg_match($pattern, '256'));
+        $this->assertSame('[0-1]', Tools::preg_max(1));
+        $this->assertSame('[0-2]', Tools::preg_max(2));
+        $this->assertSame('[0-5]', Tools::preg_max(5));
+        $this->assertSame('(0|[1-9]|10)', Tools::preg_max(10));
+        $this->assertSame('(0|[1-9][0-9]?|1[0-9]{2}|20[0-9]|21[0-3])', Tools::preg_max(213));
+        $this->assertSame('(0|[1-9][0-9]{0,2}|1[0-4][0-9]{2}|15[01][0-9]|152[0-6])', Tools::preg_max(1526));
+        $this->assertSame(
+            '(0|[1-9][0-9]{0,3}|[12][0-9]{4}|3[01][0-9]{3}|32[0-3][0-9]{2}|3240[0-9]|3241[0-7])',
+            Tools::preg_max(32417)
+        );
         // randomPassword
         $this->assertSame(1, preg_match('/^[-2-9A-HJ-NP-Za-km-z]{10}$/', Tools::randomPassword(10)));
     }
@@ -531,7 +542,22 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(
             'zlutoucky-kun',
             Tools::webalize('žluťoučký - kůň - '),
-            'LC_CTYPE: ' . setlocale(LC_CTYPE, "0")
+            '(default=true, test 1) LC_ALL: ' . setlocale(LC_ALL, "0")
+        );
+        $this->assertSame(
+            'zlutoucky-kun',
+            Tools::webalize('Žluťoučký - Kůň - '),
+            '(default=true, test 2) LC_ALL: ' . setlocale(LC_ALL, "0")
+        );
+        $this->assertSame(
+            'Zlutoucky-Kun',
+            Tools::webalize('Žluťoučký - Kůň - ', null, false),
+            '(false) LC_ALL: ' . setlocale(LC_ALL, "0")
+        );
+        $this->assertSame(
+            'ZLUTOUCKY-KUN',
+            Tools::webalize('Žluťoučký - Kůň - ', null, -1),
+            '(-1) LC_ALL: ' . setlocale(LC_ALL, "0")
         );
     }
 

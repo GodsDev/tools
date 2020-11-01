@@ -1196,7 +1196,7 @@ class Tools
         }
         $result = '0|[1-9]' . ($len > 2 ? ($len == 3 ? '[0-9]?' : '[0-9]{0,' . ($len - 2) . '}') : '');
         for ($i = 0; $i < $len; $i++) {
-            $digit = substr((string) $max, $i, 1);
+            $digit = (int) substr((string) $max, $i, 1);
             if ($i == 0 && $digit == '1') {
                 continue;
             } elseif ($digit == '0') {
@@ -1205,7 +1205,6 @@ class Tools
                 }
                 continue;
             }
-            // todo fix Binary operation "+=" between string and -1|0 results in an error.
             $digit += $i == $len - 1 ? 0 : -1;
             $m = $i ? 0 : 1;
             $result .= '|' . substr((string) $max, 0, $i)
@@ -1585,7 +1584,8 @@ class Tools
      *
      * @param string $string string to webalize
      * @param string $charlist (optional) string of chars to be used
-     * @param bool $lower (optional) convert to lower-case?
+     * @param bool|negative-int $lower (optional) DEFAULT true=convert to lower-case, -1=convert to upper-case,
+     *     false|else=don't convert
      * @return string converted text
      * @author Daniel Grudl (Nette)
      */
@@ -1604,7 +1604,6 @@ class Tools
             $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string); // @ was used intentionally
         }
         $string = str_replace(['`', "'", '"', '^', '~'], '', $string);
-        // todo fix Strict comparison using === between bool and -1 will always evaluate to false.
         if ($lower === -1) {
             $string = strtoupper($string);
         } elseif ($lower) {
