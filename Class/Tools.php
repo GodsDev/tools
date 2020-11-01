@@ -1584,7 +1584,7 @@ class Tools
      *
      * @param string $string string to webalize
      * @param string $charlist (optional) string of chars to be used
-     * @param bool|negative-int $lower (optional) DEFAULT true=convert to lower-case, -1=convert to upper-case,
+     * @param bool|int $lower (optional) DEFAULT true=convert to lower-case, -1=convert to upper-case,
      *     false|else=don't convert
      * @return string converted text
      * @author Daniel Grudl (Nette)
