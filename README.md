@@ -1,4 +1,4 @@
-# Tools 
+# Tools
 A class with useful all-purpose functions (methods). The methods are static.
 Some methods for HTML-output adopt classes used in the [Bootstrap](http://getbootstrap.com) library.
 
