@@ -1,6 +1,11 @@
-# Tools
+# Tools 
 A class with useful all-purpose functions (methods). The methods are static.
 Some methods for HTML-output adopt classes used in the [Bootstrap](http://getbootstrap.com) library.
+
+[![Total Downloads](https://img.shields.io/packagist/dt/godsdev/tools.svg)](https://packagist.org/packages/godsdev/tools)
+[![Latest Stable Version](https://img.shields.io/packagist/v/godsdev/tools.svg)](https://packagist.org/packages/godsdev/tools)
+[![Lint Code Base](https://github.com/GodsDev/tools/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/GodsDev/tools/actions?query=workflow%3A%22Lint+Code+Base%22)
+[![PHP Composer + PHPUnit](https://github.com/GodsDev/tools/workflows/PHP%20Composer%20+%20PHPUnit/badge.svg)](https://github.com/GodsDev/tools/actions?query=workflow%3A%22PHP+Composer+%2B+PHPUnit%22)
 
 ## Deployment
 

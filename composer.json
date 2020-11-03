@@ -2,6 +2,11 @@
     "name": "godsdev/tools",
     "description": "Pomocné funkce pro PHP",
     "type": "library",
+    "homepage": "https://github.com/GodsDev/tools",
+    "support": {
+        "issues": "https://github.com/GodsDev/tools/issues",
+        "source": "https://github.com/GodsDev/tools"
+    },
     "minimum-stability": "stable",
     "require": {
         "php": "^5.6 || ^7.0"
