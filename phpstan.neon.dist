@@ -1,0 +1,2 @@
+includes:
+      - phpstan.common.neon

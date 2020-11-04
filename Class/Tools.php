@@ -17,19 +17,29 @@ class Tools
 
     /** @const constants used in ::arrayListed() */
     const ARRL_HTML = 1;
+
     const ARRL_ESC = 2;
+
     const ARRL_JS = 4;
+
     const ARRL_INT = 8;
+
     const ARRL_FLOAT = 16;
+
     const ARRL_EMPTY = 32;
+
     const ARRL_DB_ID = 64;
+
     const ARRL_KEYS = 128;
+
     const ARRL_PATTERN = 256;
+
     const ARRL_LIKE = self::ARRL_ESC | self::ARRL_INT;
+
     const ARRL_PREGQ = self::ARRL_ESC | self::ARRL_FLOAT;
 
     /** var array locale settings used in ::localeDate(), ::localeTime(), ::relativeTime() */
-    static public $LOCALE = [
+    public static $LOCALE = [
         'en' => [
             'date format' => 'jS F',
             'full date format' => 'jS F Y',
@@ -87,22 +97,23 @@ class Tools
         ]
     ];
 
-    /** @var icons for each type of session messages used in ::showMessages() */
-    static public $MESSAGE_ICONS = [
+    /** @var array icons for each type of session messages used in ::showMessages() */
+    public static $MESSAGE_ICONS = [
         'success' => '<i class="fa fa-check-circle mr-1"></i>',
         'danger' => '<i class="fa fa-times-circle mr-1"></i>',
         'warning' => '<i class="fa fa-exclamation-circle mr-1"></i>',
         'info' => '<i class="fa fa-info-circle mr-1"></i>'
     ];
 
-    /** @var characters used in ::randomPassword() */
-    static public $PASSWORD_CHARS = '-23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    /** @var string characters used in ::randomPassword() */
+    public static $PASSWORD_CHARS = '-23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 
     /**
      * Add or concatenate $delta to given $variable. If the variable is not set, set it.
      *
-     * @param mixed &$variable
-     * @param mixed $delta = 1, what to add. []= used for $variable being an array, otherwise += used for numeric $delta and .= otherwise
+     * @param mixed $variable by reference
+     * @param mixed $delta = 1, what to add. []= used for $variable being an array,
+     *     otherwise += used for numeric $delta and .= otherwise
      * @return mixed variable after addition
      */
     public static function add(&$variable, $delta = 1)
@@ -112,7 +123,8 @@ class Tools
         } elseif (is_numeric($delta)) {
             $variable = (isset($variable) ? $variable : 0) + $delta;
         } else {
-            $variable = (isset($variable) ? $variable : '') . $delta; //$delta == true becomes '1'; false and null become ''
+            //$delta == true becomes '1'; false and null become ''
+            $variable = (isset($variable) ? $variable : '') . $delta;
         }
         return $variable;
     }
@@ -128,7 +140,10 @@ class Tools
     public static function addMessage($type, $message, $show = false)
     {
         $_SESSION['messages'] = self::setarray($_SESSION['messages']) ? $_SESSION['messages'] : [];
-        $_SESSION['messages'] [] = [is_bool($type) ? ($type ? 'success' : 'warning') : ($type == 'error' ? 'danger' : $type), $message];
+        $_SESSION['messages'] [] = [
+            is_bool($type) ? ($type ? 'success' : 'warning') : ($type == 'error' ? 'danger' : $type),
+            $message
+        ];
         if ($show) {
             self::showMessages();
         }
@@ -153,7 +168,7 @@ class Tools
      * To test if all arguments are set, simply use isset($var1, $var2, ...).
      *
      * @example Tools::anyset($_GET['article'], $_GET['category'])
-     * @param mixed &$n variable(s)
+     * @param mixed $args n variable(s) by reference
      * @return bool true if any (at least one) variable pass isset(), false otherwise
      */
     public static function anyset(&...$args)
@@ -215,7 +230,8 @@ class Tools
     /**
      * Like implode() but with more options.
      *
-     * @example: Tools::arrayListed(["Levi's", "Procter & Gamble"], 1, ", ", "<b>", "</b>") --> <b>Levi's</b>, <b>Procter &amp; Gamble</b>
+     * @example: Tools::arrayListed(["Levi's", "Procter & Gamble"], 1, ", ", "<b>", "</b>")
+     *     --> <b>Levi's</b>, <b>Procter &amp; Gamble</b>
      *
      * @param mixed[] $array
      * @param int $flags (optional) set of the following bits
@@ -235,7 +251,8 @@ class Tools
      * @return string
      * @example Tools::arrayListed(["<b>Apple</b>", "Levi's", "H&M"]) --> "<b>Apple</b>,Levi's,H&M"
      * @example Tools::arrayListed(['A', 'B', 0, '', false, null, 'C'], Tools::ARRL_EMPTY) --> "A,B,C"
-     * @example Tools::arrayListed(['about', 'links'], Tools::ARRL_PATTERN, ' | ', '<a href="/en/#" title="#">#</a>', '#')
+     * @example Tools::arrayListed(['about', 'links'], Tools::ARRL_PATTERN, ' | ',
+     *     '<a href="/en/#" title="#">#</a>', '#')
      *  --> '<a href="/en/about" title="about">about</a> | <a href="/en/links" title="links">links</a>'
      */
     public static function arrayListed($array, $flags = 0, $glue = ',', $before = '', $after = '')
@@ -323,8 +340,8 @@ class Tools
      *      Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Orange') --> [2=>'Kiwi'];
      *      Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Kiwi') --> [];
      *
-     * @param array $array1 array to remove items from
-     * @param mixed $array2 either array containing values that are keys to be removed
+     * @param array $array array to remove items from
+     * @param mixed $remove either array containing values that are keys to be removed
      *              or key(s) to be removed
      * @return array with removed keys
      *
@@ -353,7 +370,8 @@ class Tools
 
     /**
      * Return the key of given array whose index .. equals ...
-     * @example $array = [0=>['id'=>5,'name'=>'Joe'], 1=>['id'=>17,'name'=>'Irene']]; Tools::arraySearchAssoc(['name'=>'Irene'], $array) --> 1
+     * @example $array = [0=>['id'=>5,'name'=>'Joe'], 1=>['id'=>17,'name'=>'Irene']];
+     *     Tools::arraySearchAssoc(['name'=>'Irene'], $array) --> 1
      * Keys that don't exist are counted as non-matches.
      *
      * @param array $needles
@@ -363,17 +381,17 @@ class Tools
      *      [partial] - non-zero -> search for at least one match (default: all must match)
      * @return mixed key for the $needle or false if array item was not found
      */
-    public static function arraySearchAssoc($needles, $haystack, $options = [])
+    public static function arraySearchAssoc(array $needles, array $haystack, array $options = [])
     {
-        if (!is_array($haystack) || !is_array($needles)) {
-            return false;
-        }
         self::set($options['strict'], false);
         self::set($options['partial'], false);
         foreach ($haystack as $key => $value) {
             $matched = 0;
             foreach ($needles as $needleKey => $needleValue) {
-                if (isset($value[$needleKey]) && ($options['strict'] ? $value[$needleKey] === $needleValue : $value[$needleKey] == $needleValue)) {
+                if (
+                    isset($value[$needleKey]) &&
+                    ($options['strict'] ? $value[$needleKey] === $needleValue : $value[$needleKey] == $needleValue)
+                ) {
                     $matched++;
                 } elseif (!$options['partial']) {
                     break;
@@ -428,7 +446,7 @@ class Tools
             }
         } else {
             foreach ($beginning as $value) {
-                if (mb_strtolower(mb_substr($text, 0, mb_strlen($value, $encoding)), $encoding) === mb_strtolower($value)) {
+                if (mb_strtolower(mb_substr($text, 0, mb_strlen($value, $encoding)), $encoding) === mb_strtolower($value)) { // phpcs:ignore
                     return true;
                 }
             }
@@ -441,7 +459,7 @@ class Tools
      *
      * @example $word = 'vitamins'; Tools::blacklist($product, ['violence', 'sex'], null); //$word remains 'vitamins'
      * @example $word = 'violence'; Tools::blacklist($product, ['violence', 'sex'], null); //$word set to null
-     * @param mixed &$value
+     * @param mixed $value by reference
      * @param array $list
      * @param mixed $else
      * @return bool if the value was in the list
@@ -460,18 +478,18 @@ class Tools
      * Colors are treated in 24-bit / 16.7M / 8-bit per component format.
      * You can enter colors in hexadecimal/integer format, or per component.
      *
-     * @example Tools::colorFade(16, 32, 64, 32, 64, 128, 0.5) --> "183060"
-     * @example Tools::colorFade(0x102040, 0x204080, 0.5) same
-     * @example Tools::colorFade('#102040', '#204080', 0.5) same
-     * @example Tools::colorFade('102040', '204080', 0.5) same
+     * @example Tools::colorChange(16, 32, 64, 32, 64, 128, 0.5) --> "183060"
+     * @example Tools::colorChange(0x102040, 0x204080, 0.5) same
+     * @example Tools::colorChange('#102040', '#204080', 0.5) same
+     * @example Tools::colorChange('102040', '204080', 0.5) same
      *
-     * @param int $sR source color, red component (0..255)
-     * @param int $sG source color, green component (0..255)
-     * @param int $sB source color, blue component (0..255)
-     * @param int $dR destination color, red component (0..255)
-     * @param int $dG destination color, green component (0..255)
-     * @param int $dB destination color, blue component (0..255)
-     * @param float $progress number between 0.0 (source) and 1.0 (destination color)
+     * @param int|string $sR int source color, red component (0..255) | string hex representation of source RGB
+     * @param int|string $sG int source color, green component (0..255) | string hex representation of destination RGB
+     * @param int|float $sB int source color, blue component (0..255) | float progress
+     * @param int $dR OPTIONAL destination color, red component (0..255)
+     * @param int $dG OPTIONAL destination color, green component (0..255)
+     * @param int $dB OPTIONAL destination color, blue component (0..255)
+     * @param float $progress OPTIONAL number between 0.0 (source) and 1.0 (destination color)
      * @return string 6-hexadecimal result color in rrggbb format (without initial #)
      */
     public static function colorChange($sR, $sG, $sB, $dR = 0, $dG = 0, $dB = 0, $progress = 0.5)
@@ -522,7 +540,6 @@ class Tools
      */
     public static function columnName($columnIndex = 0)
     {
-
         if ($columnIndex < 26) {
             return $columnIndex < 0 ? '' : chr(65 + $columnIndex);
         }
@@ -533,8 +550,8 @@ class Tools
      * Make a cURL call and return its response. Requires running cURL extension with certain defaults (see below).
      *
      * @param string $url URL to call
-     * @param mixed[] options (optional) changing CURL options
-     * @param &mixed byref variable to fill with possible error
+     * @param mixed[] $options (optional) changing CURL options
+     * @param mixed $error byref variable to fill with possible error
      * @return string response or null if curl_errno() is non-zero
      */
     public static function curlCall($url, $options = [], &$error = null)
@@ -565,7 +582,7 @@ class Tools
     /**
      * Cut a given string from the beginning to the first occurence of a substring.
      *
-     * @param string &$haystack
+     * @param string $haystack by reference
      * @param string $needle
      * @return void; If substring is found, $haystack will be modified.
      */
@@ -612,7 +629,7 @@ class Tools
             }
         } else {
             foreach ($ending as $value) {
-                if (mb_strtolower(mb_substr($text, -mb_strlen($value, $encoding), null, $encoding)) === mb_strtolower($value)) {
+                if (mb_strtolower(mb_substr($text, -mb_strlen($value, $encoding), null, $encoding)) === mb_strtolower($value)) { // phpcs:ignore
                     return true;
                 }
             }
@@ -623,7 +640,7 @@ class Tools
     /**
      * Shortcut for isset($a) && $a == $b; useful for long variables.
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @param mixed $b tested value
      * @return bool
      */
@@ -664,7 +681,11 @@ class Tools
             }
             return substr($result, 1);
         }
-        preg_match_all('~([-\+]?(0x[0-9a-f]+|(0|[1-9][0-9]*)(\.[0-9]+)?(e[-\+]?[0-9]+)?)|\'(\.|[^\'])*\'|"(\.|[^"])*")~i', $input, $matches);
+        preg_match_all(
+            '~([-\+]?(0x[0-9a-f]+|(0|[1-9][0-9]*)(\.[0-9]+)?(e[-\+]?[0-9]+)?)|\'(\.|[^\'])*\'|"(\.|[^"])*")~i',
+            $input,
+            $matches
+        );
         return implode(',', $matches[0]);
     }
 
@@ -750,7 +771,7 @@ class Tools
      *
      * @param mixed $value
      * @param string $text
-     * @param mixed $default (optional)
+     * @param int|string $default (optional)
      * @param bool $disabled (optional)
      * @return string HTML code
      */
@@ -767,7 +788,7 @@ class Tools
      *
      * @param string $name name attribute of the element
      * @param mixed $input associative array of value=>label pairs or one value (in case of one item)
-     * @param scalar $value value that should be checked
+     * @param array|scalar $value value that should be checked
      * @param mixed[] $options (optional)
      *     [separator] - between items,
      *     [radio-class] - optional class for <input type=radio>,
@@ -790,13 +811,15 @@ class Tools
         self::set($options['between'], ' ');
         foreach ($input as $inputKey => $inputValue) {
             $result .= $options['separator']
-                . ($inputValue !== '' ? '<label' . self::wrap(trim($options['label-class'], ' '), ' class="', '"') . '>' : '')
+                . ($inputValue !== '' ? '<label' . self::wrap(trim($options['label-class'], ' '), ' class="', '"')
+                . '>' : '')
                 . '<input type="radio" name="' . $name . '" value="' . self::h($inputKey) . '"'
                 . ($inputKey === $value ? ' checked="checked"' : '')
                 . self::wrap($options['radio-class'], ' class="', '"');
             foreach ($options as $optionKey => $optionValue) {
-                if (!in_array($optionKey, ['separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value', 'between']) && $optionValue !== null) {
-                    $result .= ' ' . $optionKey . ($optionValue === true ? '' : '="' . self::escapeJS($optionValue) . '"');
+                if (!in_array($optionKey, ['separator', 'offset', 'radio-class', 'label-class', 'checked', 'id', 'name', 'value', 'between']) && $optionValue !== null) { // phpcs:ignore
+                    $result .= ' ' . $optionKey
+                        . ($optionValue === true ? '' : '="' . self::escapeJS($optionValue) . '"');
                 }
             }
             $result .= '/>' . ($inputValue !== '' ? $options['between'] . self::h($inputValue) . '</label>' : '');
@@ -815,8 +838,8 @@ class Tools
      *
      * @param string $name
      * @param array $values
-     * @param string $default value
-     * @param mixed[] options (optional)
+     * @param int|string $default value
+     * @param mixed[] $options (optional)
      *  [prepend] array of options to prepend before $values
      *  [append] array of options to append after $values
      *  [class], [id], [onchange], ... optional HTML attributes to add to the <select> notation
@@ -842,7 +865,7 @@ class Tools
      * Used in ::htmlSelect().
      *
      * @param array $array key:value pairs to be converted to <option>s
-     * @param mixed $default
+     * @param int|string $default
      * @return string
      */
     protected static function htmlSelectAppend(array $array, $default)
@@ -903,9 +926,9 @@ class Tools
             $options['id'] = 'input-' . self::webalize($name);
         }
         if (self::nonempty($options['random-id'])) {
-            $options['id'] = self::set($options['id'], 'input') . '-' . rand(1e8, 1e9 - 1);
+            $options['id'] = self::set($options['id'], 'input') . '-' . rand((int) 1e8, (int) (1e9 - 1));
         }
-        if (!isset($options['rows']) and ! self::nonempty($options['type'])) {
+        if (!isset($options['rows']) && !self::nonempty($options['type'])) {
             $options['type'] = 'text';
         }
         if (self::nonempty($options['table'])) {
@@ -928,15 +951,32 @@ class Tools
         $result .= '<' . (isset($options['rows']) ? 'textarea' : 'input');
         $options = array_merge($options, ['name' => self::h($name), 'value' => $value]);
         foreach ($options as $k => $v) {
-            if (is_string($k) && $v !== null && !self::among($k, 'before', 'between', 'after', 'table', 'random-id', 'label-after', 'label-html', 'label-class', 'value')) {
-                $result .= ' ' . $k . ($v === true ? '' : '="' . (mb_substr($k, 0, 2) == 'on' ? self::h($v) : self::h($v)) . '"');
+            if (
+                is_string($k) && $v !== null && !self::among(
+                    $k,
+                    'before',
+                    'between',
+                    'after',
+                    'table',
+                    'random-id',
+                    'label-after',
+                    'label-html',
+                    'label-class',
+                    'value'
+                )
+            ) {
+                $result .= ' ' . $k
+                    . ($v === true ? '' : '="' . (mb_substr($k, 0, 2) == 'on' ? self::h($v) : self::h($v)) . '"');
             }
         }
-        $result .= isset($options['rows']) ? '>' . self::h($value) . '</textarea>' : ' value="' . self::h($value) . '"/>';
-        $label = self::among($label, '', false, null) ? '' : '<label' . self::wrap(self::h(self::set($options['id'])), ' for="', '"')
+        $result .= isset($options['rows']) ? '>' . self::h($value) . '</textarea>' : ' value="'
+            . self::h($value) . '"/>';
+        $label = self::among($label, '', false, null) ? '' : '<label'
+            . self::wrap(self::h(self::set($options['id'])), ' for="', '"')
             . self::wrap(self::h(self::set($options['label-class'], '')), ' class="', '"') . '>' . $label . '</label>';
         return self::setifempty($options['before']) . (self::nonempty($options['label-after']) ? $result : $label)
-            . self::setifempty($options['between']) . (self::nonempty($options['label-after']) ? $label : $result) . self::setifempty($options['after']);
+            . self::setifempty($options['between']) . (self::nonempty($options['label-after']) ? $label : $result)
+            . self::setifempty($options['after']);
     }
 
     /**
@@ -990,8 +1030,7 @@ class Tools
      * Return first non-null parameter passed to this function, or null.
      *
      * @param mixed $a tested value
-     * @param mixed $b value returned if parameter #1 is null
-     * @return mixed
+     * @return mixed next parameter returned if parameter #1 is null
      */
     public static function ifnull($a)
     {
@@ -1006,7 +1045,7 @@ class Tools
     /**
      * Shortcut for isset($a) ? $a : $b;
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @param mixed $b optional variable in case $a is not set
      * @return mixed
      */
@@ -1044,7 +1083,7 @@ class Tools
             $datetime = strtotime($datetime);
         }
         $language = isset(self::$LOCALE[$language]) ? $language : 'en';
-        $format = date('Y', $datetime) == date('Y') ? self::$LOCALE[$language]['date format'] : self::$LOCALE[$language]['full date format'];
+        $format = date('Y', $datetime) == date('Y') ? self::$LOCALE[$language]['date format'] : self::$LOCALE[$language]['full date format']; // phpcs:ignore
         $date = date($format, +$datetime);
         if ($language != 'en') {
             $date = strtr($date, self::$LOCALE[$language]['months']);
@@ -1100,7 +1139,7 @@ class Tools
     /**
      * Shortcut for isset($a) && !empty($a); useful for long variables.
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @return bool
      */
     public static function nonempty(&$a)
@@ -1111,7 +1150,7 @@ class Tools
     /**
      * Shortcut for isset($a) && $a; useful for long variables.
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @return bool
      */
     public static function nonzero(&$a)
@@ -1127,9 +1166,10 @@ class Tools
      *
      * @param int $amount amount
      * @param string $form1 form for amount of 1
-     * @param string $form234 form for amount of 2, 3, or 4 (if false is given, $form5plus will be used)
+     * @param bool|string $form234 form for amount of 2, 3, or 4 (if false is given, $form5plus will be used)
      * @param string $form5plus form for amount of 5+
-     * @param string $form0 = false (optional) form for amount of 0 (omit it or submit false to use $form5plus instead)
+     * @param bool|string $form0 = false (optional) form for amount of 0
+     *     (omit it or submit false to use $form5plus instead)
      * @param bool $mod100 = false get modulo of 100 from $amount
      * @return string result form
      */
@@ -1151,12 +1191,12 @@ class Tools
      */
     public static function preg_max($max)
     {
-        if (($len = strlen($max = (int) $max)) == 1) {
+        if (($len = strlen((string) ($max = (int) $max))) == 1) {
             return ($max ? "[0-$max]" : 0);
         }
         $result = '0|[1-9]' . ($len > 2 ? ($len == 3 ? '[0-9]?' : '[0-9]{0,' . ($len - 2) . '}') : '');
         for ($i = 0; $i < $len; $i++) {
-            $digit = substr($max, $i, 1);
+            $digit = (int) substr((string) $max, $i, 1);
             if ($i == 0 && $digit == '1') {
                 continue;
             } elseif ($digit == '0') {
@@ -1167,7 +1207,8 @@ class Tools
             }
             $digit += $i == $len - 1 ? 0 : -1;
             $m = $i ? 0 : 1;
-            $result .= '|' . substr($max, 0, $i) . ($digit > $m ? '[' . $m . ($digit - $m > 1 ? '-' : '') . $digit . ']' : $digit)
+            $result .= '|' . substr((string) $max, 0, $i)
+                . ($digit > $m ? '[' . $m . ($digit - $m > 1 ? '-' : '') . $digit . ']' : $digit)
                 . ($len - $i > 1 ? '[0-9]' . ($len - $i > 2 ? '{' . ($len - $i - 1) . '}' : '') : '');
         }
         return "($result)";
@@ -1199,7 +1240,8 @@ class Tools
     public static function redir($url = '', $HTTPCode = 303)
     {
         $url = parse_url($url);
-        $url2 = (self::set($url['scheme']) ? $url['scheme'] . '://' : (self::set($_SERVER['HTTPS']) == 'on' ? 'https://' : 'http://'))
+        $url2 = (self::set($url['scheme']) ? $url['scheme']
+            . '://' : (self::set($_SERVER['HTTPS']) == 'on' ? 'https://' : 'http://'))
             . (self::set($url['host']) ? $url['host'] : $_SERVER['HTTP_HOST'])
             . (self::set($url['path']) ? $url['path'] : $_SERVER['SCRIPT_NAME'])
             . self::wrap(self::set($url['query']) ? $url['query'] : $_SERVER['QUERY_STRING'], '?')
@@ -1210,8 +1252,7 @@ class Tools
         header("Location: $url2", true, $HTTPCode);
         header('Connection: close');
         die('<script type="text/javascript">window.location=' . json_encode($url2) . ";</script>\n"
-            . '<a href="' . $url2 . '">&rarr;</a>' //yes, without escaping
-        );
+            . '<a href="' . $url2 . '">&rarr;</a>'); //yes, without escaping
     }
 
     /**
@@ -1233,10 +1274,12 @@ class Tools
         $result = '';
         foreach (explode(' ', 'y m d h i s') as $part) {
             $result .= ($diff->{$part} ? ',' . $diff->{$part} . ' '
-                . self::plural($diff->$part,
+                . self::plural(
+                    $diff->$part,
                     self::$LOCALE[$language]['time ago'][$part][0],
                     self::$LOCALE[$language]['time ago'][$part][1],
-                    self::$LOCALE[$language]['time ago'][$part][2]) : '');
+                    self::$LOCALE[$language]['time ago'][$part][2]
+                ) : '');
         }
         $result = explode(',', $result);
         $result = array_slice($result, 1, 2) ?: [self::$LOCALE[$language]['time ago']['moment']];
@@ -1263,7 +1306,7 @@ class Tools
 
     /**
      * If called with just one parameter, returns given variable if it is set and non-zero, false otherwise.
-     * If called with two parameters, assign the 2nd parameter to the 1st if the 1st variable is not set or not non-zero.
+     * If called with 2 parameters, assign the 2nd parameter to the 1st if the 1st variable is not set or not non-zero.
      * For PHP7+ use the ?? operator.
      *
      * @example unset($a); Tools::set($a); --> false
@@ -1273,7 +1316,7 @@ class Tools
      * @example $a = 0; Tools::set($a, 5); --> 5 ($a = 5)
      * @example $a = 4; Tools::set($a, 5); --> 4 ($a = 4)
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @param mixed $b (optional) value to assign to the first variable
      * @return mixed
      */
@@ -1288,7 +1331,7 @@ class Tools
     /**
      * Shortcut for isset($a) && is_array($a);
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @return bool
      */
     public static function setarray(&$a)
@@ -1299,7 +1342,7 @@ class Tools
     /**
      * Shortcut for if (isset($a) && !$a) $a = $b; useful for long variables.
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @param mixed $b (optional) value in case $a is not set or empty
      * @return mixed
      */
@@ -1311,7 +1354,7 @@ class Tools
     /**
      * Shortcut for $a = isset($a) ? $a : $b;
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @param mixed $b (optional) value in case $a is set
      * @return mixed
      */
@@ -1323,19 +1366,20 @@ class Tools
     /**
      * Shortcut for if (isset($a) && is_null($a)) $a = $b; useful for long variables.
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @param mixed $b (optional) value in case $a is not set or null
      * @return mixed
      */
     public static function setifnull(&$a, $b = null)
     {
+        // ignore phpstan locally: Strict comparison using === between mixed and null will always evaluate to false.
         return $a = isset($a) ? ($a === null ? $b : $a) : $b;
     }
 
     /**
      * Shortcut for isset($a) && is_scalar($a);
      *
-     * @param mixed &$a tested variable
+     * @param mixed $a tested variable by reference
      * @return bool
      */
     public static function setscalar(&$a)
@@ -1344,11 +1388,13 @@ class Tools
     }
 
     /**
-     * Shorten a string to given $limit of characters (with $ellipsis concatenated at the end), shorter strings are returned the same.
+     * Shorten a string to given $limit of characters (with $ellipsis concatenated at the end),
+     * shorter strings are returned the same.
      *
      * @param string $string
      * @param int $limit
      * @param string $ellipsis (optional) string to signify ellipsis
+     * @param mixed $encoding (optional)
      * @return string
      */
     public static function shortify($string, $limit, $ellipsis = '…', $encoding = null)
@@ -1364,16 +1410,17 @@ class Tools
      * Return or show session message variables as HTML <div>s and unset them. Bootstrap styling is used.
      *
      * @param bool $echo (optional) echo the messages immediately?
-     * @return void or array with session messages or void if $echo == true
+     * @return string of session messages or empty string if $echo == false
      */
     public static function showMessages($echo = true)
     {
-        $_SESSION['messages'] = isset($_SESSION['messages']) && is_array($_SESSION['messages']) ? $_SESSION['messages'] : [];
+        $_SESSION['messages'] = isset($_SESSION['messages']) && is_array($_SESSION['messages']) ? $_SESSION['messages'] : []; // phpcs:ignore
         $result = '';
         foreach ((array) $_SESSION['messages'] as $key => $message) {
             if (isset($message[0], $message[1])) {
                 $result .= '<div class="alert alert-dismissible alert-' . self::h($message[0]) . '" role="alert">'
-                    . '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+                    . '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
+                    . '<span aria-hidden="true">&times;</span></button>'
                     . self::$MESSAGE_ICONS[$message[0]] . ' ' . $message[1] . '</div>' . PHP_EOL;
             }
             unset($_SESSION['messages'][$key]);
@@ -1382,6 +1429,7 @@ class Tools
             return $result;
         }
         echo $result;
+        return '';
     }
 
     /**
@@ -1396,7 +1444,7 @@ class Tools
     {
         $domd = new \DOMDocument();
         libxml_use_internal_errors(true);
-        $rootTag = 'x' . rand(1e8, 1e9 - 1);
+        $rootTag = 'x' . rand((int) 1e8, (int) (1e9 - 1));
         $domd->loadXML("<$rootTag>$html</$rootTag>");
         libxml_use_internal_errors(false);
         $domx = new \DOMXPath($domd);
@@ -1415,8 +1463,16 @@ class Tools
             }
         }
         $result = $domd->saveXML();
-        //strip "<"."?xml version="1.0"?".">\n<x100000000>" from beginning and "</x100000000>\n" @todo: version-sensitive
-        return substr($result, ($pos = strpos($result, '?' . ">") + 12) + ($result[$pos] == "\n" ? 1 : 0) + 3, substr($result, -1) == "\n" ? -14 : -13);
+        //strip "<"."?xml version="1.0"?".">\n<x100000000>" from beginning and "</x100000000>\n"
+        //@todo: version-sensitive
+        return substr(
+            $result,
+            ($pos = strpos(
+                $result,
+                '?' . ">"
+            ) + 12) + ($result[$pos] == "\n" ? 1 : 0) + 3,
+            substr($result, -1) == "\n" ? -14 : -13
+        );
     }
 
     /**
@@ -1426,7 +1482,7 @@ class Tools
      * @param string $needle
      * @param bool $caseInsensitive (optional) default: false
      * @param string $encoding (optional)
-     * @return string substring after $needle or false is $needle wasn't found
+     * @return bool|string substring after $needle or false if $needle wasn't found
      */
     public static function str_after($haystack, $needle, $caseInsensitive = false, $encoding = null)
     {
@@ -1445,7 +1501,7 @@ class Tools
      * @param string $needle
      * @param bool $caseInsensitive (optional) default: false
      * @param string $encoding (optional)
-     * @return string substring before $needle or false is $needle wasn't found
+     * @return bool|string substring before $needle or false if $needle wasn't found
      */
     public static function str_before($haystack, $needle, $caseInsensitive = false, $encoding = null)
     {
@@ -1462,7 +1518,7 @@ class Tools
      *
      * @example: $s = 'ábcdef'; Tools::str_delete($s, 2, 3); --> 'ábef' ($s = 'ábef')
      *
-     * @param string &$string
+     * @param string $string by reference
      * @param int $offset
      * @param mixed $length length as number or null for "till the end"
      * @param mixed $encoding (optional)
@@ -1472,7 +1528,8 @@ class Tools
     {
         $encoding = $encoding ?: mb_internal_encoding();
         $length = $length === null ? mb_strlen($string, $encoding) - $offset : $length;
-        return $string = mb_substr($string, 0, $offset, $encoding) . mb_substr($string, $offset + $length, null, $encoding);
+        $string = mb_substr($string, 0, $offset, $encoding) . mb_substr($string, $offset + $length, null, $encoding);
+        return $string;
     }
 
     /**
@@ -1522,11 +1579,13 @@ class Tools
     }
 
     /**
-     * String conversion: diacritics --> ASCII, everything else than a-z, A-Z, 0-9, "_", "-" --> "-", then "--" --> "-" and "-" at the ends get trimmed.
+     * String conversion: diacritics --> ASCII, everything else than a-z, A-Z, 0-9, "_", "-" --> "-",
+     *     then "--" --> "-" and "-" at the ends get trimmed.
      *
-     * @param $string string to webalize
-     * @param $charlist (optional) string of chars to be used
-     * @param $lower bool (optional) convert to lower-case?
+     * @param string $string string to webalize
+     * @param string $charlist (optional) string of chars to be used
+     * @param bool|int $lower (optional) DEFAULT true=convert to lower-case, -1=convert to upper-case,
+     *     false|else=don't convert
      * @return string converted text
      * @author Daniel Grudl (Nette)
      */
@@ -1534,12 +1593,15 @@ class Tools
     {
         $string = strtr($string, '`\'"^~', '-----');
         if (ICONV_IMPL === 'glibc') {
-            $string = @iconv('UTF-8', 'WINDOWS-1250//TRANSLIT', $string); // intentionally @
-            $string = strtr($string, "\xa5\xa3\xbc\x8c\xa7\x8a\xaa\x8d\x8f\x8e\xaf\xb9\xb3\xbe\x9c\x9a\xba\x9d\x9f\x9e\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2"
-                . "\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf8\xf9\xfa\xfb\xfc\xfd\xfe",
-                "ALLSSSSTZZZallssstzzzRAAAALCCCEEEEIIDDNNOOOOxRUUUUYTsraaaalccceeeeiiddnnooooruuuuyt");
+            $string = iconv('UTF-8', 'WINDOWS-1250//TRANSLIT', $string); // @ was used intentionally
+            $string = strtr(
+                $string,
+                "\xa5\xa3\xbc\x8c\xa7\x8a\xaa\x8d\x8f\x8e\xaf\xb9\xb3\xbe\x9c\x9a\xba\x9d\x9f\x9e\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2" // phpcs:ignore
+                . "\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf8\xf9\xfa\xfb\xfc\xfd\xfe", // phpcs:ignore
+                "ALLSSSSTZZZallssstzzzRAAAALCCCEEEEIIDDNNOOOOxRUUUUYTsraaaalccceeeeiiddnnooooruuuuyt"
+            );
         } else {
-            $string = @iconv('UTF-8', 'ASCII//TRANSLIT', $string); // intentionally @
+            $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string); // @ was used intentionally
         }
         $string = str_replace(['`', "'", '"', '^', '~'], '', $string);
         if ($lower === -1) {
@@ -1547,9 +1609,7 @@ class Tools
         } elseif ($lower) {
             $string = strtolower($string);
         }
-        $string = preg_replace('#[^a-z0-9' . preg_quote($charlist, '#') . ']+#i', '-', $string);
-        $string = trim($string, '-');
-        return $string;
+        return trim(preg_replace('#[^a-z0-9' . preg_quote($charlist, '#') . ']+#i', '-', $string), '-');
     }
 
     /**
@@ -1557,7 +1617,7 @@ class Tools
      *
      * @example $os = 'Windows'; Tools::whitelist($os, ['Windows', 'Unix'], 'unsupported'); //$os remains 'Windows'
      * @example $os = 'Solaris'; Tools::whitelist($os, ['Windows', 'Unix'], 'unsupported'); //$os set to 'unsupported'
-     * @param mixed &$value
+     * @param mixed $value by reference
      * @param array $list
      * @param mixed $else
      * @return bool if the value was in the list
@@ -1575,24 +1635,21 @@ class Tools
      * If $text is set and non-zero, return it with prefix and postfix around, return $else otherwise.
      *
      * @param mixed $text value to be wrapped or replaced by $else
-     * @param mixed $prefix
-     * @param mixed $postfix (optional)
+     * @param string $prefix
+     * @param string $postfix (optional)
      * @param mixed $else (optional) value to be returned if $text is zero
      * @return string
      */
     public static function wrap($text, $prefix, $postfix = '', $else = '')
     {
-        if ($text) {
-            return $prefix . $text . $postfix;
-        }
-        return $else;
+        return $text ? ($prefix . (string) $text . $postfix) : (string) $else;
     }
 
     /**
      * Cipher a text with a key using xor operator
      *
-     * @param string text to cipher
-     * @param string key
+     * @param string $text to cipher
+     * @param string $key
      * @return string
      * @copyright Jakub Vrána, https://php.vrana.cz/
      */
@@ -1609,8 +1666,8 @@ class Tools
     /**
      * Decipher a text with a key using xor operator
      *
-     * @param string ciphered data
-     * @param string key
+     * @param string $cipher ciphered data
+     * @param string $key
      * @return string
      * @copyright Jakub Vrána, https://php.vrana.cz/
      */
@@ -1624,5 +1681,4 @@ class Tools
         $text2 = explode(':', $text2, 2);
         return substr(isset($text2[1]) ? $text2[1] : '', 0, isset($text2[0]) ? (int) $text2[0] : 0);
     }
-
 }
