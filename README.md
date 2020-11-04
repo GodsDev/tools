@@ -1,9 +1,13 @@
-
 # Tools
 A class with useful all-purpose functions (methods). The methods are static.
 Some methods for HTML-output adopt classes used in the [Bootstrap](http://getbootstrap.com) library.
 
-# Deployment
+[![Total Downloads](https://img.shields.io/packagist/dt/godsdev/tools.svg)](https://packagist.org/packages/godsdev/tools)
+[![Latest Stable Version](https://img.shields.io/packagist/v/godsdev/tools.svg)](https://packagist.org/packages/godsdev/tools)
+[![Lint Code Base](https://github.com/GodsDev/tools/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/GodsDev/tools/actions?query=workflow%3A%22Lint+Code+Base%22)
+[![PHP Composer + PHPUnit](https://github.com/GodsDev/tools/workflows/PHP%20Composer%20+%20PHPUnit/badge.svg)](https://github.com/GodsDev/tools/actions?query=workflow%3A%22PHP+Composer+%2B+PHPUnit%22)
+
+## Deployment
 
 Once composer is installed, execute the following command in your project root to install this library:
 
@@ -15,7 +19,7 @@ The `composer.json` file should then contain current version of the class - some
 ```json
 {
     "require": {
-        "godsdev/tools": "^0.3.5"
+        "godsdev/tools": "^0.3.7"
     }
 }
 ```
@@ -40,7 +44,8 @@ to the **file** where you want to use Tools' methods. Then you can address all i
 * `str_putcsv()` opens the `"php://memory"` stream
 * `curlCall()` uses cURL extension
 * `webalize()` tests for `ext-iconv` extension and `iconv()` function
-### Notes:
+
+### Notes
 * Methods handling messages use session (`$_SESSION["messages"]` variable) for storing messages.
 * `escapeSQL()` is obsolete and should not be used
 * `escapeIn()` and `escapeDbIdentifier()` are specific to MySQL/MariaDb DBMS.
@@ -64,8 +69,9 @@ The `"require"` item in `composer.json` should really be:
 But since not all methods are used by every project, all those requirements are not stated there.
 This might trigger some error messages in testing. See chapter *Troubleshooting* for more.
 
-# Configuration
-## Class Constants
+## Configuration
+
+### Class Constants
 * The `::$LOCALE[]` array contains configuration for locale date/time formats. Example for Czech language:
 ```php
 Tools::LOCALE['cs'] => [
@@ -111,11 +117,7 @@ Tools::LOCALE['cs'] => [
 * The `::$MESSAGE_ICONS` array contains (HTML-coded) icons that accompany each type of message. The keys (and the message types) are: `success`, `danger`, `warning` and `info`.
 * The `::$PASSWORD_CHARS` constant is a string containing characters from which to generate passwords. Used by `randomPassword()`.
 
-# Administration
-...
-# Continuous Integration
-...
-# Testing
+## Testing
 
 Testing is implemented using `phpunit` in projects folder `vendor/phpunit/phpunit`. The testing class is in `test/ToolsTest.php` (methods there are tested in alphabetical order). If you add a new method, don't forget to add its testing to `ToolsTest.php` and run:
 
@@ -123,12 +125,13 @@ Testing is implemented using `phpunit` in projects folder `vendor/phpunit/phpuni
 vendor/phpunit/phpunit/phpunit
 ```
 
-*Note: The `redir()` method (which performs HTTP redirection) is not included in unit testing.*
+* Note: The `redir()` method (which performs HTTP redirection) is not included in unit testing.*
+* Note: PHP included in ubuntu-latest (for GitHub Actions) does not support iconv //TRANSLIT flag as iconv implementation is unknown, therefore PHPUnit group iconvtranslit is excluded
 
-## Troubleshooting
+### Troubleshooting
 After running `phpunit` you might get error messages saying that certain PHP extension is not available. (See chapter *PHP Extensions* for more). If your project does not require said extension(s), it will run without error messages of this kind. If it does, it's up to You to provide enabling of this/these extension(s).
 
-# Methods
+## Methods
 
 Variable testing and setting
 * `anyset()` – is any of given variables set?
@@ -156,7 +159,7 @@ HTML output
 * `stripAttributes()` – strip attributes off a HTML code
 
 HTTP
-* `curlCall()` – call a URL, return result 
+* `curlCall()` – call a URL, return result
 * `httpResponse()` – HTTP response split into headers and body
 * `redir()` – make an HTTP redirection
 * `urlChange()` – add/delete/modify GET variables of an URL
@@ -166,7 +169,7 @@ Messages
 * `outputMessage()` – output a message
 * `resolve()` – add either a 'success' or 'error' message based on a result
 * `showMessages()` – show messages from session
- 
+
 Strings
 * `begins()` – does a string begin with given parameter?
 * `cutTill()` – cut string to first occurence of given parameter

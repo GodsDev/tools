@@ -11,4 +11,9 @@
             <directory>./test/</directory>
         </testsuite>
     </testsuites>
+    <groups>
+        <exclude>
+            <group>iconvtranslit</group>
+        </exclude>
+    </groups>
 </phpunit>
