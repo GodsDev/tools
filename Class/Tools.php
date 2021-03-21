@@ -771,7 +771,7 @@ class Tools
      *
      * @param mixed $value
      * @param string $text
-     * @param int|string $default (optional)
+     * @param mixed $default (optional)
      * @param bool $disabled (optional)
      * @return string HTML code
      */
@@ -838,7 +838,7 @@ class Tools
      *
      * @param string $name
      * @param array $values
-     * @param int|string $default value
+     * @param mixed $default value
      * @param mixed[] $options (optional)
      *  [prepend] array of options to prepend before $values
      *  [append] array of options to append after $values
@@ -865,7 +865,7 @@ class Tools
      * Used in ::htmlSelect().
      *
      * @param array $array key:value pairs to be converted to <option>s
-     * @param int|string $default
+     * @param mixed $default
      * @return string
      */
     protected static function htmlSelectAppend(array $array, $default)
@@ -1372,7 +1372,9 @@ class Tools
      */
     public static function setifnull(&$a, $b = null)
     {
-        // ignore phpstan locally: Strict comparison using === between mixed and null will always evaluate to false.
+        /**
+         * @phpstan-ignore-next-line Strict comparison using === between mixed and null will always evaluate to false.
+         */
         return $a = isset($a) ? ($a === null ? $b : $a) : $b;
     }
 
@@ -1659,7 +1661,7 @@ class Tools
             return '';
         }
         $text2 = strlen($text) . ':' . str_pad($text, 17);
-        $repeat = ceil(strlen($text2) / strlen($key));
+        $repeat = (int) ceil(strlen($text2) / strlen($key));
         return $text2 ^ str_repeat($key, $repeat);
     }
 
@@ -1676,7 +1678,7 @@ class Tools
         if ($key == '') {
             return '';
         }
-        $repeat = ceil(strlen($cipher) / strlen($key));
+        $repeat = (int) ceil(strlen($cipher) / strlen($key));
         $text2 = $cipher ^ str_repeat($key, $repeat);
         $text2 = explode(':', $text2, 2);
         return substr(isset($text2[1]) ? $text2[1] : '', 0, isset($text2[0]) ? (int) $text2[0] : 0);

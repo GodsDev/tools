@@ -440,7 +440,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         // resolve
         $_SESSION['messages'] = [];
         Tools::resolve(5 === 5, 'Equal', 'Not equal');
-        // ignore phpstan warning Strict comparison using === between 5 and '5' will always evaluate to false.
+        /**
+         * @phpstan-ignore-next-line Strict comparison using === between 5 and '5' will always evaluate to false.
+         */
         Tools::resolve(5 === '5', 'Equal!', 'Not equal!');
         $this->assertSame($_SESSION['messages'], [
             ['success', 'Equal'],
