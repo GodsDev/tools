@@ -199,7 +199,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
             . "int(1)\n"
             . "bool(true)\n"
             . "NULL\n"
-            . "</pre>", $a);
+            . "</pre>", $a, 'Formatting added by Xdebug?');
         // ends
         $palindrom = 'Příliš žluťoučký kůň úpěl ďábelské ódy!';
         $this->assertSame(true, Tools::ends($palindrom, 'ódy!'));
