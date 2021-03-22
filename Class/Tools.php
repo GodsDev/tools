@@ -38,7 +38,7 @@ class Tools
 
     const ARRL_PREGQ = self::ARRL_ESC | self::ARRL_FLOAT;
 
-    /** var array locale settings used in ::localeDate(), ::localeTime(), ::relativeTime() */
+    /** @var array<array> locale settings used in ::localeDate(), ::localeTime(), ::relativeTime() */
     public static $LOCALE = [
         'en' => [
             'date format' => 'jS F',
@@ -97,7 +97,7 @@ class Tools
         ]
     ];
 
-    /** @var array icons for each type of session messages used in ::showMessages() */
+    /** @var array<string> icons for each type of session messages used in ::showMessages() */
     public static $MESSAGE_ICONS = [
         'success' => '<i class="fa fa-check-circle mr-1"></i>',
         'danger' => '<i class="fa fa-times-circle mr-1"></i>',
@@ -188,7 +188,7 @@ class Tools
      *
      * @param mixed[] $array Array to walk through
      * @param mixed $keys key or array of keys to extract
-     * @return array
+     * @return array<mixed>
      */
     public static function arrayConfineKeys($array, $keys)
     {
@@ -308,8 +308,9 @@ class Tools
      *          arrayReindex($a, 'id') --> [5=>[name=>John, surname=>Doe], 6=>[name=>Jane, surname=>Dean]]
      *          arrayReindex($b, 'id') --> [5=>John, 6=>Jane]
      *
-     * @param array $array
+     * @param array<mixed> $array
      * @param mixed $index (optional)
+     * @return array<mixed>
      */
     public static function arrayReindex(array $array, $index = 0)
     {
@@ -340,10 +341,10 @@ class Tools
      *      Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Orange') --> [2=>'Kiwi'];
      *      Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Kiwi') --> [];
      *
-     * @param array $array array to remove items from
+     * @param array<mixed> $array array to remove items from
      * @param mixed $remove either array containing values that are keys to be removed
      *              or key(s) to be removed
-     * @return array with removed keys
+     * @return array<mixed> with removed keys
      *
      * Note: this function can have more arguments - argument #3, 4.. are taken as further items to remove
      * Note: no error, warning or notice is thrown if item in array is not found.
@@ -374,9 +375,9 @@ class Tools
      *     Tools::arraySearchAssoc(['name'=>'Irene'], $array) --> 1
      * Keys that don't exist are counted as non-matches.
      *
-     * @param array $needles
-     * @param array $haystack
-     * @param array $options
+     * @param array<mixed> $needles
+     * @param array<mixed> $haystack
+     * @param array<bool> $options
      *      [strict] - non-zero -> strict comparison (default - false)
      *      [partial] - non-zero -> search for at least one match (default: all must match)
      * @return mixed key for the $needle or false if array item was not found
@@ -405,10 +406,10 @@ class Tools
     }
 
     /**
-     * Case-insensitive version of array_search().
+     * Case-insensitive version of array_search(). (For strings only.)
      *
      * @param string $needle
-     * @param array $haystack
+     * @param array<string> $haystack
      * @param bool $strict (optional)
      * @param mixed $encoding (optional)
      * @return mixed found key or false if needle not found
@@ -460,7 +461,7 @@ class Tools
      * @example $word = 'vitamins'; Tools::blacklist($product, ['violence', 'sex'], null); //$word remains 'vitamins'
      * @example $word = 'violence'; Tools::blacklist($product, ['violence', 'sex'], null); //$word set to null
      * @param mixed $value by reference
-     * @param array $list
+     * @param array<mixed> $list
      * @param mixed $else
      * @return bool if the value was in the list
      */
@@ -552,7 +553,7 @@ class Tools
      * @param string $url URL to call
      * @param mixed[] $options (optional) changing CURL options
      * @param mixed $error byref variable to fill with possible error
-     * @return string response or null if curl_errno() is non-zero
+     * @return string|null|bool string response or null if curl_errno() is non-zero
      */
     public static function curlCall($url, $options = [], &$error = null)
     {
@@ -760,6 +761,12 @@ class Tools
 
     /**
      * HTML notation for the <input> tag. See Tools::htmlTextInput() for more info.
+     *
+     * @param string $name element name
+     * @param string $label label, omitted if empty, translated if true
+     * @param mixed $value value, either given directly or as an array in the [name] index
+     * @param mixed $options (optional) options. Either an associative array or string containing type
+     * @return string HTML code
      */
     public static function htmlInput($name, $label, $value, $options = [])
     {
@@ -788,7 +795,7 @@ class Tools
      *
      * @param string $name name attribute of the element
      * @param mixed $input associative array of value=>label pairs or one value (in case of one item)
-     * @param array|scalar $value value that should be checked
+     * @param array<string>|scalar $value value that should be checked
      * @param mixed[] $options (optional)
      *     [separator] - between items,
      *     [radio-class] - optional class for <input type=radio>,
@@ -837,7 +844,7 @@ class Tools
      *          </select>
      *
      * @param string $name
-     * @param array $values
+     * @param array<string> $values
      * @param mixed $default value
      * @param mixed[] $options (optional)
      *  [prepend] array of options to prepend before $values
@@ -864,7 +871,7 @@ class Tools
     /**
      * Used in ::htmlSelect().
      *
-     * @param array $array key:value pairs to be converted to <option>s
+     * @param array<string|array> $array key:value pairs to be converted to <option>s
      * @param mixed $default
      * @return string
      */
@@ -983,9 +990,9 @@ class Tools
      * Return a HTTP response split into headers and body.
      *
      * @param string $response
-     * @param array $options (optional)
+     * @param array<bool> $options (optional)
      *        $options['JSON'] = non-zero - apply json_decode() on response body
-     * @return array containing ['headers'] with HTTP headers and ['body'] with response body
+     * @return array<array> containing ['headers'] with HTTP headers and ['body'] with response body
      */
     public static function httpResponse($response, array $options = [])
     {
@@ -1058,7 +1065,7 @@ class Tools
      * Case-insensitive version of in_array().
      *
      * @param string $needle
-     * @param array $haystack
+     * @param array<string> $haystack
      * @param bool $strict (optional) default false
      * @param mixed $encoding (optional)
      * @return bool true/false whether the needle was found
@@ -1539,7 +1546,7 @@ class Tools
      * For parameter details see PHP's fputcsv()
      * edited version from https://gist.github.com/johanmeiring/2894568
      *
-     * @param array $fields
+     * @param array<mixed> $fields
      * @param string $delimiter (optional) default ','
      * @param string $enclosure (optional) default '"'
      * @param string $escape_char (optional) default "\\"
@@ -1548,6 +1555,7 @@ class Tools
     public static function str_putcsv(array $fields, $delimiter = ',', $enclosure = '"', $escape_char = "\\")
     {
         $fp = fopen('php://memory', 'r+b');
+        // fputcsv #2 param transforms null=>'', false=> '', true=>1, int=>int
         fputcsv($fp, $fields, $delimiter, $enclosure, $escape_char);
         $size = ftell($fp);
         rewind($fp);
@@ -1559,7 +1567,7 @@ class Tools
     /**
      * Return actual QUERY_STRING changed by suggested amendments.
      *
-     * @param array $changes parameters to add/modify, null as a value signifies omitting the key:value pair
+     * @param array<mixed> $changes parameters to add/modify, null as a value signifies omitting the key:value pair
      * @param bool $htmlspecialchars (optional) apply htmlspecialchars()?
      * @return string URL-encoded string
      */
@@ -1620,7 +1628,7 @@ class Tools
      * @example $os = 'Windows'; Tools::whitelist($os, ['Windows', 'Unix'], 'unsupported'); //$os remains 'Windows'
      * @example $os = 'Solaris'; Tools::whitelist($os, ['Windows', 'Unix'], 'unsupported'); //$os set to 'unsupported'
      * @param mixed $value by reference
-     * @param array $list
+     * @param array<mixed> $list
      * @param mixed $else
      * @return bool if the value was in the list
      */

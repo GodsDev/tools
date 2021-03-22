@@ -18,6 +18,8 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
+     *
+     * @return void
      */
     protected function setUp()
     {
@@ -28,12 +30,17 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
     /**
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
+     *
+     * @return void
      */
     protected function tearDown()
     {
         // no action
     }
 
+    /**
+     * @return void
+     */
     public function testAllFromAToE()
     {
         // add
@@ -134,6 +141,12 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([2 => 'Kiwi'], Tools::arrayRemoveItems($fruits, ['Apple', 'Pear']));
         $this->assertSame([2 => 'Kiwi'], Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Orange'));
         $this->assertSame([], Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Kiwi', 'Orange'));
+        $tempArray = ['Apple', 14, 3.8, false];
+        $this->assertSame([0 => 'Apple', 2 => 3.8], Tools::arrayRemoveItems($tempArray, [14, false]));
+        $this->assertSame([1 => 14, 3 => false], Tools::arrayRemoveItems($tempArray, 'Apple', 3.8));
+        $tempArray = ['fruits' => ['Apple', 'Kiwi'], 'other' => [14, 3.8, false]];
+        $this->assertSame(['other' => [14, 3.8, false]], Tools::arrayRemoveItems($tempArray, [['Apple', 'Kiwi']]));
+        $this->assertSame([], Tools::arrayRemoveItems($tempArray, 'Orange', [14, 3.8, false], ['Apple', 'Kiwi']));
         // arraySearchAssoc
         $a = [
             0 => ['id' => 5, 'name' => 'Joe', 'surname' => 'Doe', 'age' => 35],
@@ -226,12 +239,18 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('30', Tools::exploded('-', '1996-07-30', 2));
     }
 
+    /**
+     * @return void
+     */
     public function testGoogleAuthenticatorCode()
     {
         // GoogleAuthenticatorCode
         $this->assertRegExp('~^\d+$~', (string) $this->tools->GoogleAuthenticatorCode('abc'));
     }
 
+    /**
+     * @return void
+     */
     public function testH()
     {
         // h
@@ -240,6 +259,8 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group iconvtranslit
+     *
+     * @return void
      */
     public function testHtmlInput()
     {
@@ -271,12 +292,18 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return void
+     */
     public function testHtmlOption()
     {
         // htmlOption
         $this->assertSame('<option value="1">Android</option>' . PHP_EOL, Tools::htmlOption(1, 'Android'));
     }
 
+    /**
+     * @return void
+     */
     public function testHtmlRadio()
     {
         // htmlRadio
@@ -304,6 +331,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return void
+     */
     public function testHtmlSelect()
     {
         // htmlSelect
@@ -317,6 +347,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return void
+     */
     public function testHtmlTextArea()
     {
         // htmlTextarea
@@ -330,6 +363,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return void
+     */
     public function testHttpResponse()
     {
         // httpResponse
@@ -348,6 +384,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
             ], Tools::httpResponse($response, ['JSON' => true]));
     }
 
+    /**
+     * @return void
+     */
     public function testAllFromIToP()
     {
         // ifempty
@@ -418,12 +457,18 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1, preg_match('/^[-2-9A-HJ-NP-Za-km-z]{10}$/', Tools::randomPassword(10)));
     }
 
+    /**
+     * @return void
+     */
     public function testRedir()
     {
         // redir
         $this->markTestSkipped();
     }
 
+    /**
+     * @return void
+     */
     public function testRelativeTime()
     {
         // relativeTime
@@ -435,6 +480,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('/(za 1 vteřina|za okamžik)/', Tools::relativeTime(time() + 1, 'cs'));
     }
 
+    /**
+     * @return void
+     */
     public function testResolve()
     {
         // resolve
@@ -450,6 +498,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function testAllFromSToU()
     {
         // set
@@ -533,10 +584,13 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('a=1&color=b%26w', Tools::urlChange(['a' => 1, 'color' => 'b&w']));
         $this->assertSame('a=1', Tools::urlChange(['a' => 1, 'color' => ('black' == 'white' ? 'b&w' : null)]));
         $this->assertSame('array%5B0%5D=2&array%5B1%5D=3', Tools::urlChange(['array' => [2, 3]]));
+        $this->assertSame('b1=1&b2=0', Tools::urlChange(['b1' => true, 'b2' => false, 'b3' => null]));
     }
 
     /**
      * @group iconvtranslit
+     *
+     * @return void
      */
     public function testWebalize()
     {
@@ -563,6 +617,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return void
+     */
     public function testWhitelist()
     {
         // whitelist
@@ -574,6 +631,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('unsupported', $os);
     }
 
+    /**
+     * @return void
+     */
     public function testWrap()
     {
         // wrap
@@ -583,6 +643,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('N/A', Tools::wrap([], '<b>', '</b>', 'N/A'));
     }
 
+    /**
+     * @return void
+     */
     public function testXorCipherDecipher()
     {
         // xorCipher
