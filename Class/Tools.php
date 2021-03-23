@@ -12,6 +12,8 @@
 
 namespace GodsDev\Tools;
 
+use Exception;
+
 class Tools
 {
 
@@ -441,13 +443,13 @@ class Tools
         $beginning = is_array($beginning) ? $beginning : [$beginning];
         if ($caseSensitive) {
             foreach ($beginning as $value) {
-                if (mb_substr($text, 0, mb_strlen($value, $encoding), $encoding) === $value) {
+                if (mb_substr($text, 0, (int) mb_strlen($value, $encoding), $encoding) === $value) {
                     return true;
                 }
             }
         } else {
             foreach ($beginning as $value) {
-                if (mb_strtolower(mb_substr($text, 0, mb_strlen($value, $encoding)), $encoding) === mb_strtolower($value)) { // phpcs:ignore
+                if (mb_strtolower(mb_substr($text, 0, (int) mb_strlen($value, $encoding)), $encoding) === mb_strtolower($value)) { // phpcs:ignore
                     return true;
                 }
             }
@@ -529,7 +531,7 @@ class Tools
             $dB = $dB * $progress + $sB * (1 - $progress);
         }
         // components returned hexadecimal, 3 * 2-digits
-        return substr('0' . dechex($dR), -2) . substr('0' . dechex($dG), -2) . substr('0' . dechex($dB), -2);
+        return substr('0' . dechex((int) $dR), -2) . substr('0' . dechex((int) $dG), -2) . substr('0' . dechex((int) $dB), -2);
     }
 
     /**
@@ -710,7 +712,9 @@ class Tools
      */
     public static function escapeSQL($input)
     {
-        //TODO: zavést logování, kde je použito a pak po opravě instancí zrušit
+        // TODO: refactor this library not to use this function
+        // TODO: zavést logování, kde je použito a pak po opravě instancí zrušit
+        //error_log('Obsolete function escapeSQL. Use mysqli_real_escape_string() instead.');
         return addslashes($input);
     }
 
@@ -721,12 +725,13 @@ class Tools
      * @param string $separator
      * @param string $string to extract from
      * @param int $index (optional)
-     * @return string or null if given position does not exist
+     * @return string|null
+     *   null if given position does not exist
      */
     public static function exploded($separator, $string, $index = 0)
     {
         $result = explode($separator, $string);
-        return isset($result[$index]) ? $result[$index] : null;
+        return ($result === false) ? null : (isset($result[$index]) ? $result[$index] : null);
     }
 
     /**
@@ -736,6 +741,7 @@ class Tools
      * @param string $secret 6-8 chars secret
      * @param int $timeSlot delta to time slot of floor(time() / 30)
      * @return int
+     * @throws Exception on error
      */
     public function GoogleAuthenticatorCode($secret, $timeSlot = 0)
     {
@@ -745,6 +751,9 @@ class Tools
         $data = str_pad(pack('N', $timeSlot), 8, "\0", STR_PAD_LEFT);
         $hash = hash_hmac('sha1', $data, $secret, true);
         $unpacked = unpack('N', substr($hash, ord(substr($hash, -1)) & 0xF, 4));
+        if ($unpacked === false) {
+            throw new Exception('GoogleAuthenticatorCode unpack failure');
+        }
         return ($unpacked[1] & 0x7FFFFFFF) % 1000000;
     }
 
@@ -1083,22 +1092,24 @@ class Tools
      * @param string $language (optional) language code as key to Tools::LOCALE
      * @param bool $includeTime (optional) return also time?
      * @return string
+     * @throws Exception on error
      */
     public static function localeDate($datetime, $language = 'en', $includeTime = true)
     {
+        if (!is_string($datetime) && !is_int($datetime)) { // e.g. result of mktime with invalid arguments is false
+            throw new Exception('Invalid #1 $datetime argument');
+        }
         if (is_string($datetime)) {
-            $datetime = strtotime($datetime);
+            $datetime = (int) strtotime($datetime);
         }
         $language = isset(self::$LOCALE[$language]) ? $language : 'en';
-        $format = date('Y', $datetime) == date('Y') ? self::$LOCALE[$language]['date format'] : self::$LOCALE[$language]['full date format']; // phpcs:ignore
+        $format = date('Y', $datetime) == date('Y') ? self::$LOCALE[$language]['date format'] //
+            : self::$LOCALE[$language]['full date format'];
         $date = date($format, +$datetime);
         if ($language != 'en') {
             $date = strtr($date, self::$LOCALE[$language]['months']);
         }
-        if (!$includeTime) {
-            return $date;
-        }
-        return $date . ' ' . date(self::$LOCALE[$language]['time format'], +$datetime);
+        return !$includeTime ? $date : $date . ' ' . date(self::$LOCALE[$language]['time format'], +$datetime);
     }
 
     /**
@@ -1551,10 +1562,14 @@ class Tools
      * @param string $enclosure (optional) default '"'
      * @param string $escape_char (optional) default "\\"
      * @return string CSV of given arguments
+     * @throws Exception on error
      */
     public static function str_putcsv(array $fields, $delimiter = ',', $enclosure = '"', $escape_char = "\\")
     {
         $fp = fopen('php://memory', 'r+b');
+        if ($fp === false) {
+            throw new Exception('Failed fopen php://memory');
+        }
         // fputcsv #2 param transforms null=>'', false=> '', true=>1, int=>int
         fputcsv($fp, $fields, $delimiter, $enclosure, $escape_char);
         $size = ftell($fp);

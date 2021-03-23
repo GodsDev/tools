@@ -2,6 +2,7 @@
 
 namespace GodsDev\Tools\Test;
 
+use Exception;
 use GodsDev\Tools\Tools;
 
 /**
@@ -237,6 +238,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame("<a href=\\\"#\\\" class=\'btn\'>#</a>", Tools::escapeSQL('<a href="#" class=\'btn\'>#</a>'));
         // exploded
         $this->assertSame('30', Tools::exploded('-', '1996-07-30', 2));
+        $this->assertNull(Tools::exploded('-', '', 2));
     }
 
     /**
@@ -411,6 +413,11 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(false, Tools::in_array_i('kiwi2', $fruits));
         $this->assertSame(true, Tools::in_array_i('šípek', $fruits));
         // localeDate
+        try {
+            $this->assertSame('1st February 2018', Tools::localeDate(false, 'en', false));
+        } catch (Exception $e) {
+            $this->assertEquals($e->getMessage(), 'Invalid #1 $datetime argument');
+        }
         $this->assertSame('1st February 2018', Tools::localeDate(mktime(0, 0, 0, 2, 1, 2018), 'en', false));
         $this->assertSame('1. únor 2018', Tools::localeDate(mktime(0, 0, 0, 2, 1, 2018), 'cs', false));
         $this->assertSame('1. únor 2018 15:16:17', Tools::localeDate(mktime(15, 16, 17, 2, 1, 2018), 'cs', true));
