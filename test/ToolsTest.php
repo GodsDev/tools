@@ -443,6 +443,17 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('children', Tools::plural(2, 'child', false, 'children'));
         $this->assertSame('Jahre', Tools::plural(2, 'Jahr', 'Jahre', 'Jahren'));
         $this->assertSame('child', Tools::plural(7601, 'child', false, 'children', false, true));
+        $this->assertSame('ničeho', Tools::plural(0, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=0');
+        $this->assertSame('kus', Tools::plural(1, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=1');
+        $this->assertSame('kusy', Tools::plural(2, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=2');
+        $this->assertSame('kusy', Tools::plural(3, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=3');
+        $this->assertSame('kusy', Tools::plural(4, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=4');
+        $this->assertSame('kusů', Tools::plural(5, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=5');
+        $this->assertSame('kus', Tools::plural(-1, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=-1');
+        $this->assertSame('kusy', Tools::plural(-2, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=-2');
+        $this->assertSame('kusy', Tools::plural(-3, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=-3');
+        $this->assertSame('kusy', Tools::plural(-4, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=-4');
+        $this->assertSame('kusů', Tools::plural(-5, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=-5');
         // preg_max
         $pattern = '/^' . Tools::preg_max(255) . '$/';
         $this->assertSame(0, preg_match($pattern, '-1'));
@@ -470,7 +481,14 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
     public function testRedir()
     {
         // redir
-        $this->markTestSkipped();
+        foreach (["http:///example.com", "http://:80", "http://user@:80",] as $url) {
+            try {
+                Tools::redir($url);
+            } catch (Exception $e) {
+                $this->assertEquals($e->getMessage(), "Seriously malformed url {$url}");
+            }
+        }
+        // TODO test HTTP redirection if possible
     }
 
     /**

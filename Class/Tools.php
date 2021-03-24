@@ -531,7 +531,8 @@ class Tools
             $dB = $dB * $progress + $sB * (1 - $progress);
         }
         // components returned hexadecimal, 3 * 2-digits
-        return substr('0' . dechex((int) $dR), -2) . substr('0' . dechex((int) $dG), -2) . substr('0' . dechex((int) $dB), -2);
+        return substr('0' . dechex((int) $dR), -2) . substr('0' . dechex((int) $dG), -2) //
+            . substr('0' . dechex((int) $dB), -2);
     }
 
     /**
@@ -1184,9 +1185,9 @@ class Tools
      *
      * @param int $amount amount
      * @param string $form1 form for amount of 1
-     * @param bool|string $form234 form for amount of 2, 3, or 4 (if false is given, $form5plus will be used)
+     * @param false|string $form234 form for amount of 2, 3, or 4 (if false is given, $form5plus will be used)
      * @param string $form5plus form for amount of 5+
-     * @param bool|string $form0 = false (optional) form for amount of 0
+     * @param false|string $form0 = false (optional) form for amount of 0
      *     (omit it or submit false to use $form5plus instead)
      * @param bool $mod100 = false get modulo of 100 from $amount
      * @return string result form
@@ -1196,7 +1197,9 @@ class Tools
         $amount = abs((int) $amount);
         $amount = $mod100 ? $amount % 100 : $amount;
         $form234 = $form234 !== false ? $form234 : $form5plus;
-        $form0 = $form0 === false ? $form5plus : $form0;
+        if ($amount === 0) {
+            return $form0 === false ? $form5plus : $form0;
+        }
         return $amount >= 5 ? $form5plus : ($amount == 1 ? $form1 : $form234);
     }
 
@@ -1251,19 +1254,24 @@ class Tools
     /**
      * Perform a HTTP redirection to a given URL.
      *
-     * @param string $url (optional) URL to redirect to. Default value "" means the current URL
+     * @param string $urlString (optional) URL to redirect to. Default value "" means the current URL
      * @param int $HTTPCode (optional) HTTP code used in header. Should be between 300 and 399, default is 303.
      * @return void
+     * @throws Exception on error when URL is seriously malformed (examples in unit tests)
      */
-    public static function redir($url = '', $HTTPCode = 303)
+    public static function redir($urlString = '', $HTTPCode = 303)
     {
-        $url = parse_url($url);
+        $url = parse_url($urlString);
+        if ($url === false) {
+            throw new Exception('Seriously malformed url ' . (string) $urlString);
+        }
+        /** @phpstan-ignore-next-line */
         $url2 = (self::set($url['scheme']) ? $url['scheme']
             . '://' : (self::set($_SERVER['HTTPS']) == 'on' ? 'https://' : 'http://'))
-            . (self::set($url['host']) ? $url['host'] : $_SERVER['HTTP_HOST'])
-            . (self::set($url['path']) ? $url['path'] : $_SERVER['SCRIPT_NAME'])
-            . self::wrap(self::set($url['query']) ? $url['query'] : $_SERVER['QUERY_STRING'], '?')
-            . self::wrap(self::set($url['fragment']), '#');
+            . ((isset($url['host']) && $url['host']) ? $url['host'] : $_SERVER['HTTP_HOST'])
+            . ((isset($url['path']) && $url['path']) ? $url['path'] : $_SERVER['SCRIPT_NAME'])
+            . self::wrap((isset($url['query']) && $url['query']) ? $url['query'] : $_SERVER['QUERY_STRING'], '?')
+            . self::wrap((isset($url['fragment']) && $url['fragment']), '#');
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_write_close();
         }
@@ -1284,7 +1292,7 @@ class Tools
     public static function relativeTime($datetime, $language = 'en')
     {
         if (is_numeric($datetime)) {
-            $datetime = date("Y-m-d\TH:i:sP", $datetime);
+            $datetime = date("Y-m-d\TH:i:sP", (int) $datetime);
         }
         $diff = new \DateTime($datetime);
         $diff = $diff->diff(new \DateTime());
@@ -1573,8 +1581,14 @@ class Tools
         // fputcsv #2 param transforms null=>'', false=> '', true=>1, int=>int
         fputcsv($fp, $fields, $delimiter, $enclosure, $escape_char);
         $size = ftell($fp);
+        if ($size === false) {
+            throw new Exception('ftell php://memory failed');
+        }
         rewind($fp);
         $data = fread($fp, $size);
+        if ($data === false) {
+            throw new Exception('fread php://memory failed');
+        }
         fclose($fp);
         return $data;
     }
