@@ -616,7 +616,7 @@ class Tools
      * Return true if $text ends with $ending.
      *
      * @param string $text text to test
-     * @param mixed $ending string (for one) or array (for more) endings to test against
+     * @param string|array<string> $ending string (for one) or array (for more) endings to test against
      * @param bool $caseSensitive (optional) case sensitive searching?
      * @param string $encoding (optional) internal encoding
      * @return bool
@@ -909,8 +909,7 @@ class Tools
     {
         $label = self::set($options['label'], '');
         unset($options['label']);
-        $options = array_merge($options, ['cols' => $cols, 'rows' => $rows]);
-        return self::htmlTextInput($name, $label, $content, $options);
+        return self::htmlTextInput($name, $label, $content, array_merge($options, ['cols' => $cols, 'rows' => $rows]));
     }
 
     /**
@@ -1116,8 +1115,10 @@ class Tools
     /**
      * Return given date using Tools::$LOCALE.
      *
-     * @param mixed $datetime a date/time as a string or integer
+     * @param int|string|false $datetime a date/time as a string or integer
+     *   or false as a result of mktime with invalid arguments
      * @param string $language (optional) language code as key to Tools::LOCALE
+     * @throws Exception on $datetime parsing fail
      * @return string
      */
     public static function localeTime($datetime, $language = 'en')
@@ -1125,8 +1126,10 @@ class Tools
         if (is_string($datetime)) {
             $datetime = strtotime($datetime);
         }
-        $language = isset(self::$LOCALE[$language]) ? $language : 'en';
-        return date(self::$LOCALE[$language]['time format'], $datetime);
+        if ($datetime === false) {
+            throw new Exception('strtotime parsing fail on ' . (string) $datetime);
+        }
+        return date(self::$LOCALE[isset(self::$LOCALE[$language]) ? $language : 'en']['time format'], $datetime);
     }
 
     /**
@@ -1197,10 +1200,8 @@ class Tools
         $amount = abs((int) $amount);
         $amount = $mod100 ? $amount % 100 : $amount;
         $form234 = $form234 !== false ? $form234 : $form5plus;
-        if ($amount === 0) {
-            return $form0 === false ? $form5plus : $form0;
-        }
-        return $amount >= 5 ? $form5plus : ($amount == 1 ? $form1 : $form234);
+        return ($amount === 0) ?
+            ($form0 === false ? $form5plus : $form0) : ($amount >= 5 ? $form5plus : ($amount == 1 ? $form1 : $form234));
     }
 
     /**
@@ -1256,7 +1257,7 @@ class Tools
      *
      * @param string $urlString (optional) URL to redirect to. Default value "" means the current URL
      * @param int $HTTPCode (optional) HTTP code used in header. Should be between 300 and 399, default is 303.
-     * @return void
+     * @return never
      * @throws Exception on error when URL is seriously malformed (examples in unit tests)
      */
     public static function redir($urlString = '', $HTTPCode = 303)
@@ -1532,7 +1533,7 @@ class Tools
      * @param string $needle
      * @param bool $caseInsensitive (optional) default: false
      * @param string $encoding (optional)
-     * @return bool|string substring after $needle or false if $needle wasn't found
+     * @return string|false substring after $needle or false if $needle wasn't found
      */
     public static function str_after($haystack, $needle, $caseInsensitive = false, $encoding = null)
     {
@@ -1551,7 +1552,7 @@ class Tools
      * @param string $needle
      * @param bool $caseInsensitive (optional) default: false
      * @param string $encoding (optional)
-     * @return bool|string substring before $needle or false if $needle wasn't found
+     * @return string|false substring before $needle or false if $needle wasn't found
      */
     public static function str_before($haystack, $needle, $caseInsensitive = false, $encoding = null)
     {
@@ -1579,7 +1580,7 @@ class Tools
         $encoding = $encoding ?: mb_internal_encoding();
         $length = $length === null ? mb_strlen($string, $encoding) - $offset : $length;
         $string = mb_substr($string, 0, $offset, $encoding) . mb_substr($string, $offset + $length, null, $encoding);
-        return $string;
+        return $string; // Note: the original Param #1 $string MUST also be changed
     }
 
     /**
