@@ -461,6 +461,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1, preg_match($pattern, '255'));
         $this->assertSame(0, preg_match($pattern, '256'));
         $this->assertSame(0, preg_match($pattern, '256'));
+        $this->assertSame('[0]', Tools::preg_max(0));
         $this->assertSame('[0-1]', Tools::preg_max(1));
         $this->assertSame('[0-2]', Tools::preg_max(2));
         $this->assertSame('[0-5]', Tools::preg_max(5));

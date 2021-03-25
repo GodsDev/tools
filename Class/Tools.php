@@ -1213,7 +1213,7 @@ class Tools
     public static function preg_max($max)
     {
         if (($len = strlen((string) ($max = (int) $max))) == 1) {
-            return ($max ? "[0-$max]" : 0);
+            return ($max ? "[0-$max]" : '[0]');
         }
         $result = '0|[1-9]' . ($len > 2 ? ($len == 3 ? '[0-9]?' : '[0-9]{0,' . ($len - 2) . '}') : '');
         for ($i = 0; $i < $len; $i++) {
@@ -1465,8 +1465,9 @@ class Tools
      * Requires DOMDocument, DOMXPath, DOMElement, DOMElementList classes
      *
      * @param string $html HTML/XML - whole or partial
-     * @param mixed $attributes attribute(s) to strip from elements - either string (for one) or array
+     * @param string|array<string> $attributes attribute(s) to strip from elements - either string (for one) or array
      * @return string HTML/XML stripped of attributes
+     * @throws Exception on malformed expression or invalid contextNode
      */
     public static function stripAttributes($html, $attributes)
     {
@@ -1478,19 +1479,40 @@ class Tools
         $domx = new \DOMXPath($domd);
         $attributes = is_array($attributes) ? $attributes : [$attributes];
         if (in_array('*', $attributes)) { //strip all attributes
-            foreach ($domx->query("//*[@*]") as $element) {
-                for ($i = $element->attributes->length - 1; $i >= 0; --$i) {
+            $domNodeList = $domx->query("//*[@*]");
+            if ($domNodeList === false) {
+                throw new Exception('Malformed expression or invalid contextNode');
+            }
+            foreach ($domNodeList as $element) {
+                $elAttr = $element->attributes;
+                if (is_null($elAttr)) {
+                    throw new Exception('DOMNamedNodeMap degenerated to null');
+                }
+                for ($i = $elAttr->length - 1; $i >= 0; --$i) {
+                    /**
+                     * @phpstan-ignore-next-line Call to an undefined method DOMNode::removeAttributeNode().
+                     */
                     $element->removeAttributeNode($element->attributes->item($i));
                 }
             }
         } else {
             foreach ($attributes as $attribute) {
-                foreach ($domx->query("//*[@$attribute]") as $element) {
+                $domNodeList = $domx->query("//*[@$attribute]");
+                if ($domNodeList === false) {
+                    throw new Exception('Malformed expression or invalid contextNode');
+                }
+                foreach ($domNodeList as $element) {
+                    /**
+                     * @phpstan-ignore-next-line Call to an undefined method DOMNode::removeAttributeNode().
+                     */
                     $element->removeAttribute($attribute);
                 }
             }
         }
         $result = $domd->saveXML();
+        if ($result === false) {
+            throw new Exception('Failure of dump of the internal XML tree back into a string');
+        }
         //strip "<"."?xml version="1.0"?".">\n<x100000000>" from beginning and "</x100000000>\n"
         //@todo: version-sensitive
         return substr(
@@ -1626,13 +1648,17 @@ class Tools
      * @param bool|int $lower (optional) DEFAULT true=convert to lower-case, -1=convert to upper-case,
      *     false|else=don't convert
      * @return string converted text
-     * @author Daniel Grudl (Nette)
+     * @author David Grudl (Nette)
+     * @throws Exception on iconv failure
      */
     public static function webalize($string, $charlist = null, $lower = true)
     {
         $string = strtr($string, '`\'"^~', '-----');
         if (ICONV_IMPL === 'glibc') {
             $string = iconv('UTF-8', 'WINDOWS-1250//TRANSLIT', $string); // @ was used intentionally
+            if ($string === false) {
+                throw new Exception('iconv WINDOWS-1250 failed on ' . (string) $string);
+            }
             $string = strtr(
                 $string,
                 "\xa5\xa3\xbc\x8c\xa7\x8a\xaa\x8d\x8f\x8e\xaf\xb9\xb3\xbe\x9c\x9a\xba\x9d\x9f\x9e\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2" // phpcs:ignore
@@ -1641,6 +1667,9 @@ class Tools
             );
         } else {
             $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string); // @ was used intentionally
+            if ($string === false) {
+                throw new Exception('iconv ASCII failed on ' . (string) $string);
+            }
         }
         $string = str_replace(['`', "'", '"', '^', '~'], '', $string);
         if ($lower === -1) {
@@ -1648,7 +1677,14 @@ class Tools
         } elseif ($lower) {
             $string = strtolower($string);
         }
-        return trim(preg_replace('#[^a-z0-9' . preg_quote($charlist, '#') . ']+#i', '-', $string), '-');
+        return trim(
+            (string) preg_replace(
+                '#[^a-z0-9' . ($charlist !== null ? preg_quote($charlist, '#') : '') . ']+#i',
+                '-',
+                $string
+            ),
+            '-'
+        );
     }
 
     /**
