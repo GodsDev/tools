@@ -1257,10 +1257,12 @@ class Tools
      *
      * @param string $urlString (optional) URL to redirect to. Default value "" means the current URL
      * @param int $HTTPCode (optional) HTTP code used in header. Should be between 300 and 399, default is 303.
+     * @param bool $sessionWriteClose (optional) set as false if session info needs to be passed on to next page
+     *   So that Tracy gets info about redirect
      * @return never
      * @throws Exception on error when URL is seriously malformed (examples in unit tests)
      */
-    public static function redir($urlString = '', $HTTPCode = 303)
+    public static function redir($urlString = '', $HTTPCode = 303, $sessionWriteClose = true)
     {
         $url = parse_url($urlString);
         if ($url === false) {
@@ -1270,10 +1272,11 @@ class Tools
         $url2 = (self::set($url['scheme']) ? $url['scheme']
             . '://' : (self::set($_SERVER['HTTPS']) == 'on' ? 'https://' : 'http://'))
             . ((isset($url['host']) && $url['host']) ? $url['host'] : $_SERVER['HTTP_HOST'])
+            . ((isset($url['port']) && $url['port']) ? ':' . $url['port'] : '')
             . ((isset($url['path']) && $url['path']) ? $url['path'] : $_SERVER['SCRIPT_NAME'])
             . self::wrap((isset($url['query']) && $url['query']) ? $url['query'] : $_SERVER['QUERY_STRING'], '?')
             . self::wrap((isset($url['fragment']) && $url['fragment']), '#');
-        if (session_status() == PHP_SESSION_ACTIVE) {
+        if ($sessionWriteClose && session_status() == PHP_SESSION_ACTIVE) {
             session_write_close();
         }
         header("Location: $url2", true, $HTTPCode);
