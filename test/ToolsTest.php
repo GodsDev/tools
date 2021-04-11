@@ -2,6 +2,7 @@
 
 namespace GodsDev\Tools\Test;
 
+use Exception;
 use GodsDev\Tools\Tools;
 
 /**
@@ -18,6 +19,8 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
+     *
+     * @return void
      */
     protected function setUp()
     {
@@ -28,12 +31,17 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
     /**
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
+     *
+     * @return void
      */
     protected function tearDown()
     {
         // no action
     }
 
+    /**
+     * @return void
+     */
     public function testAllFromAToE()
     {
         // add
@@ -134,6 +142,12 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([2 => 'Kiwi'], Tools::arrayRemoveItems($fruits, ['Apple', 'Pear']));
         $this->assertSame([2 => 'Kiwi'], Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Orange'));
         $this->assertSame([], Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Kiwi', 'Orange'));
+        $tempArray = ['Apple', 14, 3.8, false];
+        $this->assertSame([0 => 'Apple', 2 => 3.8], Tools::arrayRemoveItems($tempArray, [14, false]));
+        $this->assertSame([1 => 14, 3 => false], Tools::arrayRemoveItems($tempArray, 'Apple', 3.8));
+        $tempArray = ['fruits' => ['Apple', 'Kiwi'], 'other' => [14, 3.8, false]];
+        $this->assertSame(['other' => [14, 3.8, false]], Tools::arrayRemoveItems($tempArray, [['Apple', 'Kiwi']]));
+        $this->assertSame([], Tools::arrayRemoveItems($tempArray, 'Orange', [14, 3.8, false], ['Apple', 'Kiwi']));
         // arraySearchAssoc
         $a = [
             0 => ['id' => 5, 'name' => 'Joe', 'surname' => 'Doe', 'age' => 35],
@@ -199,7 +213,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
             . "int(1)\n"
             . "bool(true)\n"
             . "NULL\n"
-            . "</pre>", $a);
+            . "</pre>", $a, 'Formatting added by Xdebug?');
         // ends
         $palindrom = 'Příliš žluťoučký kůň úpěl ďábelské ódy!';
         $this->assertSame(true, Tools::ends($palindrom, 'ódy!'));
@@ -224,14 +238,21 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame("<a href=\\\"#\\\" class=\'btn\'>#</a>", Tools::escapeSQL('<a href="#" class=\'btn\'>#</a>'));
         // exploded
         $this->assertSame('30', Tools::exploded('-', '1996-07-30', 2));
+        $this->assertNull(Tools::exploded('-', '', 2));
     }
 
+    /**
+     * @return void
+     */
     public function testGoogleAuthenticatorCode()
     {
         // GoogleAuthenticatorCode
         $this->assertRegExp('~^\d+$~', (string) $this->tools->GoogleAuthenticatorCode('abc'));
     }
 
+    /**
+     * @return void
+     */
     public function testH()
     {
         // h
@@ -240,6 +261,8 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group iconvtranslit
+     *
+     * @return void
      */
     public function testHtmlInput()
     {
@@ -271,12 +294,18 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return void
+     */
     public function testHtmlOption()
     {
         // htmlOption
         $this->assertSame('<option value="1">Android</option>' . PHP_EOL, Tools::htmlOption(1, 'Android'));
     }
 
+    /**
+     * @return void
+     */
     public function testHtmlRadio()
     {
         // htmlRadio
@@ -304,6 +333,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return void
+     */
     public function testHtmlSelect()
     {
         // htmlSelect
@@ -317,6 +349,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return void
+     */
     public function testHtmlTextArea()
     {
         // htmlTextarea
@@ -330,6 +365,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return void
+     */
     public function testHttpResponse()
     {
         // httpResponse
@@ -348,6 +386,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
             ], Tools::httpResponse($response, ['JSON' => true]));
     }
 
+    /**
+     * @return void
+     */
     public function testAllFromIToP()
     {
         // ifempty
@@ -372,6 +413,11 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(false, Tools::in_array_i('kiwi2', $fruits));
         $this->assertSame(true, Tools::in_array_i('šípek', $fruits));
         // localeDate
+        try {
+            $this->assertSame('1st February 2018', Tools::localeDate(false, 'en', false));
+        } catch (Exception $e) {
+            $this->assertEquals($e->getMessage(), 'Invalid #1 $datetime argument');
+        }
         $this->assertSame('1st February 2018', Tools::localeDate(mktime(0, 0, 0, 2, 1, 2018), 'en', false));
         $this->assertSame('1. únor 2018', Tools::localeDate(mktime(0, 0, 0, 2, 1, 2018), 'cs', false));
         $this->assertSame('1. únor 2018 15:16:17', Tools::localeDate(mktime(15, 16, 17, 2, 1, 2018), 'cs', true));
@@ -397,6 +443,17 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('children', Tools::plural(2, 'child', false, 'children'));
         $this->assertSame('Jahre', Tools::plural(2, 'Jahr', 'Jahre', 'Jahren'));
         $this->assertSame('child', Tools::plural(7601, 'child', false, 'children', false, true));
+        $this->assertSame('ničeho', Tools::plural(0, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=0');
+        $this->assertSame('kus', Tools::plural(1, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=1');
+        $this->assertSame('kusy', Tools::plural(2, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=2');
+        $this->assertSame('kusy', Tools::plural(3, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=3');
+        $this->assertSame('kusy', Tools::plural(4, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=4');
+        $this->assertSame('kusů', Tools::plural(5, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=5');
+        $this->assertSame('kus', Tools::plural(-1, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=-1');
+        $this->assertSame('kusy', Tools::plural(-2, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=-2');
+        $this->assertSame('kusy', Tools::plural(-3, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=-3');
+        $this->assertSame('kusy', Tools::plural(-4, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=-4');
+        $this->assertSame('kusů', Tools::plural(-5, 'kus', 'kusy', 'kusů', 'ničeho', false), 'Amount=-5');
         // preg_max
         $pattern = '/^' . Tools::preg_max(255) . '$/';
         $this->assertSame(0, preg_match($pattern, '-1'));
@@ -404,6 +461,7 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1, preg_match($pattern, '255'));
         $this->assertSame(0, preg_match($pattern, '256'));
         $this->assertSame(0, preg_match($pattern, '256'));
+        $this->assertSame('[0]', Tools::preg_max(0));
         $this->assertSame('[0-1]', Tools::preg_max(1));
         $this->assertSame('[0-2]', Tools::preg_max(2));
         $this->assertSame('[0-5]', Tools::preg_max(5));
@@ -418,12 +476,25 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1, preg_match('/^[-2-9A-HJ-NP-Za-km-z]{10}$/', Tools::randomPassword(10)));
     }
 
+    /**
+     * @return void
+     */
     public function testRedir()
     {
         // redir
-        $this->markTestSkipped();
+        foreach (["http:///example.com", "http://:80", "http://user@:80",] as $url) {
+            try {
+                Tools::redir($url);
+            } catch (Exception $e) {
+                $this->assertEquals($e->getMessage(), "Seriously malformed url {$url}");
+            }
+        }
+        // TODO test HTTP redirection if possible
     }
 
+    /**
+     * @return void
+     */
     public function testRelativeTime()
     {
         // relativeTime
@@ -435,12 +506,17 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('/(za 1 vteřina|za okamžik)/', Tools::relativeTime(time() + 1, 'cs'));
     }
 
+    /**
+     * @return void
+     */
     public function testResolve()
     {
         // resolve
         $_SESSION['messages'] = [];
         Tools::resolve(5 === 5, 'Equal', 'Not equal');
-        // ignore phpstan warning Strict comparison using === between 5 and '5' will always evaluate to false.
+        /**
+         * @phpstan-ignore-next-line Strict comparison using === between 5 and '5' will always evaluate to false.
+         */
         Tools::resolve(5 === '5', 'Equal!', 'Not equal!');
         $this->assertSame($_SESSION['messages'], [
             ['success', 'Equal'],
@@ -448,6 +524,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function testAllFromSToU()
     {
         // set
@@ -531,10 +610,13 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('a=1&color=b%26w', Tools::urlChange(['a' => 1, 'color' => 'b&w']));
         $this->assertSame('a=1', Tools::urlChange(['a' => 1, 'color' => ('black' == 'white' ? 'b&w' : null)]));
         $this->assertSame('array%5B0%5D=2&array%5B1%5D=3', Tools::urlChange(['array' => [2, 3]]));
+        $this->assertSame('b1=1&b2=0', Tools::urlChange(['b1' => true, 'b2' => false, 'b3' => null]));
     }
 
     /**
      * @group iconvtranslit
+     *
+     * @return void
      */
     public function testWebalize()
     {
@@ -561,6 +643,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return void
+     */
     public function testWhitelist()
     {
         // whitelist
@@ -572,6 +657,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('unsupported', $os);
     }
 
+    /**
+     * @return void
+     */
     public function testWrap()
     {
         // wrap
@@ -581,6 +669,9 @@ class ToolsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('N/A', Tools::wrap([], '<b>', '</b>', 'N/A'));
     }
 
+    /**
+     * @return void
+     */
     public function testXorCipherDecipher()
     {
         // xorCipher
