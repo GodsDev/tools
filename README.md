@@ -12,14 +12,14 @@ Some methods for HTML-output adopt classes used in the [Bootstrap](http://getboo
 Once composer is installed, execute the following command in your project root to install this library:
 
 ```sh
-composer require godsdev/tools:dev-develop
+composer require godsdev/tools:^0.3.8
 ```
 
 The `composer.json` file should then contain current version of the class - something similar to:
 ```json
 {
     "require": {
-        "godsdev/tools": "^0.3.7"
+        "godsdev/tools": "^0.3.8"
     }
 }
 ```
@@ -32,7 +32,7 @@ require_once '/path/to/your-project/vendor/autoload.php';
 
 Finally, include this line
 ```php
-use \GodsDev\Tools\Tools;
+use GodsDev\Tools\Tools;
 ```
 to the **file** where you want to use Tools' methods. Then you can address all its function like this - `Tools::method()`.
 
