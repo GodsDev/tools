@@ -12,6 +12,8 @@
 
 namespace GodsDev\Tools;
 
+use Exception;
+
 class Tools
 {
 
@@ -38,7 +40,7 @@ class Tools
 
     const ARRL_PREGQ = self::ARRL_ESC | self::ARRL_FLOAT;
 
-    /** var array locale settings used in ::localeDate(), ::localeTime(), ::relativeTime() */
+    /** @var array<array> locale settings used in ::localeDate(), ::localeTime(), ::relativeTime() */
     public static $LOCALE = [
         'en' => [
             'date format' => 'jS F',
@@ -97,7 +99,7 @@ class Tools
         ]
     ];
 
-    /** @var array icons for each type of session messages used in ::showMessages() */
+    /** @var array<string> icons for each type of session messages used in ::showMessages() */
     public static $MESSAGE_ICONS = [
         'success' => '<i class="fa fa-check-circle mr-1"></i>',
         'danger' => '<i class="fa fa-times-circle mr-1"></i>',
@@ -188,7 +190,7 @@ class Tools
      *
      * @param mixed[] $array Array to walk through
      * @param mixed $keys key or array of keys to extract
-     * @return array
+     * @return array<mixed>
      */
     public static function arrayConfineKeys($array, $keys)
     {
@@ -308,8 +310,9 @@ class Tools
      *          arrayReindex($a, 'id') --> [5=>[name=>John, surname=>Doe], 6=>[name=>Jane, surname=>Dean]]
      *          arrayReindex($b, 'id') --> [5=>John, 6=>Jane]
      *
-     * @param array $array
+     * @param array<mixed> $array
      * @param mixed $index (optional)
+     * @return array<mixed>
      */
     public static function arrayReindex(array $array, $index = 0)
     {
@@ -340,10 +343,10 @@ class Tools
      *      Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Orange') --> [2=>'Kiwi'];
      *      Tools::arrayRemoveItems($fruits, 'Apple', 'Pear', 'Kiwi') --> [];
      *
-     * @param array $array array to remove items from
+     * @param array<mixed> $array array to remove items from
      * @param mixed $remove either array containing values that are keys to be removed
      *              or key(s) to be removed
-     * @return array with removed keys
+     * @return array<mixed> with removed keys
      *
      * Note: this function can have more arguments - argument #3, 4.. are taken as further items to remove
      * Note: no error, warning or notice is thrown if item in array is not found.
@@ -374,9 +377,9 @@ class Tools
      *     Tools::arraySearchAssoc(['name'=>'Irene'], $array) --> 1
      * Keys that don't exist are counted as non-matches.
      *
-     * @param array $needles
-     * @param array $haystack
-     * @param array $options
+     * @param array<mixed> $needles
+     * @param array<mixed> $haystack
+     * @param array<bool> $options
      *      [strict] - non-zero -> strict comparison (default - false)
      *      [partial] - non-zero -> search for at least one match (default: all must match)
      * @return mixed key for the $needle or false if array item was not found
@@ -405,10 +408,10 @@ class Tools
     }
 
     /**
-     * Case-insensitive version of array_search().
+     * Case-insensitive version of array_search(). (For strings only.)
      *
      * @param string $needle
-     * @param array $haystack
+     * @param array<string> $haystack
      * @param bool $strict (optional)
      * @param mixed $encoding (optional)
      * @return mixed found key or false if needle not found
@@ -440,13 +443,13 @@ class Tools
         $beginning = is_array($beginning) ? $beginning : [$beginning];
         if ($caseSensitive) {
             foreach ($beginning as $value) {
-                if (mb_substr($text, 0, mb_strlen($value, $encoding), $encoding) === $value) {
+                if (mb_substr($text, 0, (int) mb_strlen($value, $encoding), $encoding) === $value) {
                     return true;
                 }
             }
         } else {
             foreach ($beginning as $value) {
-                if (mb_strtolower(mb_substr($text, 0, mb_strlen($value, $encoding)), $encoding) === mb_strtolower($value)) { // phpcs:ignore
+                if (mb_strtolower(mb_substr($text, 0, (int) mb_strlen($value, $encoding)), $encoding) === mb_strtolower($value)) { // phpcs:ignore
                     return true;
                 }
             }
@@ -460,7 +463,7 @@ class Tools
      * @example $word = 'vitamins'; Tools::blacklist($product, ['violence', 'sex'], null); //$word remains 'vitamins'
      * @example $word = 'violence'; Tools::blacklist($product, ['violence', 'sex'], null); //$word set to null
      * @param mixed $value by reference
-     * @param array $list
+     * @param array<mixed> $list
      * @param mixed $else
      * @return bool if the value was in the list
      */
@@ -528,7 +531,8 @@ class Tools
             $dB = $dB * $progress + $sB * (1 - $progress);
         }
         // components returned hexadecimal, 3 * 2-digits
-        return substr('0' . dechex($dR), -2) . substr('0' . dechex($dG), -2) . substr('0' . dechex($dB), -2);
+        return substr('0' . dechex((int) $dR), -2) . substr('0' . dechex((int) $dG), -2) //
+            . substr('0' . dechex((int) $dB), -2);
     }
 
     /**
@@ -552,7 +556,7 @@ class Tools
      * @param string $url URL to call
      * @param mixed[] $options (optional) changing CURL options
      * @param mixed $error byref variable to fill with possible error
-     * @return string response or null if curl_errno() is non-zero
+     * @return string|null|bool string response or null if curl_errno() is non-zero
      */
     public static function curlCall($url, $options = [], &$error = null)
     {
@@ -612,7 +616,7 @@ class Tools
      * Return true if $text ends with $ending.
      *
      * @param string $text text to test
-     * @param mixed $ending string (for one) or array (for more) endings to test against
+     * @param string|array<string> $ending string (for one) or array (for more) endings to test against
      * @param bool $caseSensitive (optional) case sensitive searching?
      * @param string $encoding (optional) internal encoding
      * @return bool
@@ -709,7 +713,9 @@ class Tools
      */
     public static function escapeSQL($input)
     {
-        //TODO: zavést logování, kde je použito a pak po opravě instancí zrušit
+        // TODO: refactor this library not to use this function
+        // TODO: zavést logování, kde je použito a pak po opravě instancí zrušit
+        //error_log('Obsolete function escapeSQL. Use mysqli_real_escape_string() instead.');
         return addslashes($input);
     }
 
@@ -720,12 +726,13 @@ class Tools
      * @param string $separator
      * @param string $string to extract from
      * @param int $index (optional)
-     * @return string or null if given position does not exist
+     * @return string|null
+     *   null if given position does not exist
      */
     public static function exploded($separator, $string, $index = 0)
     {
         $result = explode($separator, $string);
-        return isset($result[$index]) ? $result[$index] : null;
+        return ($result === false) ? null : (isset($result[$index]) ? $result[$index] : null);
     }
 
     /**
@@ -735,6 +742,7 @@ class Tools
      * @param string $secret 6-8 chars secret
      * @param int $timeSlot delta to time slot of floor(time() / 30)
      * @return int
+     * @throws Exception on error
      */
     public function GoogleAuthenticatorCode($secret, $timeSlot = 0)
     {
@@ -744,6 +752,9 @@ class Tools
         $data = str_pad(pack('N', $timeSlot), 8, "\0", STR_PAD_LEFT);
         $hash = hash_hmac('sha1', $data, $secret, true);
         $unpacked = unpack('N', substr($hash, ord(substr($hash, -1)) & 0xF, 4));
+        if ($unpacked === false) {
+            throw new Exception('GoogleAuthenticatorCode unpack failure');
+        }
         return ($unpacked[1] & 0x7FFFFFFF) % 1000000;
     }
 
@@ -760,6 +771,12 @@ class Tools
 
     /**
      * HTML notation for the <input> tag. See Tools::htmlTextInput() for more info.
+     *
+     * @param string $name element name
+     * @param string $label label, omitted if empty, translated if true
+     * @param mixed $value value, either given directly or as an array in the [name] index
+     * @param mixed $options (optional) options. Either an associative array or string containing type
+     * @return string HTML code
      */
     public static function htmlInput($name, $label, $value, $options = [])
     {
@@ -771,7 +788,7 @@ class Tools
      *
      * @param mixed $value
      * @param string $text
-     * @param int|string $default (optional)
+     * @param mixed $default (optional)
      * @param bool $disabled (optional)
      * @return string HTML code
      */
@@ -788,7 +805,7 @@ class Tools
      *
      * @param string $name name attribute of the element
      * @param mixed $input associative array of value=>label pairs or one value (in case of one item)
-     * @param array|scalar $value value that should be checked
+     * @param array<string>|scalar $value value that should be checked
      * @param mixed[] $options (optional)
      *     [separator] - between items,
      *     [radio-class] - optional class for <input type=radio>,
@@ -837,8 +854,8 @@ class Tools
      *          </select>
      *
      * @param string $name
-     * @param array $values
-     * @param int|string $default value
+     * @param array<string> $values
+     * @param mixed $default value
      * @param mixed[] $options (optional)
      *  [prepend] array of options to prepend before $values
      *  [append] array of options to append after $values
@@ -864,8 +881,8 @@ class Tools
     /**
      * Used in ::htmlSelect().
      *
-     * @param array $array key:value pairs to be converted to <option>s
-     * @param int|string $default
+     * @param array<string|array> $array key:value pairs to be converted to <option>s
+     * @param mixed $default
      * @return string
      */
     protected static function htmlSelectAppend(array $array, $default)
@@ -892,8 +909,7 @@ class Tools
     {
         $label = self::set($options['label'], '');
         unset($options['label']);
-        $options = array_merge($options, ['cols' => $cols, 'rows' => $rows]);
-        return self::htmlTextInput($name, $label, $content, $options);
+        return self::htmlTextInput($name, $label, $content, array_merge($options, ['cols' => $cols, 'rows' => $rows]));
     }
 
     /**
@@ -983,9 +999,9 @@ class Tools
      * Return a HTTP response split into headers and body.
      *
      * @param string $response
-     * @param array $options (optional)
+     * @param array<bool> $options (optional)
      *        $options['JSON'] = non-zero - apply json_decode() on response body
-     * @return array containing ['headers'] with HTTP headers and ['body'] with response body
+     * @return array<array> containing ['headers'] with HTTP headers and ['body'] with response body
      */
     public static function httpResponse($response, array $options = [])
     {
@@ -1058,7 +1074,7 @@ class Tools
      * Case-insensitive version of in_array().
      *
      * @param string $needle
-     * @param array $haystack
+     * @param array<string> $haystack
      * @param bool $strict (optional) default false
      * @param mixed $encoding (optional)
      * @return bool true/false whether the needle was found
@@ -1076,29 +1092,33 @@ class Tools
      * @param string $language (optional) language code as key to Tools::LOCALE
      * @param bool $includeTime (optional) return also time?
      * @return string
+     * @throws Exception on error
      */
     public static function localeDate($datetime, $language = 'en', $includeTime = true)
     {
+        if (!is_string($datetime) && !is_int($datetime)) { // e.g. result of mktime with invalid arguments is false
+            throw new Exception('Invalid #1 $datetime argument');
+        }
         if (is_string($datetime)) {
-            $datetime = strtotime($datetime);
+            $datetime = (int) strtotime($datetime);
         }
         $language = isset(self::$LOCALE[$language]) ? $language : 'en';
-        $format = date('Y', $datetime) == date('Y') ? self::$LOCALE[$language]['date format'] : self::$LOCALE[$language]['full date format']; // phpcs:ignore
+        $format = date('Y', $datetime) == date('Y') ? self::$LOCALE[$language]['date format'] //
+            : self::$LOCALE[$language]['full date format'];
         $date = date($format, +$datetime);
         if ($language != 'en') {
             $date = strtr($date, self::$LOCALE[$language]['months']);
         }
-        if (!$includeTime) {
-            return $date;
-        }
-        return $date . ' ' . date(self::$LOCALE[$language]['time format'], +$datetime);
+        return !$includeTime ? $date : $date . ' ' . date(self::$LOCALE[$language]['time format'], +$datetime);
     }
 
     /**
      * Return given date using Tools::$LOCALE.
      *
-     * @param mixed $datetime a date/time as a string or integer
+     * @param int|string|false $datetime a date/time as a string or integer
+     *   or false as a result of mktime with invalid arguments
      * @param string $language (optional) language code as key to Tools::LOCALE
+     * @throws Exception on $datetime parsing fail
      * @return string
      */
     public static function localeTime($datetime, $language = 'en')
@@ -1106,8 +1126,10 @@ class Tools
         if (is_string($datetime)) {
             $datetime = strtotime($datetime);
         }
-        $language = isset(self::$LOCALE[$language]) ? $language : 'en';
-        return date(self::$LOCALE[$language]['time format'], $datetime);
+        if ($datetime === false) {
+            throw new Exception('strtotime parsing fail on ' . (string) $datetime);
+        }
+        return date(self::$LOCALE[isset(self::$LOCALE[$language]) ? $language : 'en']['time format'], $datetime);
     }
 
     /**
@@ -1166,9 +1188,9 @@ class Tools
      *
      * @param int $amount amount
      * @param string $form1 form for amount of 1
-     * @param bool|string $form234 form for amount of 2, 3, or 4 (if false is given, $form5plus will be used)
+     * @param false|string $form234 form for amount of 2, 3, or 4 (if false is given, $form5plus will be used)
      * @param string $form5plus form for amount of 5+
-     * @param bool|string $form0 = false (optional) form for amount of 0
+     * @param false|string $form0 = false (optional) form for amount of 0
      *     (omit it or submit false to use $form5plus instead)
      * @param bool $mod100 = false get modulo of 100 from $amount
      * @return string result form
@@ -1178,8 +1200,8 @@ class Tools
         $amount = abs((int) $amount);
         $amount = $mod100 ? $amount % 100 : $amount;
         $form234 = $form234 !== false ? $form234 : $form5plus;
-        $form0 = $form0 === false ? $form5plus : $form0;
-        return $amount >= 5 ? $form5plus : ($amount == 1 ? $form1 : $form234);
+        return ($amount === 0) ?
+            ($form0 === false ? $form5plus : $form0) : ($amount >= 5 ? $form5plus : ($amount == 1 ? $form1 : $form234));
     }
 
     /**
@@ -1192,7 +1214,7 @@ class Tools
     public static function preg_max($max)
     {
         if (($len = strlen((string) ($max = (int) $max))) == 1) {
-            return ($max ? "[0-$max]" : 0);
+            return ($max ? "[0-$max]" : '[0]');
         }
         $result = '0|[1-9]' . ($len > 2 ? ($len == 3 ? '[0-9]?' : '[0-9]{0,' . ($len - 2) . '}') : '');
         for ($i = 0; $i < $len; $i++) {
@@ -1233,20 +1255,28 @@ class Tools
     /**
      * Perform a HTTP redirection to a given URL.
      *
-     * @param string $url (optional) URL to redirect to. Default value "" means the current URL
+     * @param string $urlString (optional) URL to redirect to. Default value "" means the current URL
      * @param int $HTTPCode (optional) HTTP code used in header. Should be between 300 and 399, default is 303.
-     * @return void
+     * @param bool $sessionWriteClose (optional) set as false if session info needs to be passed on to next page
+     *   So that Tracy gets info about redirect
+     * @return never
+     * @throws Exception on error when URL is seriously malformed (examples in unit tests)
      */
-    public static function redir($url = '', $HTTPCode = 303)
+    public static function redir($urlString = '', $HTTPCode = 303, $sessionWriteClose = true)
     {
-        $url = parse_url($url);
+        $url = parse_url($urlString);
+        if ($url === false) {
+            throw new Exception('Seriously malformed url ' . (string) $urlString);
+        }
+        /** @phpstan-ignore-next-line */
         $url2 = (self::set($url['scheme']) ? $url['scheme']
             . '://' : (self::set($_SERVER['HTTPS']) == 'on' ? 'https://' : 'http://'))
-            . (self::set($url['host']) ? $url['host'] : $_SERVER['HTTP_HOST'])
-            . (self::set($url['path']) ? $url['path'] : $_SERVER['SCRIPT_NAME'])
-            . self::wrap(self::set($url['query']) ? $url['query'] : $_SERVER['QUERY_STRING'], '?')
-            . self::wrap(self::set($url['fragment']), '#');
-        if (session_status() == PHP_SESSION_ACTIVE) {
+            . ((isset($url['host']) && $url['host']) ? $url['host'] : $_SERVER['HTTP_HOST'])
+            . ((isset($url['port']) && $url['port']) ? ':' . $url['port'] : '')
+            . ((isset($url['path']) && $url['path']) ? $url['path'] : $_SERVER['SCRIPT_NAME'])
+            . self::wrap((isset($url['query']) && $url['query']) ? $url['query'] : $_SERVER['QUERY_STRING'], '?')
+            . self::wrap((isset($url['fragment']) && $url['fragment']), '#');
+        if ($sessionWriteClose && session_status() == PHP_SESSION_ACTIVE) {
             session_write_close();
         }
         header("Location: $url2", true, $HTTPCode);
@@ -1266,7 +1296,7 @@ class Tools
     public static function relativeTime($datetime, $language = 'en')
     {
         if (is_numeric($datetime)) {
-            $datetime = date("Y-m-d\TH:i:sP", $datetime);
+            $datetime = date("Y-m-d\TH:i:sP", (int) $datetime);
         }
         $diff = new \DateTime($datetime);
         $diff = $diff->diff(new \DateTime());
@@ -1372,7 +1402,9 @@ class Tools
      */
     public static function setifnull(&$a, $b = null)
     {
-        // ignore phpstan locally: Strict comparison using === between mixed and null will always evaluate to false.
+        /**
+         * @phpstan-ignore-next-line Strict comparison using === between mixed and null will always evaluate to false.
+         */
         return $a = isset($a) ? ($a === null ? $b : $a) : $b;
     }
 
@@ -1437,8 +1469,9 @@ class Tools
      * Requires DOMDocument, DOMXPath, DOMElement, DOMElementList classes
      *
      * @param string $html HTML/XML - whole or partial
-     * @param mixed $attributes attribute(s) to strip from elements - either string (for one) or array
+     * @param string|array<string> $attributes attribute(s) to strip from elements - either string (for one) or array
      * @return string HTML/XML stripped of attributes
+     * @throws Exception on malformed expression or invalid contextNode
      */
     public static function stripAttributes($html, $attributes)
     {
@@ -1450,19 +1483,40 @@ class Tools
         $domx = new \DOMXPath($domd);
         $attributes = is_array($attributes) ? $attributes : [$attributes];
         if (in_array('*', $attributes)) { //strip all attributes
-            foreach ($domx->query("//*[@*]") as $element) {
-                for ($i = $element->attributes->length - 1; $i >= 0; --$i) {
+            $domNodeList = $domx->query("//*[@*]");
+            if ($domNodeList === false) {
+                throw new Exception('Malformed expression or invalid contextNode');
+            }
+            foreach ($domNodeList as $element) {
+                $elAttr = $element->attributes;
+                if (is_null($elAttr)) {
+                    throw new Exception('DOMNamedNodeMap degenerated to null');
+                }
+                for ($i = $elAttr->length - 1; $i >= 0; --$i) {
+                    /**
+                     * @phpstan-ignore-next-line Call to an undefined method DOMNode::removeAttributeNode().
+                     */
                     $element->removeAttributeNode($element->attributes->item($i));
                 }
             }
         } else {
             foreach ($attributes as $attribute) {
-                foreach ($domx->query("//*[@$attribute]") as $element) {
+                $domNodeList = $domx->query("//*[@$attribute]");
+                if ($domNodeList === false) {
+                    throw new Exception('Malformed expression or invalid contextNode');
+                }
+                foreach ($domNodeList as $element) {
+                    /**
+                     * @phpstan-ignore-next-line Call to an undefined method DOMNode::removeAttributeNode().
+                     */
                     $element->removeAttribute($attribute);
                 }
             }
         }
         $result = $domd->saveXML();
+        if ($result === false) {
+            throw new Exception('Failure of dump of the internal XML tree back into a string');
+        }
         //strip "<"."?xml version="1.0"?".">\n<x100000000>" from beginning and "</x100000000>\n"
         //@todo: version-sensitive
         return substr(
@@ -1482,7 +1536,7 @@ class Tools
      * @param string $needle
      * @param bool $caseInsensitive (optional) default: false
      * @param string $encoding (optional)
-     * @return bool|string substring after $needle or false if $needle wasn't found
+     * @return string|false substring after $needle or false if $needle wasn't found
      */
     public static function str_after($haystack, $needle, $caseInsensitive = false, $encoding = null)
     {
@@ -1501,7 +1555,7 @@ class Tools
      * @param string $needle
      * @param bool $caseInsensitive (optional) default: false
      * @param string $encoding (optional)
-     * @return bool|string substring before $needle or false if $needle wasn't found
+     * @return string|false substring before $needle or false if $needle wasn't found
      */
     public static function str_before($haystack, $needle, $caseInsensitive = false, $encoding = null)
     {
@@ -1529,7 +1583,7 @@ class Tools
         $encoding = $encoding ?: mb_internal_encoding();
         $length = $length === null ? mb_strlen($string, $encoding) - $offset : $length;
         $string = mb_substr($string, 0, $offset, $encoding) . mb_substr($string, $offset + $length, null, $encoding);
-        return $string;
+        return $string; // Note: the original Param #1 $string MUST also be changed
     }
 
     /**
@@ -1537,19 +1591,30 @@ class Tools
      * For parameter details see PHP's fputcsv()
      * edited version from https://gist.github.com/johanmeiring/2894568
      *
-     * @param array $fields
+     * @param array<mixed> $fields
      * @param string $delimiter (optional) default ','
      * @param string $enclosure (optional) default '"'
      * @param string $escape_char (optional) default "\\"
      * @return string CSV of given arguments
+     * @throws Exception on error
      */
     public static function str_putcsv(array $fields, $delimiter = ',', $enclosure = '"', $escape_char = "\\")
     {
         $fp = fopen('php://memory', 'r+b');
+        if ($fp === false) {
+            throw new Exception('Failed fopen php://memory');
+        }
+        // fputcsv #2 param transforms null=>'', false=> '', true=>1, int=>int
         fputcsv($fp, $fields, $delimiter, $enclosure, $escape_char);
         $size = ftell($fp);
+        if ($size === false) {
+            throw new Exception('ftell php://memory failed');
+        }
         rewind($fp);
         $data = fread($fp, $size);
+        if ($data === false) {
+            throw new Exception('fread php://memory failed');
+        }
         fclose($fp);
         return $data;
     }
@@ -1557,7 +1622,7 @@ class Tools
     /**
      * Return actual QUERY_STRING changed by suggested amendments.
      *
-     * @param array $changes parameters to add/modify, null as a value signifies omitting the key:value pair
+     * @param array<mixed> $changes parameters to add/modify, null as a value signifies omitting the key:value pair
      * @param bool $htmlspecialchars (optional) apply htmlspecialchars()?
      * @return string URL-encoded string
      */
@@ -1587,13 +1652,17 @@ class Tools
      * @param bool|int $lower (optional) DEFAULT true=convert to lower-case, -1=convert to upper-case,
      *     false|else=don't convert
      * @return string converted text
-     * @author Daniel Grudl (Nette)
+     * @author David Grudl (Nette)
+     * @throws Exception on iconv failure
      */
     public static function webalize($string, $charlist = null, $lower = true)
     {
         $string = strtr($string, '`\'"^~', '-----');
         if (ICONV_IMPL === 'glibc') {
             $string = iconv('UTF-8', 'WINDOWS-1250//TRANSLIT', $string); // @ was used intentionally
+            if ($string === false) {
+                throw new Exception('iconv WINDOWS-1250 failed on ' . (string) $string);
+            }
             $string = strtr(
                 $string,
                 "\xa5\xa3\xbc\x8c\xa7\x8a\xaa\x8d\x8f\x8e\xaf\xb9\xb3\xbe\x9c\x9a\xba\x9d\x9f\x9e\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2" // phpcs:ignore
@@ -1602,6 +1671,9 @@ class Tools
             );
         } else {
             $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string); // @ was used intentionally
+            if ($string === false) {
+                throw new Exception('iconv ASCII failed on ' . (string) $string);
+            }
         }
         $string = str_replace(['`', "'", '"', '^', '~'], '', $string);
         if ($lower === -1) {
@@ -1609,7 +1681,14 @@ class Tools
         } elseif ($lower) {
             $string = strtolower($string);
         }
-        return trim(preg_replace('#[^a-z0-9' . preg_quote($charlist, '#') . ']+#i', '-', $string), '-');
+        return trim(
+            (string) preg_replace(
+                '#[^a-z0-9' . ($charlist !== null ? preg_quote($charlist, '#') : '') . ']+#i',
+                '-',
+                $string
+            ),
+            '-'
+        );
     }
 
     /**
@@ -1618,7 +1697,7 @@ class Tools
      * @example $os = 'Windows'; Tools::whitelist($os, ['Windows', 'Unix'], 'unsupported'); //$os remains 'Windows'
      * @example $os = 'Solaris'; Tools::whitelist($os, ['Windows', 'Unix'], 'unsupported'); //$os set to 'unsupported'
      * @param mixed $value by reference
-     * @param array $list
+     * @param array<mixed> $list
      * @param mixed $else
      * @return bool if the value was in the list
      */
@@ -1659,7 +1738,7 @@ class Tools
             return '';
         }
         $text2 = strlen($text) . ':' . str_pad($text, 17);
-        $repeat = ceil(strlen($text2) / strlen($key));
+        $repeat = (int) ceil(strlen($text2) / strlen($key));
         return $text2 ^ str_repeat($key, $repeat);
     }
 
@@ -1676,7 +1755,7 @@ class Tools
         if ($key == '') {
             return '';
         }
-        $repeat = ceil(strlen($cipher) / strlen($key));
+        $repeat = (int) ceil(strlen($cipher) / strlen($key));
         $text2 = $cipher ^ str_repeat($key, $repeat);
         $text2 = explode(':', $text2, 2);
         return substr(isset($text2[1]) ? $text2[1] : '', 0, isset($text2[0]) ? (int) $text2[0] : 0);

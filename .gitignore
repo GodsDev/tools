@@ -4,9 +4,9 @@
 /composer.lock
 
 #disable IDE files
-/nbproject/private/
 /nbproject/
 /.idea
+/.php_cs.cache
 
 #disable image win/mac auxiliary files
 thumbs.db
