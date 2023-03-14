@@ -10,7 +10,6 @@ use GodsDev\Tools\Tools;
  */
 class ToolsTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @var Tools
      */

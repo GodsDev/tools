@@ -162,7 +162,7 @@ HTTP
 * `curlCall()` – call a URL, return result
 * `httpResponse()` – HTTP response split into headers and body
 * `redir()` – make an HTTP redirection
-* `urlChange()` – add/delete/modify GET variables of an URL
+* `urlChange()` – add/delete/modify GET variables of a URL
 
 Messages
 * `addMessage()` – add a message to a session
@@ -217,4 +217,4 @@ Locale
 
 Specific
 * `GoogleAuthenticatorCode()` – GoogleAuthenticator hash
-* `preg_max()` – return RegEx mask to match integer range from 0 to given maximum
+* `preg_max()` – return regular expression mask to match integer range from 0 to given maximum

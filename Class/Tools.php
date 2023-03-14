@@ -16,7 +16,6 @@ use Exception;
 
 class Tools
 {
-
     /** @const constants used in ::arrayListed() */
     const ARRL_HTML = 1;
 

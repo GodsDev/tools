@@ -8,11 +8,13 @@
     stopOnFailure="false">
     <testsuites>
         <testsuite name="Application Test Suite">
-            <directory>./test/</directory>
+            <directory>./../test/</directory>
         </testsuite>
     </testsuites>
     <groups>
         <exclude>
+            <!-- PHP included in ubuntu-latest does not support iconv //TRANSLIT flag as iconv implementation is unknown -->
+            <!-- therefore PHPUnit group iconvtranslit is excluded -->
             <group>iconvtranslit</group>
         </exclude>
     </groups>
