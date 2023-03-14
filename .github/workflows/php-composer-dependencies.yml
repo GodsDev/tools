@@ -15,7 +15,8 @@ on:
 jobs:
   # Note: https://docs.github.com/en/actions/using-workflows/reusing-workflows The strategy property is not supported in any job that calls a reusable workflow.
   call-workflow:
-    uses: WorkOfStan/MyCMS/.github/workflows/php-composer-dependencies-reusable.yml@main
+    # TODO use @main
+    uses: WorkOfStan/MyCMS/.github/workflows/php-composer-dependencies-reusable.yml@feature/reusableConfig
     with:
       # JSON
       php-version: '["5.6", "7.0", "7.1", "7.2", "7.3", "7.4"]'
