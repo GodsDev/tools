@@ -12,3 +12,6 @@
 thumbs.db
 __MACOSX/
 .sass-cache/
+
+# PHPUnit cache
+.phpunit.result.cache
