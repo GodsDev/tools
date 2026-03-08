@@ -16,7 +16,6 @@ use Exception;
 
 class Tools
 {
-
     /** @const constants used in ::arrayListed() */
     const ARRL_HTML = 1;
 
@@ -40,7 +39,7 @@ class Tools
 
     const ARRL_PREGQ = self::ARRL_ESC | self::ARRL_FLOAT;
 
-    /** @var array<array> locale settings used in ::localeDate(), ::localeTime(), ::relativeTime() */
+    /** @var array<array<mixed>> locale settings used in ::localeDate(), ::localeTime(), ::relativeTime() */
     public static $LOCALE = [
         'en' => [
             'date format' => 'jS F',
@@ -188,27 +187,27 @@ class Tools
      * @example $employees = [[name=>John, surname=>Doe, age=>43], [name=>Lucy, surname=>Smith, age=>28]]
      *          Tools::arrayConfineKeys($employees, 'age') --> [['age'=>43], ['age'=>28]]
      *
-     * @param mixed[] $array Array to walk through
-     * @param mixed $keys key or array of keys to extract
+     * @param array<mixed> $array Array to walk through
+     * @param string|array<string> $keys key or array of keys to extract
      * @return array<mixed>
      */
-    public static function arrayConfineKeys($array, $keys)
+    public static function arrayConfineKeys(array $array, $keys): array
     {
         $keys = is_array($keys) ? $keys : [$keys];
         $result = [];
-        if (is_array($array)) {
-            foreach ($array as $arrayKey => $item) {
-                $tmp = [];
-                foreach ($keys as $key) {
-                    if (isset($item[$key])) {
-                        $tmp[$key] = $item[$key];
-                    }
-                }
-                if ($tmp) {
-                    $result[$arrayKey] = $tmp;
+        //if (is_array($array)) {
+        foreach ($array as $arrayKey => $item) {
+            $tmp = [];
+            foreach ($keys as $key) {
+                if (isset($item[$key])) {
+                    $tmp[$key] = $item[$key];
                 }
             }
+            if ($tmp) {
+                $result[$arrayKey] = $tmp;
+            }
         }
+        //}
         return $result;
     }
 
@@ -235,7 +234,7 @@ class Tools
      * @example: Tools::arrayListed(["Levi's", "Procter & Gamble"], 1, ", ", "<b>", "</b>")
      *     --> <b>Levi's</b>, <b>Procter &amp; Gamble</b>
      *
-     * @param mixed[] $array
+     * @param array<mixed> $array
      * @param int $flags (optional) set of the following bits
      *      +1 = htmlentities
      *      +2 = escape string
@@ -257,47 +256,47 @@ class Tools
      *     '<a href="/en/#" title="#">#</a>', '#')
      *  --> '<a href="/en/about" title="about">about</a> | <a href="/en/links" title="links">links</a>'
      */
-    public static function arrayListed($array, $flags = 0, $glue = ',', $before = '', $after = '')
+    public static function arrayListed(array $array, $flags = 0, $glue = ',', $before = '', $after = ''): string
     {
         $result = '';
-        if (is_array($array)) {
-            foreach ($array as $k => $v) {
-                if ($flags & self::ARRL_KEYS) {
-                    $v = $k;
-                }
-                if ($flags & self::ARRL_DB_ID) {
-                    $v = str_replace('`', '``', $v);
-                }
-                if ($flags & self::ARRL_HTML) {
-                    $v = htmlspecialchars($v, ENT_QUOTES);
-                }
-                if ($flags & self::ARRL_ESC) {
-                    if ($flags & self::ARRL_INT) {
-                        $v = strtr($v, ['"' => '\"', "'" => "\\'", "\\" => "\\\\", '%' => '%%', '_' => '\_']); //like
-                    } elseif ($flags & self::ARRL_FLOAT) {
-                        $v = preg_quote($v);
-                    } else {
-                        $v = self::escapeSQL($v);
-                    }
-                }
-                if ($flags & self::ARRL_JS) {
-                    $v = self::escapeJS($v);
-                }
+        //if (is_array($array)) {
+        foreach ($array as $k => $v) {
+            if ($flags & self::ARRL_KEYS) {
+                $v = $k;
+            }
+            if ($flags & self::ARRL_DB_ID) {
+                $v = str_replace('`', '``', $v);
+            }
+            if ($flags & self::ARRL_HTML) {
+                $v = htmlspecialchars($v, ENT_QUOTES);
+            }
+            if ($flags & self::ARRL_ESC) {
                 if ($flags & self::ARRL_INT) {
-                    $v = intval($v);
+                    $v = strtr($v, ['"' => '\"', "'" => "\\'", "\\" => "\\\\", '%' => '%%', '_' => '\_']); //like
+                } elseif ($flags & self::ARRL_FLOAT) {
+                    $v = preg_quote($v);
+                } else {
+                    $v = self::escapeSQL($v);
                 }
-                if ($flags & self::ARRL_FLOAT) {
-                    $v = (float) $v;
-                }
-                if (!($flags & self::ARRL_EMPTY) || $v) {
-                    if ($flags & self::ARRL_PATTERN) {
-                        $result .= $glue . strtr($before, [$after => $v]);
-                    } else {
-                        $result .= $glue . $before . $v . $after;
-                    }
+            }
+            if ($flags & self::ARRL_JS) {
+                $v = self::escapeJS($v);
+            }
+            if ($flags & self::ARRL_INT) {
+                $v = intval($v);
+            }
+            if ($flags & self::ARRL_FLOAT) {
+                $v = (float) $v;
+            }
+            if (!($flags & self::ARRL_EMPTY) || $v) {
+                if ($flags & self::ARRL_PATTERN) {
+                    $result .= $glue . strtr($before, [$after => $v]);
+                } else {
+                    $result .= $glue . $before . $v . $after;
                 }
             }
         }
+        //}
         return mb_substr($result, mb_strlen($glue));
     }
 
@@ -310,7 +309,7 @@ class Tools
      *          arrayReindex($a, 'id') --> [5=>[name=>John, surname=>Doe], 6=>[name=>Jane, surname=>Dean]]
      *          arrayReindex($b, 'id') --> [5=>John, 6=>Jane]
      *
-     * @param array<mixed> $array
+     * @param array<array<mixed>> $array
      * @param mixed $index (optional)
      * @return array<mixed>
      */
@@ -392,6 +391,7 @@ class Tools
             $matched = 0;
             foreach ($needles as $needleKey => $needleValue) {
                 if (
+                    is_array($value) &&
                     isset($value[$needleKey]) &&
                     ($options['strict'] ? $value[$needleKey] === $needleValue : $value[$needleKey] == $needleValue)
                 ) {
@@ -413,8 +413,8 @@ class Tools
      * @param string $needle
      * @param array<string> $haystack
      * @param bool $strict (optional)
-     * @param mixed $encoding (optional)
-     * @return mixed found key or false if needle not found
+     * @param string|null $encoding (optional)
+     * @return int|string|false found key or false if needle not found
      */
     public static function array_search_i($needle, array $haystack, $strict = false, $encoding = null)
     {
@@ -495,8 +495,15 @@ class Tools
      * @param float $progress OPTIONAL number between 0.0 (source) and 1.0 (destination color)
      * @return string 6-hexadecimal result color in rrggbb format (without initial #)
      */
-    public static function colorChange($sR, $sG, $sB, $dR = 0, $dG = 0, $dB = 0, $progress = 0.5)
-    {
+    public static function colorChange(
+        $sR,
+        $sG,
+        $sB,
+        int $dR = 0,
+        int $dG = 0,
+        int $dB = 0,
+        float $progress = 0.5
+    ): string {
         if (func_num_args() == 3) { //colors entered compressed
             $progress = $sB; //set parameters correctly
             if (is_string($sG)) {
@@ -526,8 +533,8 @@ class Tools
             $dG = $sG;
             $dB = $sB;
         } elseif ($progress < 1) {
-            $dR = $dR * $progress + $sR * (1 - $progress);
-            $dG = $dG * $progress + $sG * (1 - $progress);
+            $dR = $dR * $progress + (int) $sR * (1 - $progress);
+            $dG = $dG * $progress + (int) $sG * (1 - $progress);
             $dB = $dB * $progress + $sB * (1 - $progress);
         }
         // components returned hexadecimal, 3 * 2-digits
@@ -586,13 +593,13 @@ class Tools
     /**
      * Cut a given string from the beginning to the first occurence of a substring.
      *
-     * @param string $haystack by reference
+     * @param string|false $haystack by reference
      * @param string $needle
-     * @return void; If substring is found, $haystack will be modified.
+     * @return void If substring is found, $haystack will be modified.
      */
-    public static function cutTill(&$haystack, $needle)
+    public static function cutTill(&$haystack, string $needle): void
     {
-        if (($p = strpos($haystack, $needle)) !== false) {
+        if (is_string($haystack) && ($p = strpos($haystack, $needle)) !== false) {
             $haystack = substr($haystack, 0, $p);
         }
     }
@@ -603,7 +610,7 @@ class Tools
      * @param mixed $args variables or expressions to be dumped
      * @return void
      */
-    public static function dump($args)
+    public static function dump($args): void
     {
         echo '<pre>';
         foreach (func_get_args() as &$arg) {
@@ -648,7 +655,7 @@ class Tools
      * @param mixed $b tested value
      * @return bool
      */
-    public static function equal(&$a, $b)
+    public static function equal(&$a, $b): bool
     {
         return isset($a) && $a === $b;
     }
@@ -731,8 +738,11 @@ class Tools
      */
     public static function exploded($separator, $string, $index = 0)
     {
+        if ($separator === '') {
+            return null;
+        }
         $result = explode($separator, $string);
-        return ($result === false) ? null : (isset($result[$index]) ? $result[$index] : null);
+        return $result[$index] ?? null;
     }
 
     /**
@@ -775,10 +785,10 @@ class Tools
      * @param string $name element name
      * @param string $label label, omitted if empty, translated if true
      * @param mixed $value value, either given directly or as an array in the [name] index
-     * @param mixed $options (optional) options. Either an associative array or string containing type
+     * @param array<mixed>|string $options (optional) options. Either an associative array or string containing type
      * @return string HTML code
      */
-    public static function htmlInput($name, $label, $value, $options = [])
+    public static function htmlInput(string $name, string $label, $value, $options = []): string
     {
         return self::htmlTextInput($name, $label, $value, $options);
     }
@@ -792,7 +802,7 @@ class Tools
      * @param bool $disabled (optional)
      * @return string HTML code
      */
-    public static function htmlOption($value, $text, $default = null, $disabled = false)
+    public static function htmlOption($value, string $text, $default = null, bool $disabled = false): string
     {
         return '<option' . ($disabled ? '' : ' value="' . self::h($value) . '"')
             . ($value === $default ? ' selected="selected"' : '')
@@ -856,13 +866,13 @@ class Tools
      * @param string $name
      * @param array<string> $values
      * @param mixed $default value
-     * @param mixed[] $options (optional)
+     * @param array<mixed> $options (optional)
      *  [prepend] array of options to prepend before $values
      *  [append] array of options to append after $values
      *  [class], [id], [onchange], ... optional HTML attributes to add to the <select> notation
      * @return string HTML code
      */
-    public static function htmlSelect($name, array $values, $default, $options = [])
+    public static function htmlSelect($name, array $values, $default, $options = []): string
     {
         $result = '<select name="' . self::h($name) . '"';
         foreach ($options as $key => $value) {
@@ -881,16 +891,16 @@ class Tools
     /**
      * Used in ::htmlSelect().
      *
-     * @param array<string|array> $array key:value pairs to be converted to <option>s
+     * @param array<string|array<scalar>> $array key:value pairs to be converted to <option>s
      * @param mixed $default
      * @return string
      */
-    protected static function htmlSelectAppend(array $array, $default)
+    protected static function htmlSelectAppend(array $array, $default): string
     {
         $result = '';
         foreach ($array as $key => $value) {
             $option = is_string($value) ? explode("\0", $value) : array_values($value);
-            $result .= self::htmlOption($option[0], $option[1], $default);
+            $result .= self::htmlOption($option[0], (string) $option[1], $default);
         }
         return $result;
     }
@@ -918,7 +928,7 @@ class Tools
      * @param string $name element name
      * @param string $label label, omitted if empty, translated if true
      * @param mixed $value value, either given directly or as an array in the [name] index
-     * @param mixed $options (optional) options. Either an associative array or string containing type
+     * @param array<mixed>|string $options (optional) options. Either an associative array or string containing type
      *     [type] - input's type, 'text' by default
      *     [before], [between], [after] - HTML to insert before/between/after <label> and <input>
      *     [table] - refill [before], [between], [after] to make a table row
@@ -929,7 +939,7 @@ class Tools
      *     other tag's attributes - will be specified (except for NULLs)
      * @return string HTML code
      */
-    protected static function htmlTextInput($name, $label, $value, $options = [])
+    protected static function htmlTextInput(string $name, string $label, $value, $options = []): string
     {
         $result = '';
         if (is_array($value)) {
@@ -1001,9 +1011,9 @@ class Tools
      * @param string $response
      * @param array<bool> $options (optional)
      *        $options['JSON'] = non-zero - apply json_decode() on response body
-     * @return array<array> containing ['headers'] with HTTP headers and ['body'] with response body
+     * @return array<array<mixed>> containing ['headers'] with HTTP headers and ['body'] with response body
      */
-    public static function httpResponse($response, array $options = [])
+    public static function httpResponse(string $response, array $options = []): array
     {
         static $HEADERS_BODY_SEPARATOR = "\r\n\r\n";
         $result = [
@@ -1076,11 +1086,15 @@ class Tools
      * @param string $needle
      * @param array<string> $haystack
      * @param bool $strict (optional) default false
-     * @param mixed $encoding (optional)
+     * @param string|null $encoding (optional)
      * @return bool true/false whether the needle was found
      */
-    public static function in_array_i($needle, array $haystack, $strict = false, $encoding = null)
-    {
+    public static function in_array_i(
+        string $needle,
+        array $haystack,
+        bool $strict = false,
+        ?string $encoding = null
+    ): bool {
         $key = self::array_search_i($needle, $haystack, $strict, $encoding);
         return $key !== false && isset($haystack[$key]);
     }
@@ -1088,13 +1102,13 @@ class Tools
     /**
      * Date (and time) locally. Uses Tools::$LOCALE.
      *
-     * @param mixed $datetime date/time as a string or integer
+     * @param int|string|false $datetime date/time as a string or integer
      * @param string $language (optional) language code as key to Tools::LOCALE
      * @param bool $includeTime (optional) return also time?
      * @return string
      * @throws Exception on error
      */
-    public static function localeDate($datetime, $language = 'en', $includeTime = true)
+    public static function localeDate($datetime, string $language = 'en', bool $includeTime = true): string
     {
         if (!is_string($datetime) && !is_int($datetime)) { // e.g. result of mktime with invalid arguments is false
             throw new Exception('Invalid #1 $datetime argument');
@@ -1121,7 +1135,7 @@ class Tools
      * @throws Exception on $datetime parsing fail
      * @return string
      */
-    public static function localeTime($datetime, $language = 'en')
+    public static function localeTime($datetime, string $language = 'en')
     {
         if (is_string($datetime)) {
             $datetime = strtotime($datetime);
@@ -1136,10 +1150,10 @@ class Tools
      * Multibyte version of low-case for first character of given string.
      *
      * @param string $string
-     * @param string $encoding (optional)
+     * @param string|null $encoding (optional)
      * @return string
      */
-    public static function mb_lcfirst($string, $encoding = null)
+    public static function mb_lcfirst(string $string, ?string $encoding = null): string
     {
         $encoding = $encoding ?: mb_internal_encoding();
         return mb_strtolower(mb_substr($string, 0, 1, $encoding), $encoding) . mb_substr($string, 1, null, $encoding);
@@ -1164,7 +1178,7 @@ class Tools
      * @param mixed $a tested variable by reference
      * @return bool
      */
-    public static function nonempty(&$a)
+    public static function nonempty(&$a): bool
     {
         return isset($a) && !empty($a);
     }
@@ -1175,7 +1189,7 @@ class Tools
      * @param mixed $a tested variable by reference
      * @return bool
      */
-    public static function nonzero(&$a)
+    public static function nonzero(&$a): bool
     {
         return isset($a) && $a;
     }
@@ -1195,8 +1209,14 @@ class Tools
      * @param bool $mod100 = false get modulo of 100 from $amount
      * @return string result form
      */
-    public static function plural($amount, $form1, $form234, $form5plus, $form0 = false, $mod100 = false)
-    {
+    public static function plural(
+        int $amount,
+        string $form1,
+        $form234,
+        string $form5plus,
+        $form0 = false,
+        bool $mod100 = false
+    ): string {
         $amount = abs((int) $amount);
         $amount = $mod100 ? $amount % 100 : $amount;
         $form234 = $form234 !== false ? $form234 : $form5plus;
@@ -1211,7 +1231,7 @@ class Tools
      * @param int $max maximum
      * @return string RegEx pattern
      */
-    public static function preg_max($max)
+    public static function preg_max(int $max): string
     {
         if (($len = strlen((string) ($max = (int) $max))) == 1) {
             return ($max ? "[0-$max]" : '[0]');
@@ -1242,7 +1262,7 @@ class Tools
      * @param int $length (optional) length of the password
      * @return string password
      */
-    public static function randomPassword($length = 8)
+    public static function randomPassword(int $length = 8): string
     {
         $rand = function_exists('random_int') ? 'random_int' : 'rand';
         $charsmax = strlen(self::$PASSWORD_CHARS) - 1;
@@ -1262,13 +1282,12 @@ class Tools
      * @return never
      * @throws Exception on error when URL is seriously malformed (examples in unit tests)
      */
-    public static function redir($urlString = '', $HTTPCode = 303, $sessionWriteClose = true)
+    public static function redir(string $urlString = '', int $HTTPCode = 303, bool $sessionWriteClose = true)
     {
         $url = parse_url($urlString);
         if ($url === false) {
             throw new Exception('Seriously malformed url ' . (string) $urlString);
         }
-        /** @phpstan-ignore-next-line */
         $url2 = (self::set($url['scheme']) ? $url['scheme']
             . '://' : (self::set($_SERVER['HTTPS']) == 'on' ? 'https://' : 'http://'))
             . ((isset($url['host']) && $url['host']) ? $url['host'] : $_SERVER['HTTP_HOST'])
@@ -1293,7 +1312,7 @@ class Tools
      * @param string $language (optional) language code as key to Tools::LOCALE
      * @return string text representation
      */
-    public static function relativeTime($datetime, $language = 'en')
+    public static function relativeTime($datetime, string $language = 'en'): string
     {
         if (is_numeric($datetime)) {
             $datetime = date("Y-m-d\TH:i:sP", (int) $datetime);
@@ -1325,7 +1344,7 @@ class Tools
      * @param string $errorMessage
      * @return void
      */
-    public static function resolve($success, $successMessage, $errorMessage)
+    public static function resolve(bool $success, string $successMessage, string $errorMessage): void
     {
         if ($success) {
             self::addMessage('success', $successMessage);
@@ -1364,7 +1383,7 @@ class Tools
      * @param mixed $a tested variable by reference
      * @return bool
      */
-    public static function setarray(&$a)
+    public static function setarray(&$a): bool
     {
         return isset($a) && is_array($a);
     }
@@ -1414,7 +1433,7 @@ class Tools
      * @param mixed $a tested variable by reference
      * @return bool
      */
-    public static function setscalar(&$a)
+    public static function setscalar(&$a): bool
     {
         return isset($a) && is_scalar($a);
     }
@@ -1426,11 +1445,15 @@ class Tools
      * @param string $string
      * @param int $limit
      * @param string $ellipsis (optional) string to signify ellipsis
-     * @param mixed $encoding (optional)
+     * @param string|null $encoding (optional)
      * @return string
      */
-    public static function shortify($string, $limit, $ellipsis = '…', $encoding = null)
-    {
+    public static function shortify(
+        string $string,
+        int $limit,
+        string $ellipsis = '…',
+        ?string $encoding = null
+    ): string {
         $encoding = $encoding ?: mb_internal_encoding();
         if (mb_strlen($string, $encoding) > $limit) {
             return mb_substr($string, 0, $limit, $encoding) . $ellipsis;
@@ -1444,7 +1467,7 @@ class Tools
      * @param bool $echo (optional) echo the messages immediately?
      * @return string of session messages or empty string if $echo == false
      */
-    public static function showMessages($echo = true)
+    public static function showMessages(bool $echo = true): string
     {
         $_SESSION['messages'] = isset($_SESSION['messages']) && is_array($_SESSION['messages']) ? $_SESSION['messages'] : []; // phpcs:ignore
         $result = '';
@@ -1535,11 +1558,15 @@ class Tools
      * @param string $haystack
      * @param string $needle
      * @param bool $caseInsensitive (optional) default: false
-     * @param string $encoding (optional)
+     * @param string|null $encoding (optional)
      * @return string|false substring after $needle or false if $needle wasn't found
      */
-    public static function str_after($haystack, $needle, $caseInsensitive = false, $encoding = null)
-    {
+    public static function str_after(
+        string $haystack,
+        string $needle,
+        bool $caseInsensitive = false,
+        ?string $encoding = null
+    ) {
         $encoding = $encoding ?: mb_internal_encoding();
         $function = $caseInsensitive ? 'mb_stripos' : 'mb_strpos';
         if (($pos = $function($haystack, $needle, 0, $encoding)) === false) {
@@ -1554,11 +1581,15 @@ class Tools
      * @param string $haystack
      * @param string $needle
      * @param bool $caseInsensitive (optional) default: false
-     * @param string $encoding (optional)
+     * @param string|null $encoding (optional)
      * @return string|false substring before $needle or false if $needle wasn't found
      */
-    public static function str_before($haystack, $needle, $caseInsensitive = false, $encoding = null)
-    {
+    public static function str_before(
+        string $haystack,
+        string $needle,
+        bool $caseInsensitive = false,
+        ?string $encoding = null
+    ) {
         $encoding = $encoding ?: mb_internal_encoding();
         $function = $caseInsensitive ? 'mb_stripos' : 'mb_strpos';
         if (($pos = $function($haystack, $needle, 0, $encoding)) === false) {
@@ -1574,12 +1605,16 @@ class Tools
      *
      * @param string $string by reference
      * @param int $offset
-     * @param mixed $length length as number or null for "till the end"
-     * @param mixed $encoding (optional)
+     * @param int|null $length length as number or null for "till the end"
+     * @param string|null $encoding (optional)
      * @return string modified string
      */
-    public static function str_delete(&$string, $offset = 0, $length = null, $encoding = null)
-    {
+    public static function str_delete(
+        string &$string,
+        int $offset = 0,
+        ?int $length = null,
+        ?string $encoding = null
+    ): string {
         $encoding = $encoding ?: mb_internal_encoding();
         $length = $length === null ? mb_strlen($string, $encoding) - $offset : $length;
         $string = mb_substr($string, 0, $offset, $encoding) . mb_substr($string, $offset + $length, null, $encoding);
@@ -1598,8 +1633,12 @@ class Tools
      * @return string CSV of given arguments
      * @throws Exception on error
      */
-    public static function str_putcsv(array $fields, $delimiter = ',', $enclosure = '"', $escape_char = "\\")
-    {
+    public static function str_putcsv(
+        array $fields,
+        string $delimiter = ',',
+        string $enclosure = '"',
+        string $escape_char = "\\"
+    ): string {
         $fp = fopen('php://memory', 'r+b');
         if ($fp === false) {
             throw new Exception('Failed fopen php://memory');
@@ -1612,6 +1651,7 @@ class Tools
         }
         rewind($fp);
         $data = fread($fp, $size);
+        /** PHP7.2 @ phpstan-ignore-next-line Strict comparison using === between string and false */
         if ($data === false) {
             throw new Exception('fread php://memory failed');
         }
@@ -1626,7 +1666,7 @@ class Tools
      * @param bool $htmlspecialchars (optional) apply htmlspecialchars()?
      * @return string URL-encoded string
      */
-    public static function urlChange(array $changes, $htmlspecialchars = false)
+    public static function urlChange(array $changes, bool $htmlspecialchars = false): string
     {
         parse_str(self::set($_SERVER['QUERY_STRING'], ''), $parameters);
         foreach ($changes as $key => $value) {
@@ -1716,11 +1756,14 @@ class Tools
      * @param mixed $text value to be wrapped or replaced by $else
      * @param string $prefix
      * @param string $postfix (optional)
-     * @param mixed $else (optional) value to be returned if $text is zero
+     * @param scalar $else (optional) value to be returned if $text is zero
      * @return string
      */
-    public static function wrap($text, $prefix, $postfix = '', $else = '')
+    public static function wrap($text, string $prefix, string $postfix = '', $else = '')
     {
+        if (!is_scalar($text)) {
+            return (string) $else;
+        }
         return $text ? ($prefix . (string) $text . $postfix) : (string) $else;
     }
 
@@ -1732,7 +1775,7 @@ class Tools
      * @return string
      * @copyright Jakub Vrána, https://php.vrana.cz/
      */
-    public static function xorCipher($text, $key)
+    public static function xorCipher(string $text, string $key): string
     {
         if ($key == '') {
             return '';
@@ -1750,14 +1793,25 @@ class Tools
      * @return string
      * @copyright Jakub Vrána, https://php.vrana.cz/
      */
-    public static function xorDecipher($cipher, $key)
+    public static function xorDecipher(string $cipher, string $key): string
     {
-        if ($key == '') {
+        $keyLen = strlen($key);
+        if ($keyLen === 0) {
             return '';
         }
-        $repeat = (int) ceil(strlen($cipher) / strlen($key));
-        $text2 = $cipher ^ str_repeat($key, $repeat);
-        $text2 = explode(':', $text2, 2);
-        return substr(isset($text2[1]) ? $text2[1] : '', 0, isset($text2[0]) ? (int) $text2[0] : 0);
+
+        $cipherLen = strlen($cipher);
+        $repeat = intdiv($cipherLen + $keyLen - 1, $keyLen); // ceil($cipherLen / $keyLen) without floats
+
+        $decoded = $cipher ^ str_repeat($key, $repeat);
+
+        $colonPos = strpos($decoded, ':');
+        if ($colonPos === false) {
+            return '';
+        }
+
+        $len = (int) substr($decoded, 0, $colonPos);
+
+        return substr($decoded, $colonPos + 1, $len);
     }
 }
