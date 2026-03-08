@@ -1,22 +1,27 @@
 ---
 name: PHP Composer + PHPUnit + PHPStan
 
+# Obsoleted by polish-the-code.yml workflow, TODO: Remove this workflow in the next minor version. (Also the badge from README.md)
+
 on:
   push:
     branches-ignore:
       # notest branches to ignore testing of partial online commits
-      - 'notest/**'
+      - "notest/**"
 
   pull_request:
     branches-ignore:
       # notest branches to ignore testing of partial online commits
-      - 'notest/**'
+      - "notest/**"
+
+permissions:
+  contents: read
 
 jobs:
   # Note: https://docs.github.com/en/actions/using-workflows/reusing-workflows The strategy property is not supported in any job that calls a reusable workflow.
   call-workflow:
-    # TODO use @main
-    uses: WorkOfStan/MyCMS/.github/workflows/php-composer-dependencies-reusable.yml@feature/reusableConfig
+    uses: WorkOfStan/MyCMS/.github/workflows/php-composer-dependencies-reusable.yml@v0.5.0
     with:
       # JSON
-      php-version: '["5.6", "7.0", "7.1", "7.2", "7.3", "7.4"]'
+      # "7.2", "7.3", ... Different errors caught by PHPStan 1.x than PHPStan 2.x which is preferred
+      php-version: '["7.4"]'
